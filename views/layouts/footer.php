@@ -4,7 +4,7 @@
 
             <!-- Brand -->
             <div class="col-12 col-md-4 mb-4 mb-md-0">
-                <img src="./public/img/logo.svg" alt="Artovia" class="footer-logo">
+                <img src="<?php echo BASE_URL; ?>public/img/logo.svg" alt="Artovia" class="footer-logo">
                 <p class="footer-tagline">Web Development Finals Project</p>
             </div>
 
