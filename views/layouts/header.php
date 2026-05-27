@@ -24,8 +24,8 @@
                 <div class="navbar-collapse" id="navbarNavAltMarkup">
                     <div class="navbar-nav justify-content-center w-100 gap-4">
                         <a class="nav-link active text-light fw-bold fs-fluid-xs" aria-current="page" href="<?php echo BASE_URL; ?>#">HOME</a>
-                        <a class="nav-link text-light fw-bold fs-fluid-xs" href="#">COMMISSIONS</a>
-                        <a class="nav-link text-light fw-bold fs-fluid-xs" href="#">ARTISTS</a>
+                        <a class="nav-link text-light fw-bold fs-fluid-xs" href="<?php echo BASE_URL; ?>commissions">COMMISSIONS</a>
+                        <a class="nav-link text-light fw-bold fs-fluid-xs" href="<?php echo BASE_URL; ?>commissions">ARTISTS</a>
                     </div>
                     <a class="btn btn-primary glass-card fs-fluid-xs" href="<?php echo BASE_URL; ?>login">Log in/ Sign up</a>
                 </div>
