@@ -43,7 +43,7 @@
                                 
                                 <p class="small text-muted mb-3" style="font-size: 0.8rem; letter-spacing: 0.5px;">or login with</p>
 
-                                <div class="social-medias d-flex gap-4 justify-content-center" style="display: flex !important; justify-content: center !important; gap: 1.5rem !important;">
+                                <div class="social-medias d-flex gap-4 justify-content-center align-items-center" style="display: flex !important; justify-content: center !important; align-items: center !important; gap: 1.5rem !important;">
                                     <a href="#" class="social-icon-wrapper google" style="text-decoration: none !important; display: inline-flex; align-items: center; justify-content: center;">
                                         <img src="https://static.freepnglogo.com/images/all_img/google-logo-2025-6ffb.png" alt="Google" style="width: 32px; height: 32px; object-fit: contain;">
                                     </a>
@@ -52,8 +52,9 @@
                                         <img src="https://upload.wikimedia.org/wikipedia/commons/6/6c/Facebook_Logo_2023.png" alt="Facebook" style="width: 32px; height: 32px; object-fit: contain;">
                                     </a>
                                     
-                                     <a href="#" class="social-icon-wrapper tiktok" style="text-decoration: none !important; display: inline-flex; align-items: center; justify-content: center; margin-top: -5px; margin-bottom: -5px;">
-                                        <img src="https://img.magnific.com/premium-vector/tik-tok-logo_578229-290.jpg?semt=ais_hybrid&w=740&q=80" alt="TikTok" style="width: 32px; height: 32px; object-fit: contain;">
+                                    <a href="#" class="social-icon-wrapper tiktok" style="text-decoration: none !important; display: inline-flex; align-items: center; justify-content: center; margin-top: -5px; margin-bottom: -5px;">
+                                        <img src="https://img.magnific.com/premium-vector/tik-tok-logo_578229-290.jpg?semt=ais_hybrid&w=740&q=80" alt="TikTok" style="width: 32px; height: 32px; object-fit: contain; border-radius: 4px;">
+                                    </a>
                                 </div>
                             </div>
                         </form>
