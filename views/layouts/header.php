@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>artovia</title>
     <link rel="icon" type="image/png" href="./public/img/icon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Joan&display=swap" rel="stylesheet">   
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/glass.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/header.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/main.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/footer.css">
+    
 </head>
 
 <body>
@@ -21,9 +23,9 @@
                         style="filter:invert(1);height:2rem"></a>
                 <div class="navbar-collapse" id="navbarNavAltMarkup">
                     <div class="navbar-nav justify-content-center w-100 gap-4">
-                        <a class="nav-link active text-light fs-fluid-xs" aria-current="page" href="#">Home</a>
-                        <a class="nav-link text-light fs-fluid-xs" href="#">Commissions</a>
-                        <a class="nav-link text-light fs-fluid-xs" href="#">Artists</a>
+                        <a class="nav-link active text-light fw-bold fs-fluid-xs" aria-current="page" href="#">HOME</a>
+                        <a class="nav-link text-light fw-bold fs-fluid-xs" href="#">COMMISSIONS</a>
+                        <a class="nav-link text-light fw-bold fs-fluid-xs" href="#">ARTISTS</a>
                     </div>
                     <a class="btn btn-primary glass-card fs-fluid-xs" href="">Log in/ Sign up</a>
                 </div>

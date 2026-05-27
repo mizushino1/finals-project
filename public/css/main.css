@@ -38,6 +38,10 @@ p,
     margin-bottom: 1.5rem;
 }
 
+.joan {
+    font-family: 'Joan', serif;
+}
+
 .fs-fluid-xxs {
     font-size: clamp(0.6rem, 0.7vw, 0.8rem) !important;
 }
