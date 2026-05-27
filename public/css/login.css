@@ -44,6 +44,10 @@
     color: #999;
 }
 
+.auth-input-group .input-group-text i {
+    color: #999;
+}
+
 .auth-input-group .form-control {
     border: none;
     background: transparent;
