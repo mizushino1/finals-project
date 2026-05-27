@@ -1,0 +1,108 @@
+/* ── Login Page ── */
+
+/* Card shell */
+.auth-card {
+    border-radius: 30px;
+    overflow: hidden;
+    min-height: 550px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+/* Left info panel */
+.info-side {
+    background-color: #0d0d0d;
+    color: #ffffff;
+    border-top-left-radius: 30px;
+    border-bottom-left-radius: 30px;
+}
+
+/* Right form panel */
+.form-side {
+    background-color: #ffffff;
+    border-top-right-radius: 30px;
+    border-bottom-right-radius: 30px;
+}
+
+/* "Log In" heading */
+.form-title {
+    color: #dfba94;
+    font-family: Georgia, serif;
+    font-weight: bold;
+    font-size: 2.8rem;
+}
+
+/* Input groups */
+.auth-input-group {
+    border: 1px solid #f1d9be;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.auth-input-group .input-group-text {
+    background: transparent;
+    border: none;
+    color: #999;
+}
+
+.auth-input-group .form-control {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+}
+
+.auth-input-group .form-control:focus {
+    box-shadow: none;
+}
+
+/* "Forgot Password?" link */
+.forgot-password-link {
+    color: #dfba94;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.forgot-password-link:hover {
+    color: #c9a070;
+}
+
+/* "or login with" separator text */
+.login-divider-text {
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+}
+
+/* Social login icons */
+.social-icon-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 1.7rem;
+    transition: transform 0.2s ease;
+}
+
+.social-icon-wrapper:hover {
+    transform: scale(1.1);
+}
+
+.social-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+.social-logo--rounded {
+    border-radius: 4px;
+}
+
+/* Responsive stacking */
+@media (max-width: 767.98px) {
+    .info-side {
+        border-radius: 30px 30px 0 0;
+    }
+    .form-side {
+        border-radius: 0 0 30px 30px;
+    }
+}

@@ -84,44 +84,13 @@ p,
 
 
 
-/*Log-in*/
-.auth-card {
-    border-radius: 30px;
-    overflow: hidden;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
-    border: 4px solid #121212;
-    min-height: 520px;
-}
-
-.info-side {
-    background-color: #121212;
-    color: #ffffff;
-    border-top-left-radius: 25px;
-    border-bottom-left-radius: 25px;
-}
-
-.form-side {
-    background-color: #ffffff;
-    color: #333333;
-    border-top-right-radius: 25px;
-    border-bottom-right-radius: 25px;
-}
-
-.large-brand-initial {
-    font-size: 5.5rem;
-    font-family: 'Georgia', serif;
-    font-style: italic;
-    color: #ffffff;
-    line-height: 1;
-}
-
 .large-brand-icon {
-    width: 65px;
+    width: 55px;
     height: auto;
     object-fit: contain;
     display: inline-block;
 }
-
+ 
 .welcome-text {
     font-size: 1.8rem;
     font-weight: 700;
@@ -129,103 +98,53 @@ p,
     color: #e2c092;
     line-height: 1;
 }
-
+ 
 .info-desc {
     color: #cccccc;
     font-size: 1.05rem;
     line-height: 1.6;
     max-width: 90%;
 }
-
-.form-title {
-    font-family: 'Georgia', serif;
-    font-weight: bold;
-    font-size: 3rem;
-    color: #e2c092;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-}
-
+ 
 .form-label {
     font-size: 0.85rem;
     font-weight: 600;
     color: #555;
     margin-bottom: 4px;
 }
-
-.form-side .input-group {
-    border: 2px solid #fcdbb0;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.form-side .input-group-text {
-    background-color: transparent;
-    border: none;
-    color: #999;
-    padding-left: 14px;
-    padding-right: 8px;
-}
-
-.form-side .form-control {
-    border: none;
-    padding: 10px 10px 10px 0;
-    font-size: 0.95rem;
-}
-
-.form-side .form-control:focus {
-    box-shadow: none;
-}
-
-.eye-toggle-icon {
-    cursor: pointer;
-    padding-right: 14px !important;
-}
-
+ 
+/* ── Reusable buttons ── */
+ 
+/* Outlined gold button — "Create Account" style */
 .btn-create-account {
     background-color: #444446;
     color: #ffffff;
-    border: 2px solid #e2c092 !important;
+    border: 2px solid #e2c092;
     border-radius: 6px;
     font-weight: 600;
     font-size: 0.95rem;
-    transition: all 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
-
+ 
 .btn-create-account:hover {
     background-color: #e2c092;
     color: #121212;
 }
-
+ 
+/* Outlined gold button — "Login" style */
 .btn-login-submit {
     background-color: #ffffff;
     color: #121212;
-    border: 2px solid #e2c092 !important;
+    border: 2px solid #e2c092;
     border-radius: 6px;
     font-weight: bold;
     letter-spacing: 1px;
-    padding: 8px 40px;
-    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 180px;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
-
+ 
 .btn-login-submit:hover {
     background-color: #e2c092;
     color: #ffffff;
-}
-
-.social-icon-wrapper {
-    font-size: 1.7rem;
-    transition: transform 0.2s;
-}
-.social-icon-wrapper.google { color: #4285f4; }
-.social-icon-wrapper.facebook { color: #1877f2; }
-.social-icon-wrapper.tiktok { color: #000000; }
-.social-icon-wrapper:hover { transform: scale(1.1); }
-
-@media (max-width: 767.98px) {
-    .info-side {
-        border-radius: 25px 25px 0 0;
-    }
-    .form-side {
-        border-radius: 0 0 25px 25px;
-    }
 }
