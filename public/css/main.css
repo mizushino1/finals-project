@@ -78,6 +78,12 @@ p,
     font-size: clamp(1.4rem, 2vw, 1.5rem) !important;
 }
 
+.header-fluid-home {
+    font-size: clamp(2.5rem, 5vw + 1rem, 6rem);
+}
+
+
+
 /*Log-in*/
 .auth-card {
     border-radius: 30px;
