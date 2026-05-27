@@ -1,5 +1,4 @@
 
-<body style="background-color: #1e1e1e;">
 
     <main class="py-5">
         <div class="container d-flex justify-content-center align-items-center min-vh-100">

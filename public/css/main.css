@@ -90,6 +90,13 @@ p,
     border-bottom-left-radius: 25px;
 }
 
+.form-side {
+    background-color: #ffffff;
+    color: #333333;
+    border-top-right-radius: 25px;
+    border-bottom-right-radius: 25px;
+}
+
 .large-brand-initial {
     font-size: 5.5rem;
     font-family: 'Georgia', serif;
@@ -98,11 +105,19 @@ p,
     line-height: 1;
 }
 
+.large-brand-icon {
+    width: 65px;
+    height: auto;
+    object-fit: contain;
+    display: inline-block;
+}
+
 .welcome-text {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: 700;
     letter-spacing: 2px;
     color: #e2c092;
+    line-height: 1;
 }
 
 .info-desc {
@@ -110,28 +125,6 @@ p,
     font-size: 1.05rem;
     line-height: 1.6;
     max-width: 90%;
-}
-
-.btn-create-account {
-    background-color: #444446;
-    color: #ffffff;
-    border: 2px solid #fcdbb0;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-}
-
-.btn-create-account:hover {
-    background-color: #fcdbb0;
-    color: #121212;
-}
-
-.form-side {
-    background-color: #ffffff;
-    color: #333333;
-    border-top-right-radius: 25px;
-    border-bottom-right-radius: 25px;
 }
 
 .form-title {
@@ -178,53 +171,6 @@ p,
     padding-right: 14px !important;
 }
 
-.btn-login-submit {
-    background-color: #ffffff;
-    color: #121212;
-    border: 2px solid #fcdbb0;
-    border-radius: 6px;
-    font-weight: bold;
-    letter-spacing: 1px;
-    padding: 8px;
-    transition: all 0.3s ease;
-}
-
-.btn-login-submit:hover {
-    background-color: #fcdbb0;
-}
-
-.social-icon-wrapper {
-    font-size: 1.7rem;
-    transition: transform 0.2s;
-}
-.social-icon-wrapper.google { color: #ea4335; }
-.social-icon-wrapper.facebook { color: #1877f2; }
-.social-icon-wrapper.tiktok { color: #000000; }
-.social-icon-wrapper:hover { transform: scale(1.1); }
-
-@media (max-width: 767.98px) {
-    .info-side {
-        border-radius: 25px 25px 0 0;
-    }
-    .form-side {
-        border-radius: 0 0 25px 25px;
-    }
-}
-.large-brand-icon {
-    width: 65px;
-    height: auto;
-    object-fit: contain;
-    display: inline-block;
-}
-
-.welcome-text {
-    font-size: 1.8rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    color: #e2c092;
-    line-height: 1;
-}
-
 .btn-create-account {
     background-color: #444446;
     color: #ffffff;
@@ -254,4 +200,22 @@ p,
 .btn-login-submit:hover {
     background-color: #e2c092;
     color: #ffffff;
+}
+
+.social-icon-wrapper {
+    font-size: 1.7rem;
+    transition: transform 0.2s;
+}
+.social-icon-wrapper.google { color: #4285f4; }
+.social-icon-wrapper.facebook { color: #1877f2; }
+.social-icon-wrapper.tiktok { color: #000000; }
+.social-icon-wrapper:hover { transform: scale(1.1); }
+
+@media (max-width: 767.98px) {
+    .info-side {
+        border-radius: 25px 25px 0 0;
+    }
+    .form-side {
+        border-radius: 0 0 25px 25px;
+    }
 }
