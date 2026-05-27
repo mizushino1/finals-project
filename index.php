@@ -29,6 +29,7 @@ $routes = [
     '/messages'             => 'views/messages/inbox.php',
     '/payments/checkout'    => 'views/payments/checkout.php',
     '/admin'                => 'views/admin/dashboard.php',
+    '/settings'             => 'views/profile/settings.php',
 ];
 
 // Check if route exists
