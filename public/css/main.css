@@ -2,7 +2,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background-color: rgb(var(--bs-body-color-rgb));
+    background-color: rgb(white);
 }
 
 main {
