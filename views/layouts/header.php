@@ -23,7 +23,7 @@
                         style="filter:invert(1);height:2rem"></a>
                 <div class="navbar-collapse" id="navbarNavAltMarkup">
                     <div class="navbar-nav justify-content-center w-100 gap-4">
-                        <a class="nav-link active text-light fw-bold fs-fluid-xs" aria-current="page" href="#">HOME</a>
+                        <a class="nav-link active text-light fw-bold fs-fluid-xs" aria-current="page" href="<?php echo BASE_URL; ?>#">HOME</a>
                         <a class="nav-link text-light fw-bold fs-fluid-xs" href="#">COMMISSIONS</a>
                         <a class="nav-link text-light fw-bold fs-fluid-xs" href="#">ARTISTS</a>
                     </div>
