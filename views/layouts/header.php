@@ -27,7 +27,7 @@
                         <a class="nav-link text-light fw-bold fs-fluid-xs" href="#">COMMISSIONS</a>
                         <a class="nav-link text-light fw-bold fs-fluid-xs" href="#">ARTISTS</a>
                     </div>
-                    <a class="btn btn-primary glass-card fs-fluid-xs" href="">Log in/ Sign up</a>
+                    <a class="btn btn-primary glass-card fs-fluid-xs" href="<?php echo BASE_URL; ?>login">Log in/ Sign up</a>
                 </div>
             </div>
         </nav>
