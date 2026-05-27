@@ -1,5 +1,5 @@
-<main class="py-5">
-    <div class="container d-flex justify-content-center align-items-center min-vh-100">
+<main class="pt-5">
+    <div class="mt-5 container d-flex justify-content-center align-items-center">
         <div class="row w-100 justify-content-center">
             <div class="col-12 col-lg-10 col-xl-9">
 
