@@ -16,8 +16,8 @@
 </head>
 
 <body>
-    <header>
-        <nav class="navbar navbar-expand sticky-top" style="background-color: #111112;">
+    <heade class="sticky-top">
+        <nav class="navbar navbar-expand" style="background-color: #111112;">
             <div class="container-fluid">
                 <a class="navbar-brand ms-3" href="#"><img src="<?php echo BASE_URL; ?>public/img/logo.svg" alt=""
                         style="filter:invert(1);height:2rem"></a>
