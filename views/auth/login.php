@@ -1,11 +1,11 @@
-<main class="pt-5">
+<main class="py-5 mb-5">
     <div class="mt-5 container d-flex justify-content-center align-items-center">
         <div class="row w-100 justify-content-center">
             <div class="col-12 col-lg-10 col-xl-9">
 
                 <div class="auth-card row g-0" id="authCard">
 
-                    <!-- ── Info panel (left on login, right on register) ── -->
+                    <!-- ── Info panel ── -->
                     <div class="col-md-5 info-side p-5 d-flex flex-column justify-content-center align-items-start" id="infoPanel">
 
                         <!-- Login info -->
@@ -23,6 +23,7 @@
                         <!-- Register info -->
                         <div class="info-content d-none" id="infoRegister">
                             <div class="d-flex flex-row align-items-center mb-3">
+                                <img src="<?php echo BASE_URL; ?>public/img/icon.svg" class="large-brand-icon me-3" alt="Artovia Icon">
                                 <span class="welcome-text">CREATE AN ACCOUNT TO CONTINUE</span>
                             </div>
                             <p class="info-desc mb-4">
@@ -33,7 +34,7 @@
 
                     </div>
 
-                    <!-- ── Form panel (right on login, left on register) ── -->
+                    <!-- ── Form panel ── -->
                     <div class="col-md-7 form-side p-5 d-flex flex-column align-items-center justify-content-center" id="formPanel">
 
                         <!-- Login form -->

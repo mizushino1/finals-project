@@ -15,3 +15,20 @@
     background-color: transparent !important;
     border-color:     rgba(var(--bs-body-color-rgb), 0.10);
 }
+
+.glass-card-dark {
+    background:              rgba(0, 0, 0, 0.70) !important;
+    backdrop-filter:         blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border:                  1px solid rgba(0, 0, 0, 0.30) !important;
+    overflow:                hidden;
+    transition: 
+        transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+        box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1),
+        background 0.3s ease, 
+        border 0.3s ease;
+
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-font-smoothing: subpixel-antialiased;
+}

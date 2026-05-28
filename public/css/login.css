@@ -2,18 +2,22 @@
 
 /* Card shell */
 .auth-card {
+    background-color: #0d0d0d;
     border-radius: 30px;
     overflow: hidden;
-    min-height: 550px;
+    min-height: 600px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    position: relative;
+    display: flex;
 }
 
 /* Left info panel */
 .info-side {
-    background-color: #0d0d0d;
+    background-color: transparent;
     color: #ffffff;
     border-top-left-radius: 30px;
     border-bottom-left-radius: 30px;
+    z-index: 9;
 }
 
 /* Right form panel */
@@ -21,6 +25,7 @@
     background-color: #ffffff;
     border-top-right-radius: 30px;
     border-bottom-right-radius: 30px;
+    z-index: 10;
 }
 
 /* "Log In" heading */
@@ -102,30 +107,15 @@
 }
 
 /* ── Panel slide transition ── */
-
-/* 1. Ensure the card container is set to flex and relative positioning */
-.auth-card {
-    position: relative;
-    display: flex;
-    overflow: hidden; /* Prevents sliding elements from spilling outside the rounded card */
-}
-
-/* 2. Establish baseline layout and hardware-accelerated transitions */
 .info-side,
 .form-side {
-    width: 50%; /* Or your current column widths */
-    transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), 
-                border-radius 0.6s ease;
+    width: 50%;
+    transition: transform 1s ease-in-out,
+                border-radius 1s ease-in-out;
     will-change: transform;
 }
-.info-side{
-    z-index:9;
-}
 
-.form-side{
-    z-index: 10;
-}
-/* 3. Base layout states (Login State) */
+/* ── Login state (default) ── */
 .auth-card:not(.auth-card--register) .info-side {
     transform: translateX(0);
     border-radius: 30px 0 0 30px;
@@ -135,25 +125,25 @@
     border-radius: 0 30px 30px 0;
 }
 
-/* 4. Register State (The Slide Action) */
-/* Instead of changing 'order', we physically slide them 100% of their width */
+/* ── Register state ── */
 .auth-card--register .info-side {
-    transform: translateX(100%); /* Slides the black panel from left to right */
+    transform: translateX(100%);
     border-radius: 0 30px 30px 0;
 }
-
 .auth-card--register .form-side {
-    transform: translateX(-100%); /* Slides the white panel from right to left */
+    transform: translateX(-100%);
     border-radius: 30px 0 0 30px;
 }
 
-/* 5. Content Fade (Slightly delayed for a cleaner look) */
+/* ── Content blocks: hidden by default, JS controls opacity ── */
+/* CSS no longer drives the fade — JS sets opacity and transition inline
+   so the reveal is always tied to transitionend, not a CSS timer. */
 .form-content,
 .info-content {
-    transition: opacity 0.25s ease-in-out;
+    opacity: 0; /* JS fades these in after the slide completes */
 }
 
-/* Responsive Reset: Kill the slide on mobile screens so it just stacks normally */
+/* ── Responsive: stack on mobile, no slide ── */
 @media (max-width: 767.98px) {
     .auth-card {
         flex-direction: column;
@@ -161,7 +151,7 @@
     .info-side,
     .form-side {
         width: 100%;
-        transform: none !important; /* Disables translation on mobile */
+        transform: none !important;
         transition: border-radius 0.3s ease;
     }
     .info-side {
@@ -171,12 +161,9 @@
         border-radius: 0 0 30px 30px !important;
     }
 }
-/* Responsive stacking */
-@media (max-width: 767.98px) {
-    .info-side {
-        border-radius: 30px 30px 0 0;
-    }
-    .form-side {
-        border-radius: 0 0 30px 30px;
-    }
+
+/* ── Resize guard ── */
+.auth-card.no-transition .info-side,
+.auth-card.no-transition .form-side {
+    transition: none !important;
 }

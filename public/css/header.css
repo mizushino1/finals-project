@@ -1,8 +1,4 @@
 /* ── Navbar ── */
-.site-navbar {
-    background-color: #111112;
-}
-
 .navbar-logo {
     filter: invert(1);
     height: 2rem;
