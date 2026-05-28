@@ -116,7 +116,7 @@ p,
 /* ── Reusable buttons ── */
  
 /* Outlined gold button — "Create Account" style */
-.btn-create-account {
+.btn-fill {
     background-color: #444446;
     color: #ffffff;
     border: 2px solid #e2c092;
@@ -126,13 +126,13 @@ p,
     transition: background-color 0.3s ease, color 0.3s ease;
 }
  
-.btn-create-account:hover {
+.btn-fill:hover {
     background-color: #e2c092;
     color: #121212;
 }
  
 /* Outlined gold button — "Login" style */
-.btn-login-submit {
+.btn-outline {
     background-color: #ffffff;
     color: #121212;
     border: 2px solid #e2c092;
@@ -144,7 +144,7 @@ p,
     transition: background-color 0.3s ease, color 0.3s ease;
 }
  
-.btn-login-submit:hover {
+.btn-outline:hover {
     background-color: #e2c092;
     color: #ffffff;
 }

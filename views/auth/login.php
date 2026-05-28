@@ -17,7 +17,7 @@
                             <p class="info-desc mb-4">
                                 Please log in to your existing account or create a new account if you don't have one yet.
                             </p>
-                            <button class="btn btn-create-account px-4 py-2" id="goToRegister">Create Account</button>
+                            <button class="btn btn-fill px-4 py-2" id="goToRegister">Create Account</button>
                         </div>
 
                         <!-- Register info -->
@@ -29,7 +29,7 @@
                             <p class="info-desc mb-4">
                                 If you already have an account, proceed to log in.
                             </p>
-                            <button class="btn btn-create-account px-4 py-2" id="goToLogin">Log In</button>
+                            <button class="btn btn-fill px-4 py-2" id="goToLogin">Log In</button>
                         </div>
 
                     </div>
@@ -57,7 +57,7 @@
                                     </div>
                                 </div>
                                 <div class="text-center mb-4 d-flex flex-column align-items-center">
-                                    <button type="submit" class="btn btn-login-submit px-5 py-2 mb-3">LOGIN</button>
+                                    <button type="submit" class="btn btn-outline px-5 py-2 mb-3">LOGIN</button>
                                     <a href="#" class="forgot-password-link mb-4">Forgot Password?</a>
                                     <p class="login-divider-text small text-muted mb-3">or login with</p>
                                     <div class="social-medias d-flex gap-4 justify-content-center align-items-center">
@@ -102,7 +102,7 @@
                                     </div>
                                 </div>
                                 <div class="text-center mb-4 d-flex flex-column align-items-center">
-                                    <button type="submit" class="btn btn-login-submit px-5 py-2 mb-3">REGISTER</button>
+                                    <button type="submit" class="btn btn-outline px-5 py-2 mb-3">REGISTER</button>
                                     <p class="login-divider-text small text-muted mb-3">or register with</p>
                                     <div class="social-medias d-flex gap-4 justify-content-center align-items-center">
                                         <a href="#" class="social-icon-wrapper google">
