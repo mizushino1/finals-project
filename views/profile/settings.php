@@ -8,7 +8,7 @@
                 <form>
                     <div class="row g-4">
                         <div class="col-md-6">
-                            <div style="border: 1px solid #ffcc99; border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+                            <div class="theme-border" style="padding: 20px; margin-bottom: 20px;">
                                 <h5 style="color: #333; margin-bottom: 15px;"><i class="bi bi-person"></i> Personal Information</h5>
                                 <div class="row">
                                     <div class="col-6 mb-3">
@@ -50,7 +50,7 @@
                                 </div>
                             </div>
 
-                            <div style="border: 1px solid #ffcc99; border-radius: 10px; padding: 20px;">
+                            <div class="theme-border" style="padding: 20px;">
                                 <h5 style="color: #333; margin-bottom: 15px;"><i class="bi bi-lock"></i> Security</h5>
                                 <div class="mb-3">
                                     <label class="form-label">Current Password</label>
@@ -79,13 +79,13 @@
                         </div>
 
                         <div class="col-md-6">
-                            <div style="border: 1px solid #ffcc99; border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+                            <div class="theme-border" style=" padding: 20px; margin-bottom: 20px;">
                                 <h5 style="margin-bottom: 15px;"><i class="bi bi-person-circle"></i> Avatar / Profile Picture</h5>
 
                                 <div class="row align-items-center">
                                     <div class="col-5 text-center">
                                         <div style="width: 100px; height: 100px; background: #eee; border-radius: 50%; margin: 0 auto 10px auto; border: 2px solid #ccc;"></div>
-                                        <button type="button" class="btn btn-outline-secondary btn-sm w-100">Remove Avatar</button>
+                                        <button type="button" class="btn btn-outline btn-sm w-100">Remove Avatar</button>
                                     </div>
 
                                     <div class="col-7 text-center">
@@ -94,7 +94,7 @@
                                                 <strong>Choose New Avatar</strong><br>
                                                 Drag & drop an image here or click browse here
                                             </p>
-                                            <button type="button" class="btn btn-sm w-100" style="background:#ffcc99; font-weight:bold;">
+                                            <button type="button" class="btn btn-sm btn-fill fw-bold w-100" >
                                                 <i class="bi bi-upload"></i> Select Image
                                             </button>
                                         </div>
@@ -113,8 +113,8 @@
 
                     <div class="row mt-4 align-items-center">
                         <div class="col-6 d-flex gap-2">
-                            <button type="submit" class="btn" style="background-color: #ffcc99; font-weight: bold;">Save Changes</button>
-                            <button type="button" class="btn btn-outline-secondary">Cancel</button>
+                            <button type="submit" class="btn btn-fill">Save Changes</button>
+                            <button type="button" class="btn btn-outline">Cancel</button>
                         </div>
                         <div class="col-6 text-end">
                             <button type="button" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Delete Account</button>

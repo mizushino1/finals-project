@@ -29,7 +29,7 @@ h6 {
 }
 
 .theme-font-color {
-    color:#e2c092;
+    color: #e2c092;
 }
 
 
@@ -43,7 +43,7 @@ p,
 }
 
 .joan {
-    font-family:'Joan', serif;
+    font-family: 'Joan', serif;
 }
 
 .fs-fluid-xxs {
@@ -90,7 +90,7 @@ p,
     object-fit: contain;
     display: inline-block;
 }
- 
+
 .welcome-text {
     font-size: 1.8rem;
     font-weight: 700;
@@ -98,23 +98,23 @@ p,
     color: #e2c092;
     line-height: 1;
 }
- 
+
 .info-desc {
     color: #cccccc;
     font-size: 1.05rem;
     line-height: 1.6;
     max-width: 90%;
 }
- 
+
 .form-label {
     font-size: 0.85rem;
     font-weight: 600;
     color: #555;
     margin-bottom: 4px;
 }
- 
+
 /* ── Reusable buttons ── */
- 
+
 /* Outlined gold button — "Create Account" style */
 .btn-fill {
     background-color: #444446;
@@ -125,12 +125,12 @@ p,
     font-size: 0.95rem;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
- 
+
 .btn-fill:hover {
     background-color: #e2c092;
     color: #121212;
 }
- 
+
 /* Outlined gold button — "Login" style */
 .btn-outline {
     background-color: #ffffff;
@@ -143,8 +143,15 @@ p,
     max-width: 180px;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
- 
+
 .btn-outline:hover {
     background-color: #e2c092;
     color: #ffffff;
+}
+
+
+/*  border */
+.theme-border {
+    border: 1px solid #ffcc99;
+    border-radius: 10px;
 }
