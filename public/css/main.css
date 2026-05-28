@@ -117,9 +117,8 @@ p,
 
 /* Outlined gold button — "Create Account" style */
 .btn-fill {
-    background-color: #444446;
-    color: #ffffff;
-    border: 2px solid #e2c092;
+    background-color: #e2c092 ;
+    border: 2px solid #444446;
     border-radius: 6px;
     font-weight: 600;
     font-size: 0.95rem;
@@ -127,8 +126,8 @@ p,
 }
 
 .btn-fill:hover {
-    background-color: #e2c092;
-    color: #121212;
+    background-color: #444446;
+    color: #e2c092 ;
 }
 
 /* Outlined gold button — "Login" style */

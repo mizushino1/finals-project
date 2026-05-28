@@ -30,6 +30,7 @@ $routes = [
     '/payments/checkout'    => 'views/payments/checkout.php',
     '/admin'                => 'views/admin/dashboard.php',
     '/settings'             => 'views/profile/settings.php',
+    '/settings/edit-profile' => 'views/profile/edit.php',
 ];
 
 // Check if route exists
