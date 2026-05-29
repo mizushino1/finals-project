@@ -15,6 +15,8 @@
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/footer.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/login.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/otp.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/profile.css">
+
 </head>
 
 <body>
