@@ -53,7 +53,7 @@
                                     <div class="input-group auth-input-group">
                                         <span class="input-group-text"><i class="bi bi-lock"></i></span>
                                         <input type="password" class="form-control" placeholder="Password">
-                                        <span class="input-group-text eye-toggle-icon"><i class="bi bi-eye"></i></span>
+                                        <span class="input-group-text eye-toggle-icon"></span>
                                     </div>
                                 </div>
                                 <div class="text-center mb-4 d-flex flex-column align-items-center">
@@ -98,7 +98,7 @@
                                     <div class="input-group auth-input-group">
                                         <span class="input-group-text"><i class="bi bi-lock"></i></span>
                                         <input type="password" class="form-control" placeholder="Password">
-                                        <span class="input-group-text eye-toggle-icon"><i class="bi bi-eye"></i></span>
+                                        <span class="input-group-text eye-toggle-icon"> </span>
                                     </div>
                                 </div>
                                 <div class="text-center mb-4 d-flex flex-column align-items-center">

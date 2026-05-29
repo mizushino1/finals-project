@@ -82,8 +82,8 @@ p,
     font-size: clamp(2.5rem, 5vw + 1rem, 6rem);
 }
 
-.theme-font{
-  color:  #ffcc99;
+.theme-font {
+    color: #ffcc99;
 }
 
 
@@ -121,7 +121,7 @@ p,
 
 /* Outlined gold button — "Create Account" style */
 .btn-fill {
-    background-color: #e2c092 ;
+    background-color: #e2c092;
     border: 2px solid #444446;
     border-radius: 6px;
     font-weight: bold;
@@ -129,14 +129,17 @@ p,
     width: 100%;
     max-width: 180px;
     display: inline-flex;
-    align-items: center;     /* Centers vertically (Y-axis) */
+    align-items: center;
+    /* Centers vertically (Y-axis) */
     justify-content: center;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.5s ease , box-shadow 0.5s ease;
 }
 
 .btn-fill:hover {
     background-color: #444446;
     color: #e2c092 ;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 }
 
 .border-none {
@@ -154,14 +157,39 @@ p,
     width: 100%;
     max-width: 180px;
     display: inline-flex;
-    align-items: center;     /* Centers vertically (Y-axis) */
+    align-items: center;
+    /* Centers vertically (Y-axis) */
     justify-content: center;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: transform 0.5s ease, box-shadow 0.5s ease;
 }
 
 .btn-outline:hover {
-    background-color: #e2c092;
-    color: #ffffff;
+    border: 2px solid #e2c092;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.btn-gradient-fill {
+    background: linear-gradient(to right,
+            #ffd29fcf 0%,
+            #faefd0 34%,
+            #faefd0 62%,
+            #ffd29f 100%);
+    border-radius: 6px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    width: 100%;
+    max-width: 180px;
+    display: inline-flex;
+    align-items: center;
+    /* Centers vertically (Y-axis) */
+    justify-content: center;
+    transition: background-color 0.3s ease,transform 0.5s ease ,color 0.3s ease, box-shadow 0.5s ease;
+}
+
+.btn-gradient-fill:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 }
 
 
@@ -175,5 +203,13 @@ p,
 /* fill */
 
 .theme-fill {
-    background-color:#ffcc99 ;
+    background-color: #ffcc99;
+}
+
+.theme-gradient-fill {
+    background: linear-gradient(to right,
+            #ffd29fcf 0%,
+            #faefd0 34%,
+            #faefd0 62%,
+            #ffd29f 100%);
 }

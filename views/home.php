@@ -46,10 +46,10 @@
 
                             </div>
                             <div class="col-12 d-flex flex-row">
-                                <a class="btn btn-fill fs-fluid-sm border-none me-1">
+                                <a class="btn btn-gradient-fill fs-fluid-xs me-3">
                                     Start Commissioning
                                 </a>
-                                <a class="btn btn-outline fs-fluid-sm  me-1">
+                                <a class="btn btn-outline fs-fluid-xs  me-1">
                                     Hire an Artist
                                 </a>
 

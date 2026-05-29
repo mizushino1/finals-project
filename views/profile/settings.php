@@ -55,8 +55,8 @@
                                 <div class="mb-3">
                                     <label class="form-label">Current Password</label>
                                     <div class="input-group">
-                                        <input type="password" name="current_password" class="form-control" placeholder="••••••••">
-                                        <span class="input-group-text"><i class="bi bi-eye"></i></span>
+                                        <input type="password" name="current_password" class="form-control">
+                                        <span class="input-group-text"></span>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -64,14 +64,14 @@
                                         <label class="form-label">New Password</label>
                                         <div class="input-group">
                                             <input type="password" name="new_password" class="form-control">
-                                            <span class="input-group-text"><i class="bi bi-eye"></i></span>
+                                            <span class="input-group-text"></span>
                                         </div>
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label">Confirm Password</label>
                                         <div class="input-group">
                                             <input type="password" name="confirm_password" class="form-control">
-                                            <span class="input-group-text"><i class="bi bi-eye"></i></span>
+                                            <span class="input-group-text"></span>
                                         </div>
                                     </div>
                                 </div>
