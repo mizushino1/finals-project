@@ -114,8 +114,8 @@
 
                     <div class="row mt-4 align-items-center">
                         <div class="col-6 d-flex gap-2">
-                            <button type="submit" class="btn btn-success fw-bold">Save Changes</button>
-                            <button type="button" class="btn btn-danger fw-bold">Cancel</button>
+                            <button type="submit" id="submit" class="btn btn-success fw-bold">Save Changes</button>
+                            <button type="button" id="clearForm" class="btn btn-danger fw-bold">Cancel</button>
                         </div>
                         <div class="col-6 text-end">
                             <button type="button" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i> Delete Account</button>

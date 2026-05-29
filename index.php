@@ -31,6 +31,7 @@ $routes = [
     '/admin'                => 'views/admin/dashboard.php',
     '/settings'             => 'views/profile/settings.php',
     '/settings/edit-profile' => 'views/profile/edit.php',
+    '/login/forgot-password' => 'views/auth/forgot_password.php',
 ];
 
 // Check if route exists

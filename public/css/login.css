@@ -131,7 +131,7 @@
     border-radius: 0 30px 30px 0;
 }
 .auth-card--register .form-side {
-    transform: translateX(-100%);
+    transform: translateX(-101%);
     border-radius: 30px 0 0 30px;
 }
 

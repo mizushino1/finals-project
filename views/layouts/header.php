@@ -23,23 +23,30 @@
                 <a class="navbar-brand ms-3" href="#">
                     <img src="<?php echo BASE_URL; ?>public/img/logo.svg" alt="" class="navbar-logo">
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+                <div class="navbar-nav d-flex flex-row d-md-none text-end justify-self-end align">
+                    <a class="btn d-inline-block my-auto mx-2 text-light fw-bold glass-card fs-fluid-xs h-50" href="<?php echo BASE_URL; ?>login">LOG
+                        IN</a>
+                    <button class="navbar-toggler ms-0" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+                        aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </div>
+
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <div class="navbar-nav justify-content-center w-100 gap-4">
-                        <a class="nav-link active text-light fw-bold fs-fluid-xs" aria-current="page"
+                    <div class="navbar-nav justify-content-center w-100 gap-4 ms-3 mt-2">
+                        <a class="nav-link active text-light fw-bold fs-fluid-sm" aria-current="page"
                             href="<?php echo BASE_URL; ?>#">HOME</a>
-                        <a class="nav-link text-light fw-bold fs-fluid-xs"
+                        <a class="nav-link text-light fw-bold fs-fluid-sm"
                             href="<?php echo BASE_URL; ?>commissions">COMMISSIONS</a>
-                        <a class="nav-link text-light fw-bold fs-fluid-xs"
+                        <a class="nav-link text-light fw-bold fs-fluid-sm"
                             href="<?php echo BASE_URL; ?>commissions">ARTISTS</a>
                     </div>
-                    <div class="navbar-nav">
-                        <a class="btn btn-primary glass-card fs-fluid-xs"
-                            href="<?php echo BASE_URL; ?>login">Log in / Sign up</a>
-                    </div>
+
+                </div>
+                <div class="navbar-nav d-none d-md-block">
+                    <a class="btn text-light fw-bold glass-card fs-fluid-xs" href="<?php echo BASE_URL; ?>login">LOG
+                        IN</a>
                 </div>
             </div>
         </nav>

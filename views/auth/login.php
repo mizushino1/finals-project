@@ -58,7 +58,7 @@
                                 </div>
                                 <div class="text-center mb-4 d-flex flex-column align-items-center">
                                     <button type="submit" class="btn btn-outline px-5 py-2 mb-3">LOGIN</button>
-                                    <a href="#" class="forgot-password-link mb-4">Forgot Password?</a>
+                                    <a href="<?php echo BASE_URL; ?>login/forgot-password" class="forgot-password-link mb-4">Forgot Password?</a>
                                     <p class="login-divider-text small text-muted mb-3">or login with</p>
                                     <div class="social-medias d-flex gap-4 justify-content-center align-items-center">
                                         <a href="#" class="social-icon-wrapper google">

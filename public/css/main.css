@@ -82,6 +82,10 @@ p,
     font-size: clamp(2.5rem, 5vw + 1rem, 6rem);
 }
 
+.theme-font{
+  color:  #ffcc99;
+}
+
 
 
 .large-brand-icon {
@@ -120,14 +124,23 @@ p,
     background-color: #e2c092 ;
     border: 2px solid #444446;
     border-radius: 6px;
-    font-weight: 600;
-    font-size: 0.95rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    width: 100%;
+    max-width: 180px;
+    display: inline-flex;
+    align-items: center;     /* Centers vertically (Y-axis) */
+    justify-content: center;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .btn-fill:hover {
     background-color: #444446;
     color: #e2c092 ;
+}
+
+.border-none {
+    border: none;
 }
 
 /* Outlined gold button — "Login" style */
@@ -140,6 +153,9 @@ p,
     letter-spacing: 1px;
     width: 100%;
     max-width: 180px;
+    display: inline-flex;
+    align-items: center;     /* Centers vertically (Y-axis) */
+    justify-content: center;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -153,4 +169,11 @@ p,
 .theme-border {
     border: 1px solid #ffcc99;
     border-radius: 10px;
+}
+
+
+/* fill */
+
+.theme-fill {
+    background-color:#ffcc99 ;
 }
