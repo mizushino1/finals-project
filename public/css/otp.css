@@ -1,24 +1,14 @@
-/* ==========================================================================
-   Artovia - Premium Recovery & Password Verification Style Definitions
-   ========================================================================== */
-
-/* Main Full-Height Dark Canvas Context Layer */
-.bg-dark-custom {
-    background-color: rgb(white);
-    font-family: 'Inter', sans-serif;
-}
-
-/* --- Framework Component Resets (Clean Layout Overrides) --- */
+/* ── Modal backdrop ── */
 .modal-backdrop.show {
     opacity: 0.75 !important;
 }
 
-/* Strip Default Bootstrap Borders and Card Styles */
+/* ── Modal card ── */
 .modal-content.auth-card {
     background-color: #050505 !important;
-    border: 3px solid #d4af37 !important; /* Premium Gold Framing Accent */
-    border-radius: 4px !important;       /* Clean sharp edge profile matching Figma */
-    box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.8) !important;
+    border: 2px solid #d4af37 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8) !important;
     max-width: 540px;
     width: 100%;
 }
@@ -27,42 +17,50 @@
     max-width: 540px !important;
 }
 
-/* Close Window Handle */
+/* Disable Bootstrap's slide-in so the modal appears instantly */
+.modal.fade .modal-dialog {
+    transition: none !important;
+    transform: none !important;
+}
+
+/* ── Close button ── */
 .btn-close-white {
     filter: invert(1) grayscale(1);
-    opacity: 0.6;
-    transition: opacity 0.2s ease-in-out;
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
 }
+
 .btn-close-white:hover {
     opacity: 1;
 }
 
-/* --- Typography Foundations --- */
+/* ── Shared auth typography ── */
 .auth-title {
     color: #ffffff !important;
     font-size: 1.75rem;
     font-weight: 700;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.03em;
 }
 
 .auth-subtitle {
-    color: #a3a3a3 !important;
+    color: rgba(255, 255, 255, 0.5) !important;
     font-size: 0.875rem;
     font-weight: 400;
 }
 
 .auth-label {
-    color: #ffffff !important;
-    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-size: 0.8rem;
     font-weight: 500;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
 .fs-7 {
     font-size: 0.8rem !important;
 }
 
-/* --- Custom Component Input Elements --- */
+/* ── Custom input group ── */
 .input-group-custom {
     position: relative;
     display: flex;
@@ -80,16 +78,16 @@
     pointer-events: none;
 }
 
-/* Master Custom Form Field Rules */
+/* ── Auth text input ── */
 .auth-input {
     background-color: #ffffff !important;
     color: #121212 !important;
     border: 1px solid #ced4da !important;
     border-radius: 8px !important;
-    padding: 12px 16px 12px 45px !important; /* Left padding ensures space for icon */
+    padding: 12px 16px 12px 45px !important;
     font-size: 0.95rem !important;
     height: 48px;
-    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .auth-input:focus {
@@ -102,10 +100,70 @@
 
 .auth-input::placeholder {
     color: #adb5bd !important;
-    opacity: 1;
 }
 
-/* --- Segmented Horizontal Grid Box System (OTP Array Elements) --- */
+/* ── Dark-variant auth input (forgot password flow) ── */
+.auth-input-dark {
+    background-color: transparent !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
+    border-radius: 0 !important;
+    padding: 10px 40px 10px 0 !important;
+    font-size: 0.95rem !important;
+    transition: border-color 0.2s ease;
+    box-shadow: none !important;
+}
+
+.auth-input-dark:focus {
+    border-color: #d4af37 !important;
+    box-shadow: none !important;
+    outline: none !important;
+    background-color: transparent !important;
+    color: #ffffff !important;
+}
+
+.auth-input-dark::placeholder {
+    color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Input groups for the dark flow */
+.auth-input-group-dark {
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-input-group-dark:focus-within {
+    border-color: rgba(212, 175, 55, 0.6);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12);
+}
+
+.auth-input-group-dark .input-group-text {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.auth-input-group-dark .form-control {
+    background: transparent;
+    border: none;
+    color: #fff;
+    box-shadow: none;
+}
+
+.auth-input-group-dark .form-control:focus {
+    background: transparent;
+    color: #fff;
+    box-shadow: none;
+}
+
+.auth-input-group-dark .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* ── OTP inputs ── */
 .otp-container {
     gap: 10px;
 }
@@ -113,13 +171,14 @@
 .otp-input {
     background-color: transparent !important;
     color: #ffffff !important;
-    border: 2px solid #ffffff !important;
-    border-radius: 12px !important;
-    height: 58px !important;
+    border: 2px solid rgba(255, 255, 255, 0.5) !important;
+    border-radius: 10px !important;
+    height: 56px !important;
     width: 48px !important;
-    font-size: 1.5rem !important;
+    font-size: 1.4rem !important;
     font-weight: 700 !important;
     padding: 0 !important;
+    text-align: center;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -127,63 +186,107 @@
     background-color: transparent !important;
     color: #ffffff !important;
     border-color: #d4af37 !important;
-    box-shadow: 0 0 8px rgba(212, 175, 55, 0.5) !important;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.4) !important;
     outline: none !important;
 }
 
-/* --- Password Hide/Reveal Layout Anchors --- */
-.password-toggle-icon {
+/* ── Password toggle icon ── */
+.password-toggle-icon,
+.eye-toggle-icon {
     position: absolute;
-    right: 16px;
-    color: #6c757d;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.4);
     cursor: pointer;
-    z-index: 5;
+    z-index: 10;
     display: flex;
     align-items: center;
     user-select: none;
     transition: color 0.15s ease;
 }
 
-.password-toggle-icon:hover {
+.password-toggle-icon:hover,
+.eye-toggle-icon:hover {
     color: #d4af37;
 }
 
-/* --- Premium Action Button Callouts --- */
-.btn-gold-gradient {
-    background: linear-gradient(to right, #ffeaa7, #f1c40f) !important;
-    color: #000000 !important;
-    border: none !important;
-    border-radius: 8px !important;
-    font-weight: 700 !important;
-    font-size: 0.95rem !important;
-    letter-spacing: 0.5px !important;
-    height: 48px;
-    text-transform: none;
-    transition: transform 0.1s ease, opacity 0.2s ease !important;
+/* ── Forgot-password page wrapper ── */
+.fp-page {
+    background: var(--black);
+    padding: 20px;
 }
 
-.btn-gold-gradient:hover {
-    opacity: 0.93 !important;
-    color: #000000 !important;
-}
-
-.btn-gold-gradient:active {
-    transform: scale(0.98);
-}
-
-/* --- Interactive Hyperlinks --- */
+/* ── Gold text link ── */
 .gold-text {
     color: #d4af37 !important;
     transition: color 0.15s ease;
 }
 
 .gold-text:hover {
-    color: #fff1a8 !important;
+    color: #f0d878 !important;
     text-decoration: underline !important;
 }
 
-/* Instant Transition Modifiers (Fixes UI Engine Initialization Freezing) */
-.modal.fade .modal-dialog {
-    transition: none !important;
-    transform: none !important;
+/* ── Forgot-password flow cards ── */
+.fp-card {
+    background: #0a0a0a;
+    border: 2px solid #d4af37;
+    border-radius: 12px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6),
+                0 0 24px rgba(212, 175, 55, 0.08);
+    max-width: 520px;
+    width: 100%;
+    padding: 2.5rem 2rem;
+}
+
+@media (min-width: 576px) {
+    .fp-card {
+        padding: 3rem 2.5rem;
+    }
+}
+
+.fp-card__title {
+    font-family: Georgia, serif;
+    font-size: 1.85rem;
+    font-weight: 700;
+    color: #d4af37;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.4rem;
+}
+
+.fp-card__subtitle {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.875rem;
+    margin-bottom: 2rem;
+}
+
+/* OTP strip inside fp-card */
+.fp-otp-strip {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid #d4af37;
+    border-radius: 50px;
+    padding: 0.6rem 1rem;
+}
+
+.fp-otp-strip .fp-otp-divider {
+    color: rgba(255, 255, 255, 0.35);
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+/* Resend row */
+.fp-resend-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 0.75rem;
 }
