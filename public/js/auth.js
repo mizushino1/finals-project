@@ -21,13 +21,13 @@
     // ── Mode switch ───────────────────────────────────────────────────────────
     function switchTo(mode) {
         const toRegister = mode === 'register';
-
+    
         // 1. Instantly hide all content (no fade — instant so it's gone before slide starts)
         allContent.forEach(el => {
             el.style.transition = 'none';
             el.style.opacity    = '0';
         });
-
+    
         // 2. Swap d-none so the correct content is ready but still invisible
         //    (tiny rAF delay ensures the opacity:0 paint lands before d-none toggling)
         requestAnimationFrame(() => {
@@ -35,29 +35,21 @@
             infoRegister.classList.toggle('d-none', !toRegister);
             formLogin.classList.toggle('d-none',    toRegister);
             formRegister.classList.toggle('d-none', !toRegister);
-
+    
             // 3. Trigger the 1s panel slide
             card.classList.toggle('auth-card--register', toRegister);
-
-            // 4. After the slide finishes, fade the new content in
-            //    transitionend fires per-property; we only want to act once.
-            const onSlideEnd = (e) => {
-                // Only react to the transform transition on one of the panels
-                if (e.target !== card.querySelector('.form-side') || e.propertyName !== 'transform') return;
-                card.querySelector('.form-side').removeEventListener('transitionend', onSlideEnd);
-
-                // Fade in only the visible content blocks
-                const visible = toRegister
-                    ? [infoRegister, formRegister]
-                    : [infoLogin,    formLogin];
-
+    
+            // 4. After a delay, fade the new content in
+            const visible = toRegister
+                ? [infoRegister, formRegister]
+                : [infoLogin,    formLogin];
+    
+            setTimeout(() => {
                 visible.forEach(el => {
                     el.style.transition = 'opacity 0.3s ease-in-out';
                     el.style.opacity    = '1';
                 });
-            };
-
-            card.querySelector('.form-side').addEventListener('transitionend', onSlideEnd);
+            }, 1000); // Delay should match the CSS transition duration (1s)
         });
     }
 
