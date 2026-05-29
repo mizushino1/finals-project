@@ -55,7 +55,7 @@
                                 <div class="mb-3">
                                     <label class="form-label">Current Password</label>
                                     <div class="input-group">
-                                        <input type="password" name="current_password" class="form-control">
+                                        <input type="password" name="current_password" class="form-control"  >
                                         <span class="input-group-text"></span>
                                     </div>
                                 </div>
