@@ -97,3 +97,83 @@
     goToRegister.addEventListener('click', () => switchTo('register'));
     goToLogin.addEventListener('click',    () => switchTo('login'));
 })();
+
+document.addEventListener("DOMContentLoaded", function () {
+    // 1. Get references to the layout component cards
+    const card1 = document.getElementById('forgotPasswordCard');
+    const card2 = document.getElementById('otpVerificationCard');
+    const card3 = document.getElementById('resetPasswordCard');
+
+    // 2. Step 1: Submit Form -> Advance to Step 2 Card
+    const fpForm = document.getElementById('forgotPasswordForm');
+    if (fpForm) {
+        fpForm.addEventListener('submit', function (e) {
+            e.preventDefault(); 
+            if (card1 && card2) {
+                card1.classList.add('d-none');
+                card2.classList.remove('d-none');
+            }
+        });
+    }
+
+    // 3. Step 2: Submit OTP -> Advance to Step 3 Card
+    const otpForm = document.getElementById('otpVerificationForm');
+    if (otpForm) {
+        otpForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (card2 && card3) {
+                card2.classList.add('d-none');
+                card3.classList.remove('d-none');
+            }
+        });
+    }
+
+    // 4. Step 3: Complete Password Reset
+    const resetForm = document.getElementById('resetPasswordForm');
+    if (resetForm) {
+        resetForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            alert("Password successfully reset!");
+            // Redirect smoothly back to your primary login view
+            window.location.href = "../login";
+        });
+    }
+
+    // 5. Numeric Auto-Advance Mechanics for OTP inputs
+    const otpInputs = document.querySelectorAll('.otp-input');
+    otpInputs.forEach((input, index) => {
+        input.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+            if (e.target.value.length === 1 && index < otpInputs.length - 1) {
+                otpInputs[index + 1].focus();
+            }
+        });
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && e.target.value.length === 0 && index > 0) {
+                otpInputs[index - 1].focus();
+            }
+        });
+    });
+
+    // 6. Inline password eye toggles 
+    const allPasswordToggles = document.querySelectorAll('.eye-toggle-icon');
+    allPasswordToggles.forEach(toggle => {
+        toggle.addEventListener('click', function () {
+            const container = this.parentElement;
+            const inputField = container.querySelector('input');
+            const icon = this.querySelector('i');
+
+            if (inputField && icon) {
+                if (inputField.type === 'password') {
+                    inputField.type = 'text';
+                    icon.classList.remove('bi-eye');
+                    icon.classList.add('bi-eye-slash');
+                } else {
+                    inputField.type = 'password';
+                    icon.classList.remove('bi-eye-slash');
+                    icon.classList.add('bi-eye');
+                }
+            }
+        });
+    });
+});
