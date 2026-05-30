@@ -1,3 +1,4 @@
+<!doctype html>
 <html lang="en">
 
 <head>
@@ -27,7 +28,8 @@
                     <img src="<?php echo BASE_URL; ?>public/img/logo.svg" alt="" class="navbar-logo">
                 </a>
                 <div class="navbar-nav d-flex flex-row d-md-none text-end justify-self-end align">
-                    <a class="btn d-inline-block my-auto mx-2 text-light fw-bold glass-card fs-fluid-xs h-50" href="<?php echo BASE_URL; ?>login">LOG
+                    <a class="btn d-inline-block my-auto mx-2 text-light fw-bold glass-card fs-fluid-xs h-50"
+                        href="<?php echo BASE_URL; ?>login">LOG
                         IN</a>
                     <button class="navbar-toggler ms-0" type="button" data-bs-toggle="collapse"
                         data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"

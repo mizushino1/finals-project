@@ -191,25 +191,7 @@
 }
 
 /* ── Password toggle icon ── */
-.password-toggle-icon,
-.eye-toggle-icon {
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: rgba(255, 255, 255, 0.4);
-    cursor: pointer;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    user-select: none;
-    transition: color 0.15s ease;
-}
 
-.password-toggle-icon:hover,
-.eye-toggle-icon:hover {
-    color: #d4af37;
-}
 
 /* ── Forgot-password page wrapper ── */
 .fp-page {

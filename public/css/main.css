@@ -213,3 +213,14 @@ p,
             #faefd0 62%,
             #ffd29f 100%);
 }
+
+
+.password-toggle-icon,
+.eye-toggle-icon {
+    display: none !important;
+    cursor: pointer;
+}
+
+.eye-toggle-icon.visible {
+    display: flex !important;
+}

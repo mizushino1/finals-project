@@ -40,7 +40,6 @@
 .auth-input-group {
     border: 1px solid #f1d9be;
     border-radius: 6px;
-    overflow: hidden;
 }
 
 .auth-input-group .input-group-text {
