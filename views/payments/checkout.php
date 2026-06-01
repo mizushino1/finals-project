@@ -1,0 +1,1 @@
+<?php require_once __DIR__ . '/../../src/middleware/user_middleware.php'; ?>

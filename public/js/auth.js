@@ -1,3 +1,92 @@
+// ── LOGIN FETCH ──
+const loginForm = document.getElementById('loginForm');
+if (loginForm) {
+    loginForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const username = document.getElementById('loginUsername').value.trim();
+        const password = document.getElementById('loginPassword').value.trim();
+        const alert    = document.getElementById('auth-alert');
+
+        try {
+            const res  = await fetch(BASE_URL + 'api/auth/login.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                // Redirect based on role
+                if (data.role === 'admin') {
+                    window.location.href = BASE_URL + 'admin';
+                } else {
+                    window.location.href = BASE_URL;
+                }
+            } else {
+                alert.className = 'alert alert-danger w-100 px-lg-4';
+                alert.textContent = data.message;
+                alert.classList.remove('d-none');
+            }
+        } catch (err) {
+            alert.className = 'alert alert-danger w-100 px-lg-4';
+            alert.textContent = 'Something went wrong. Please try again.';
+            alert.classList.remove('d-none');
+        }
+    });
+}
+
+// ── REGISTER FETCH ──
+const registerForm = document.getElementById('registerForm');
+if (registerForm) {
+
+    // Show/hide start_at field when artist is selected
+    document.querySelectorAll('input[name="registerRole"]').forEach(radio => {
+        radio.addEventListener('change', function () {
+            const wrapper = document.getElementById('artistStartAtWrapper');
+            if (wrapper) {
+                wrapper.classList.toggle('d-none', this.value !== 'artist');
+            }
+        });
+    });
+
+    registerForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const role      = document.querySelector('input[name="registerRole"]:checked').value;
+        const firstName = document.getElementById('registerFirstName').value.trim();
+        const lastName  = document.getElementById('registerLastName').value.trim();
+        const username  = document.getElementById('registerUsername').value.trim();
+        const password  = document.getElementById('registerPassword').value.trim();
+        const startAt   = document.getElementById('registerStartAt')?.value || 0;
+        const alert     = document.getElementById('auth-alert');
+
+        try {
+            const res  = await fetch(BASE_URL + 'api/auth/register.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role, first_name: firstName, last_name: lastName, username, password, start_at: startAt })
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                alert.className = 'alert alert-success w-100 px-lg-4';
+                alert.textContent = data.message + ' You can now log in.';
+                alert.classList.remove('d-none');
+                setTimeout(() => switchTo('login'), 2000);
+            } else {
+                alert.className = 'alert alert-danger w-100 px-lg-4';
+                alert.textContent = data.message;
+                alert.classList.remove('d-none');
+            }
+        } catch (err) {
+            alert.className = 'alert alert-danger w-100 px-lg-4';
+            alert.textContent = 'Something went wrong. Please try again.';
+            alert.classList.remove('d-none');
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname.toLowerCase();
     

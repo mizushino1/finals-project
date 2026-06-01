@@ -1,3 +1,7 @@
+<?php
+require_once __DIR__ . '/../../config/session.php';
+require_once __DIR__ . '/../../config/constants.php';
+?>
 
 <section class="profile-header">
     <div class="container">
@@ -61,18 +65,37 @@
 
             <!-- Actions -->
             <div class="ms-auto d-flex align-items-center gap-2">
-                <button
-                    class="btn btn-follow"
-                    type="button"
-                    id="btn-follow-action"
-                    data-following="0"
-                >
-                    <i class="fas fa-plus me-1"></i> Follow
-                </button>
-
-                <button class="btn btn-notify" type="button" aria-label="Notifications">
-                    <i class="fas fa-bell"></i>
-                </button>
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <button
+                        class="btn btn-follow"
+                        type="button"
+                        id="btn-follow-action"
+                        data-following="0"
+                    >
+                        <i class="fas fa-plus me-1"></i> Follow
+                    </button>
+                    <button class="btn btn-notify" type="button" aria-label="Notifications">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                <?php else: ?>
+                    <button
+                        class="btn btn-follow"
+                        type="button"
+                        data-bs-toggle="modal"
+                        data-bs-target="#loginPromptModal"
+                    >
+                        <i class="fas fa-plus me-1"></i> Follow
+                    </button>
+                    <button
+                        class="btn btn-notify"
+                        type="button"
+                        data-bs-toggle="modal"
+                        data-bs-target="#loginPromptModal"
+                        aria-label="Notifications"
+                    >
+                        <i class="fas fa-bell"></i>
+                    </button>
+                <?php endif; ?>
             </div>
 
         </div>
@@ -158,9 +181,29 @@
     </div>
 </main>
 
-<!-- ══════════════════════════════════════
-     FOLLOW TOGGLE SCRIPT
-══════════════════════════════════════ -->
+<!-- Login prompt modal — guests only -->
+<?php if (!isset($_SESSION['user_id'])): ?>
+<div class="modal fade" id="loginPromptModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">Login Required</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>You need to be logged in to follow or interact with this artist.</p>
+            </div>
+            <div class="modal-footer border-0">
+                <a href="<?= BASE_URL ?>login" class="btn btn-primary">Log in</a>
+                <a href="<?= BASE_URL ?>register" class="btn btn-outline-secondary">Register</a>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+<!-- Follow toggle script — logged in users only -->
+<?php if (isset($_SESSION['user_id'])): ?>
 <script>
 (function () {
     const btn = document.getElementById('btn-follow-action');
@@ -181,3 +224,4 @@
     });
 })();
 </script>
+<?php endif; ?>

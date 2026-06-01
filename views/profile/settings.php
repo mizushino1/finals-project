@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../../src/middleware/auth_middleware.php'; ?>
 <main class="py-5">
     <div class="container-fluid" style="max-width: 1200px;">
         <div class="row justify-content-center">
