@@ -39,6 +39,7 @@ $routes = [
     '/settings'              => 'views/profile/settings.php',
     '/settings/edit-profile' => 'views/profile/edit.php',
     '/login/forgot-password' => 'views/auth/forgot_password.php',
+    '/commissions/my-commissions' => 'views/commssions/my_commissions.php',
 ];
  
 // Check if route exists
