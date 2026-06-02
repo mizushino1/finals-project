@@ -2,7 +2,7 @@
      <div class="container-fluid">
          <div class="row pt-3 px-3">
              <div class="col-12">
-                 <h3 class="theme-font theme-bottom-border">COMMISSIONS</h3>
+                 <h3 class="theme-bottom-border">COMMISSIONS</h3>
              </div>
 
              <div class="col border-bottom border-dark py-4">
