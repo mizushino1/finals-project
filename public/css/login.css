@@ -166,3 +166,25 @@
 .auth-card.no-transition .form-side {
     transition: none !important;
 }
+
+
+.nav-tabs .nav-link {
+    border: none !important;
+    color: #adb5bd; /* A subtle gray */
+    font-weight: normal;
+    transition: color 0.2s ease-in-out;
+}
+
+/* Style for the Active tab */
+.nav-tabs .nav-link.active {
+    color: #000000; /* Solid black */
+    font-weight: bold;
+    border-bottom: 2px solid #e2c092 !important; /* Black underline */
+    background: transparent;
+}
+
+/* Hover effect to make it feel interactive */
+.nav-tabs .nav-link:hover {
+    color: #495057; /* Slightly darker gray on hover */
+    border: none;
+}

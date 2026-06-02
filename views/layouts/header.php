@@ -27,11 +27,44 @@
                 <a class="navbar-brand ms-3" href="#">
                     <img src="<?php echo BASE_URL; ?>public/img/logo.svg" alt="" class="navbar-logo">
                 </a>
-                <div class="navbar-nav d-flex flex-row d-md-none text-end justify-self-end align">
-                    <a class="btn d-inline-block my-auto mx-2 text-light fw-bold glass-card fs-fluid-xs h-50"
-                        href="<?php echo BASE_URL; ?>login">LOG
-                        IN</a>
-                    <button class="navbar-toggler ms-0" type="button" data-bs-toggle="collapse"
+
+                <!-- Mobile: right-side controls -->
+                <div class="navbar-nav d-flex flex-row d-md-none text-end justify-self-end align-items-center">
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <div class="dropdown nav-user-dropdown me-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <!-- Avatar icon → goes to profile -->
+                                <a href="<?php echo BASE_URL; ?>profile" class="nav-user-avatar" title="View Profile">
+                                    <i class="bi bi-person-circle text-light" style="font-size:1.6rem; line-height:1;"></i>
+                                </a>
+                                <!-- Username + kebab trigger -->
+                                <button class="btn p-0 border-0 d-flex align-items-center gap-1 text-light nav-kebab-btn"
+                                    data-bs-toggle="dropdown" aria-expanded="false" title="Options">
+                                    <span class="fw-bold fs-fluid-xs"><?php echo htmlspecialchars($_SESSION['username']); ?></span>
+                                    <i class="bi bi-three-dots-vertical" style="font-size:1rem;"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end glass-card-dark border-0 mt-2 shadow">
+                                    <li>
+                                        <a class="dropdown-item text-light" href="<?php echo BASE_URL; ?>settings">
+                                            <i class="bi bi-gear me-2"></i>Settings
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider border-secondary my-1">
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="<?php echo BASE_URL; ?>logout">
+                                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <a class="btn d-inline-block my-auto mx-2 text-light fw-bold glass-card fs-fluid-xs h-50"
+                            href="<?php echo BASE_URL; ?>login">LOG IN</a>
+                    <?php endif; ?>
+                    <button class="navbar-toggler ms-1" type="button" data-bs-toggle="collapse"
                         data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
                         aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
@@ -47,11 +80,43 @@
                         <a class="nav-link text-light fw-bold fs-fluid-sm"
                             href="<?php echo BASE_URL; ?>commissions">ARTISTS</a>
                     </div>
-
                 </div>
-                <div class="navbar-nav d-none d-md-block">
-                    <a class="btn text-light fw-bold glass-card fs-fluid-xs" href="<?php echo BASE_URL; ?>login">LOG
-                        IN</a>
+
+                <!-- Desktop: right-side controls -->
+                <div class="navbar-nav d-none d-md-flex align-items-center">
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <div class="dropdown nav-user-dropdown">
+                            <div class="d-flex align-items-center gap-2">
+                                <!-- Avatar icon → goes to profile -->
+                                <a href="<?php echo BASE_URL; ?>profile" class="nav-user-avatar" title="View Profile">
+                                    <i class="bi bi-person-circle text-light" style="font-size:1.75rem; line-height:1;"></i>
+                                </a>
+                                <!-- Username + kebab trigger -->
+                                <button class="btn p-0 border-0 d-flex align-items-center gap-1 text-light nav-kebab-btn"
+                                    data-bs-toggle="dropdown" aria-expanded="false" title="Options">
+                                    <span class="fw-bold fs-fluid-xs"><?php echo htmlspecialchars($_SESSION['username']); ?></span>
+                                    <i class="bi bi-three-dots-vertical" style="font-size:1rem;"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end glass-card-dark border-0 mt-2 shadow">
+                                    <li>
+                                        <a class="dropdown-item text-light" href="<?php echo BASE_URL; ?>settings">
+                                            <i class="bi bi-gear me-2"></i>Settings
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider border-secondary my-1">
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="<?php echo BASE_URL; ?>logout">
+                                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    <?php else: ?>
+                        <a class="btn text-light fw-bold glass-card fs-fluid-xs" href="<?php echo BASE_URL; ?>login">LOG IN</a>
+                    <?php endif; ?>
                 </div>
             </div>
         </nav>

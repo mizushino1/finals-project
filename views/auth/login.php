@@ -31,7 +31,7 @@ if (isset($_SESSION['user_id'])) {
                                 <span class="welcome-text">CREATE AN ACCOUNT TO CONTINUE</span>
                             </div>
                             <p class="info-desc mb-4">If you already have an account, proceed to log in.</p>
-                            <button class="btn btn-fill px-4 py-2" id="goToLogin">Log In</button>
+                            <button class="btn btn-fill px-4 py-2 login-trigger" id="goToLogin1">Log In</button>
                         </div>
                     </div>
 
@@ -82,29 +82,31 @@ if (isset($_SESSION['user_id'])) {
                             <form class="w-100 px-lg-4" id="registerForm">
                                 <div class="mb-3">
                                     <label class="form-label">Account Type</label>
-                                    <div class="d-flex gap-3">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="registerRole" id="roleUser" value="user" checked>
-                                            <label class="form-check-label" for="roleUser">User</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="registerRole" id="roleArtist" value="artist">
-                                            <label class="form-check-label" for="roleArtist">Artist</label>
+                                    <ul class="nav nav-tabs border-0 mb-3" id="roleTab" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link active" id="user-tab" data-bs-toggle="tab" data-bs-target="#user-content" type="button" role="tab" aria-selected="true" onclick="setRole('user')">User</button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="artist-tab" data-bs-toggle="tab" data-bs-target="#artist-content" type="button" role="tab" aria-selected="false" onclick="setRole('artist')">Artist</button>
+                                        </li>
+                                    </ul>
+
+                                    <input type="hidden" name="registerRole" id="registerRole" value="user">
+                                </div>
+                                <div class="row">
+                                    <div class="mb-3 col">
+                                        <label class="form-label">First Name</label>
+                                        <div class="input-group auth-input-group">
+                                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                            <input type="text" class="form-control" id="registerFirstName" placeholder="First Name" required>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">First Name</label>
-                                    <div class="input-group auth-input-group">
-                                        <span class="input-group-text"><i class="bi bi-person"></i></span>
-                                        <input type="text" class="form-control" id="registerFirstName" placeholder="First Name" required>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Last Name</label>
-                                    <div class="input-group auth-input-group">
-                                        <span class="input-group-text"><i class="bi bi-person"></i></span>
-                                        <input type="text" class="form-control" id="registerLastName" placeholder="Last Name" required>
+                                    <div class="mb-3 col" >
+                                        <label class="form-label">Last Name</label>
+                                        <div class="input-group auth-input-group">
+                                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                            <input type="text" class="form-control" id="registerLastName" placeholder="Last Name" required>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="mb-3">
@@ -125,7 +127,7 @@ if (isset($_SESSION['user_id'])) {
 
                                 <!-- Artist only field -->
                                 <div class="mb-4 d-none" id="artistStartAtWrapper">
-                                    <label class="form-label">Starting Price (₱)</label>
+                                    <label class="form-label">Starting Price ($)</label>
                                     <div class="input-group auth-input-group">
                                         <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
                                         <input type="number" class="form-control" id="registerStartAt" placeholder="e.g. 500.00" min="0" step="0.01">
@@ -144,5 +146,16 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </div>
 </main>
+<div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body text-center" id="modalMessage">
+        </div>
+      <div class="modal-footer border-0 justify-content-center">
+        <button class="btn btn-fill px-4 py-2" id="modalActionBtn">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="<?= BASE_URL ?>public/js/auth.js"></script>

@@ -1,21 +1,24 @@
+function setRole(role) {
+    document.getElementById('registerRole').value = role;
+}
 // ── LOGIN FETCH ──
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
     loginForm.addEventListener('submit', async function (e) {
         e.preventDefault();
-
+ 
         const username = document.getElementById('loginUsername').value.trim();
         const password = document.getElementById('loginPassword').value.trim();
-        const alert    = document.getElementById('auth-alert');
-
+        const alert = document.getElementById('auth-alert');
+ 
         try {
-            const res  = await fetch(BASE_URL + 'api/auth/login.php', {
+            const res = await fetch(BASE_URL + 'api/auth/login.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
             });
             const data = await res.json();
-
+ 
             if (data.success) {
                 // Redirect based on role
                 if (data.role === 'admin') {
@@ -35,122 +38,163 @@ if (loginForm) {
         }
     });
 }
-
+ 
 // ── REGISTER FETCH ──
 const registerForm = document.getElementById('registerForm');
 if (registerForm) {
-
-    // Show/hide start_at field when artist is selected
-    document.querySelectorAll('input[name="registerRole"]').forEach(radio => {
-        radio.addEventListener('change', function () {
+ 
+    // Logic to handle tab switching for the role
+    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+        tab.addEventListener('shown.bs.tab', function (e) {
+            const role = this.innerText.toLowerCase(); // 'user' or 'artist'
             const wrapper = document.getElementById('artistStartAtWrapper');
+ 
             if (wrapper) {
-                wrapper.classList.toggle('d-none', this.value !== 'artist');
+                wrapper.classList.toggle('d-none', role !== 'artist');
             }
         });
     });
-
+ 
     registerForm.addEventListener('submit', async function (e) {
         e.preventDefault();
-
-        const role      = document.querySelector('input[name="registerRole"]:checked').value;
+ 
+        const role = document.getElementById('registerRole').value;
         const firstName = document.getElementById('registerFirstName').value.trim();
-        const lastName  = document.getElementById('registerLastName').value.trim();
-        const username  = document.getElementById('registerUsername').value.trim();
-        const password  = document.getElementById('registerPassword').value.trim();
-        const startAt   = document.getElementById('registerStartAt')?.value || 0;
-        const alert     = document.getElementById('auth-alert');
-
+        const lastName = document.getElementById('registerLastName').value.trim();
+        const username = document.getElementById('registerUsername').value.trim();
+        const password = document.getElementById('registerPassword').value.trim();
+        const startAt = document.getElementById('registerStartAt')?.value || 0;
+        const authModalEl = new bootstrap.Modal(document.getElementById('authModal'));
+        const modalMessage = document.getElementById('modalMessage');
+        const actionBtn = document.getElementById('modalActionBtn');
+ 
         try {
-            const res  = await fetch(BASE_URL + 'api/auth/register.php', {
+            const res = await fetch(BASE_URL + 'api/auth/register.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ role, first_name: firstName, last_name: lastName, username, password, start_at: startAt })
             });
             const data = await res.json();
-
+ 
+            modalMessage.textContent = data.success ? data.message + ' You can now log in.' : data.message;
+ 
             if (data.success) {
-                alert.className = 'alert alert-success w-100 px-lg-4';
-                alert.textContent = data.message + ' You can now log in.';
-                alert.classList.remove('d-none');
-                setTimeout(() => switchTo('login'), 2000);
+                actionBtn.textContent = 'Go to Login';
+                actionBtn.onclick = () => {
+                    authModalEl.hide();
+                    switchTo('login');
+                };
             } else {
-                alert.className = 'alert alert-danger w-100 px-lg-4';
-                alert.textContent = data.message;
-                alert.classList.remove('d-none');
+                actionBtn.textContent = 'Close';
+                actionBtn.onclick = () => authModalEl.hide();
             }
+ 
+            authModalEl.show();
         } catch (err) {
-            alert.className = 'alert alert-danger w-100 px-lg-4';
-            alert.textContent = 'Something went wrong. Please try again.';
-            alert.classList.remove('d-none');
+            modalMessage.textContent = 'Something went wrong. Please try again.';
+            actionBtn.textContent = 'Close';
+            actionBtn.onclick = () => authModalEl.hide();
+            authModalEl.show();
         }
     });
 }
-
+ 
 document.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname.toLowerCase();
-    
+ 
     // Determine the current page context
     const isLogin = path.includes('login.php') || path.includes('/login');
     const isSettings = path.includes('settings.php') || path.includes('/settings');
     const isForgotPassword = path.includes('forgot_password.php') || path.includes('/forgot_password');
-
+ 
     // If it's none of these pages, exit immediately
     if (!isLogin && !isSettings && !isForgotPassword) return;
-
+ 
     // ─────────────────────────────────────────────────────────────────────────
     // ── SHARED FUNCTIONALITY: Password Eye Toggle ────────────────────────────
-    // ── (Runs on login.php, settings.php, and forgot_password.php) ───────────
     // ─────────────────────────────────────────────────────────────────────────
-    
+ 
     // Dynamic eye icon visibility based on input length (handles autofills)
     document.querySelectorAll('.auth-input-group, .input-group').forEach(group => {
-        const input  = group.querySelector('input[type="password"]');
+        const input = group.querySelector('input[type="password"]');
         const toggle = group.querySelector('.eye-toggle-icon');
         if (!input || !toggle) return;
-
-        // Run immediately on load
+ 
         toggle.classList.toggle('visible', input.value.length > 0);
-
+ 
         input.addEventListener('input', () => {
             toggle.classList.toggle('visible', input.value.length > 0);
         });
     });
-
+ 
     // Click event to toggle input masking
     document.querySelectorAll('.eye-toggle-icon').forEach(toggle => {
         toggle.addEventListener('click', () => {
             const wrapper = toggle.closest('.auth-input-group') || toggle.closest('.input-group');
             if (!wrapper) return;
-
+ 
             const input = wrapper.querySelector('input[type="password"], input[type="text"]');
             if (!input) return;
-
+ 
             const isPassword = input.type === 'password';
             input.type = isPassword ? 'text' : 'password';
-
+ 
             const icon = toggle.querySelector('i');
             if (icon) {
                 icon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
             }
         });
     });
-
-
+ 
+ 
+    // ─────────────────────────────────────────────────────────────────────────
+    // ── LOGIN + REGISTER SWITCH (Login <-> Register) ─────────────────────────
+    // ── Hoisted here so register fetch handler above can also call switchTo ──
+    // ─────────────────────────────────────────────────────────────────────────
+ 
+    const card = document.getElementById('authCard');
+    const infoLogin = document.getElementById('infoLogin');
+    const infoRegister = document.getElementById('infoRegister');
+    const formLogin = document.getElementById('formLogin');
+    const formRegister = document.getElementById('formRegister');
+    const allContent = [infoLogin, infoRegister, formLogin, formRegister];
+ 
+    // Exposed to window so the register fetch handler (outside DOMContentLoaded) can reach it
+    window.switchTo = function switchTo(mode) {
+        if (!card || allContent.some(el => !el)) return;
+        const toRegister = mode === 'register';
+ 
+        allContent.forEach(el => {
+            el.style.transition = 'none';
+            el.style.opacity = '0';
+        });
+ 
+        requestAnimationFrame(() => {
+            infoLogin.classList.toggle('d-none', toRegister);
+            infoRegister.classList.toggle('d-none', !toRegister);
+            formLogin.classList.toggle('d-none', toRegister);
+            formRegister.classList.toggle('d-none', !toRegister);
+ 
+            card.classList.toggle('auth-card--register', toRegister);
+ 
+            const visible = toRegister ? [infoRegister, formRegister] : [infoLogin, formLogin];
+ 
+            setTimeout(() => {
+                visible.forEach(el => {
+                    el.style.transition = 'opacity 0.3s ease-in-out';
+                    el.style.opacity = '1';
+                });
+            }, 1000);
+        });
+    }
+ 
+ 
     // ─────────────────────────────────────────────────────────────────────────
     // ── EXCLUSIVE LOGIN FUNCTIONALITY (Only runs on login.php) ───────────────
     // ─────────────────────────────────────────────────────────────────────────
     if (isLogin) {
-        const card = document.getElementById('authCard');
-        const infoLogin = document.getElementById('infoLogin');
-        const infoRegister = document.getElementById('infoRegister');
-        const formLogin = document.getElementById('formLogin');
-        const formRegister = document.getElementById('formRegister');
         const goToRegister = document.getElementById('goToRegister');
-        const goToLogin = document.getElementById('goToLogin');
-
-        const allContent = [infoLogin, infoRegister, formLogin, formRegister];
-
+ 
         // Resize guard
         let resizeTimer = null;
         window.addEventListener('resize', () => {
@@ -159,49 +203,20 @@ document.addEventListener('DOMContentLoaded', () => {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => card.classList.remove('no-transition'), 150);
         });
-
-        // Mode switch (Login <-> Register)
-        function switchTo(mode) {
-            if (!card || allContent.some(el => !el)) return;
-            const toRegister = mode === 'register';
-
-            allContent.forEach(el => {
-                el.style.transition = 'none';
-                el.style.opacity = '0';
-            });
-
-            requestAnimationFrame(() => {
-                infoLogin.classList.toggle('d-none', toRegister);
-                infoRegister.classList.toggle('d-none', !toRegister);
-                formLogin.classList.toggle('d-none', toRegister);
-                formRegister.classList.toggle('d-none', !toRegister);
-
-                card.classList.toggle('auth-card--register', toRegister);
-
-                const visible = toRegister ? [infoRegister, formRegister] : [infoLogin, formLogin];
-
-                setTimeout(() => {
-                    visible.forEach(el => {
-                        el.style.transition = 'opacity 0.3s ease-in-out';
-                        el.style.opacity = '1';
-                    });
-                }, 1000);
-            });
-        }
-
+ 
         // Initial page load fade-in
         if (card) {
             const visible = card.classList.contains('auth-card--register')
                 ? [infoRegister, formRegister]
                 : [infoLogin, formLogin];
-
+ 
             visible.forEach(el => {
                 if (el) {
                     el.style.transition = 'none';
                     el.style.opacity = '0';
                 }
             });
-
+ 
             setTimeout(() => {
                 visible.forEach(el => {
                     if (el) {
@@ -211,12 +226,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }, 50);
         }
-
-        if (goToRegister) goToRegister.addEventListener('click', () => switchTo('register'));
-        if (goToLogin) goToLogin.addEventListener('click', () => switchTo('login'));
+ 
+        if (goToRegister) {
+            goToRegister.addEventListener('click', (e) => {
+                e.preventDefault();
+                switchTo('register');
+            });
+        }
+        document.querySelectorAll('.login-trigger').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                switchTo('login');
+            });
+        });
     }
-
-
+ 
+ 
     // ─────────────────────────────────────────────────────────────────────────
     // ── EXCLUSIVE FORGOT PASSWORD & OTP (Only runs on forgot_password.php) ───
     // ─────────────────────────────────────────────────────────────────────────
@@ -224,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const card1 = document.getElementById('forgotPasswordCard');
         const card2 = document.getElementById('otpVerificationCard');
         const card3 = document.getElementById('resetPasswordCard');
-
+ 
         // Multi-step form transition: Step 1 -> Step 2
         const fpForm = document.getElementById('forgotPasswordForm');
         if (fpForm) {
@@ -236,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }
-
+ 
         // Multi-step form transition: Step 2 -> Step 3
         const otpForm = document.getElementById('otpVerificationForm');
         if (otpForm) {
@@ -248,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }
-
+ 
         // Final step: Reset form submit
         const resetForm = document.getElementById('resetPasswordForm');
         if (resetForm) {
@@ -258,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = '../login';
             });
         }
-
+ 
         // OTP numeric auto-advance focus logic
         const otpInputs = document.querySelectorAll('.otp-input');
         otpInputs.forEach((input, index) => {
