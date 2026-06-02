@@ -108,3 +108,22 @@ create table message_box (
     constraint fk_message_sender foreign key (sender_id) references user_tbl(account_id),
     constraint fk_message_receiver foreign key (receiver_id) references artist_tbl(artist_id)
 );
+
+-- new addition, query this bayorn --
+
+CREATE TABLE commission_request_tbl (
+    request_id     INT NOT NULL AUTO_INCREMENT,
+    commission_id  INT NOT NULL,
+    artist_id      INT NOT NULL,
+    message        TEXT NULL,
+    status         VARCHAR(50) NOT NULL DEFAULT 'pending',
+    requested_at   DATE NOT NULL,
+    CONSTRAINT pk_commission_request PRIMARY KEY (request_id),
+    CONSTRAINT fk_cr_commission FOREIGN KEY (commission_id) REFERENCES commission_tbl(commission_id),
+    CONSTRAINT fk_cr_artist     FOREIGN KEY (artist_id)     REFERENCES artist_tbl(artist_id)
+);
+
+
+ALTER TABLE commission_tbl DROP FOREIGN KEY fk_commission_artist;
+ALTER TABLE commission_tbl MODIFY artist_id INT NULL DEFAULT NULL;
+
