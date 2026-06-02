@@ -33,52 +33,30 @@
 
     <main class="">
         <div class="container-fluid">
-            <div class="row">
-                <div class="col home-bg" style="min-height:100vh">
-                    <div class="row">
-                        <div class="col-12">
-                            <h1 class="joan fw-light px-4 pt-4 mb-0 mt-5 header-fluid-home">
-                                Design it. <br>
-                                Create it. Get Paid.
-                            </h1>
-                            <p class="ps-4 ms-1 mb-0 roboto fw-bold fs-fluid-sm ">Artovia is a platform where you can
-                                create,
-                                collaborate and get paid <br> for your creativity
-                            </p>
+            <div class="row pt-3 px-3">
+                <div class="col-12">
+                    <h3 class="theme-font theme-bottom-border">COMMISSIONS</h3>
+                </div>
+
+                <div class="col">
+                    <div class="row d-flex flex-row justify-content-between">
+                        <div class="col-12 col-sm-6">
+                            <button class="btn btn-fill w-100">CREATE</button>
                         </div>
-                        <div class="col-12 col-xl-8">
-                            <div class="row">
-                                <div class="col-12 col-md-4 ps-5 my-3 d-flex flex-row">
-                                    <img src="./public/img/connectIcon.svg" class="me-4 img-fluid">
-                                    <p class="">
-                                        <span class="fs-fluid-xs fw-bold theme-font-color">Design with freedom </span><br>
-                                        <span class="fs-fluid-xxs">Design and Create with no limits, make your ideas come to life!</span>
-                                    </p>
-
-                                </div>
-                                <div class="col-12 col-md-4 ps-5 my-3 d-flex flex-row">
-                                    <img src="./public/img/peopleIcon.svg" class="me-4 img-fluid">
-                                    <p class="">
-                                        <span class="fs-fluid-xs fw-bold theme-font-color">Work and collaborate  </span><br>
-                                        <span class="fs-fluid-xxs">Connect and collaborate with skilled and talented users worldwide.</span>
-                                    </p>
-
-                                </div>
-                                <div class="col-12 col-md-4 ps-5 my-3 d-flex flex-row">
-                                    <img src="./public/img/walletIcon.svg" class="me-4 img-fluid">
-                                    <p class="">
-                                        <span class="fs-fluid-xs fw-bold theme-font-color">Get paid securely </span><br>
-                                        <span class="fs-fluid-xxs">We make sure, creators get what they deserve.</span>
-                                    </p>
-
-                                </div>
+                        <div class="col-12 col-sm-6 d-flex flex-row mt-3 mt-sm-0">
+                            <input type="text" id="inputSearch" class="form-control me-2"
+                                aria-describedby="searchHelpBlock" placeholder="Search Commission">
+                            <div id="searchHelpBlock" class="form-text">
                             </div>
-
+                            <button class="btn btn-fill w-50">SEARCH</button>
                         </div>
-
-
-
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row my-3 px-3">
+                <div class="col border border-dark" id="commissionListContainer" style="min-height: 75vh;">
 
                 </div>
             </div>

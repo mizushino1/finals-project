@@ -199,6 +199,10 @@ p,
     border-radius: 10px;
 }
 
+.theme-bottom-border {
+    border-bottom: 3px solid #faefd0;
+}
+
 
 /* fill */
 
