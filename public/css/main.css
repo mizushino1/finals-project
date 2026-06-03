@@ -182,7 +182,6 @@ p,
     max-width: 180px;
     display: inline-flex;
     align-items: center;
-    /* Centers vertically (Y-axis) */
     justify-content: center;
     transition: background-color 0.3s ease,transform 0.5s ease ,color 0.3s ease, box-shadow 0.5s ease;
 }
