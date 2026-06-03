@@ -25,46 +25,6 @@
     --max-w:           1400px;
 }
 
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-family: var(--font-body);
-    font-weight: 500;
-    font-size: 0.82rem;
-    letter-spacing: 0.03em;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition);
-    border: 1.5px solid transparent;
-    white-space: nowrap;
-}
-
-.btn--ghost {
-    background: transparent;
-    color: var(--clr-mid);
-    border-color: var(--clr-border);
-}
-.btn--ghost:hover {
-    background: var(--clr-border);
-    color: var(--clr-dark);
-}
-
-.btn--accent {
-    background: var(--clr-accent);
-    color: #fff;
-    border-color: var(--clr-accent);
-}
-.btn--accent:hover {
-    background: var(--clr-accent-dark);
-    border-color: var(--clr-accent-dark);
-    box-shadow: 0 4px 14px rgb(201 135 58 / 35%);
-}
-
-.btn--sm {
-    padding: 0.32rem 0.85rem;
-    font-size: 0.78rem;
-}
 
 .hero {
     text-align: center;
