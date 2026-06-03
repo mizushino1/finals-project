@@ -16,9 +16,9 @@
                                     collaborate and get paid <br> for your creativity
                                 </p>
                             </div>
-                            <div class="col-12 col-xl-8">
+                            <div class="col-12 col-xl-10">
                                 <div class="row">
-                                    <div class="col-12 col-md-4 my-3 d-flex flex-row">
+                                    <div class="col-12 col-lg-4 my-3 d-flex flex-row">
                                         <img src="<?php echo BASE_URL; ?>public/img/connectIcon.svg" class="me-4 img-fluid">
                                         <p class="">
                                             <span class="fs-fluid-xs fw-bold theme-font-color">Design with freedom </span><br>
@@ -26,7 +26,7 @@
                                         </p>
 
                                     </div>
-                                    <div class="col-12 col-md-4 my-3 d-flex flex-row">
+                                    <div class="col-12 col-lg-4 my-3 d-flex flex-row">
                                         <img src="<?php echo BASE_URL; ?>public/img/peopleIcon.svg" class="me-4 img-fluid">
                                         <p class="">
                                             <span class="fs-fluid-xs fw-bold theme-font-color">Work and collaborate </span><br>
@@ -34,7 +34,7 @@
                                         </p>
 
                                     </div>
-                                    <div class="col-12 col-md-4 my-3 d-flex flex-row">
+                                    <div class="col-12 col-lg-4 my-3 d-flex flex-row">
                                         <img src="<?php echo BASE_URL; ?>public/img/walletIcon.svg" class="me-4 img-fluid">
                                         <p class="">
                                             <span class="fs-fluid-xs fw-bold theme-font-color">Get paid securely </span><br>
