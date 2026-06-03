@@ -132,3 +132,18 @@ alter table user_tbl add Email varchar(255);
 alter table artist_tbl add Email varchar(255);
 alter table administrator add Email varchar(255);
 alter table administrator add Phone varchar(20);
+
+--image table ni jay-r--
+create table image_tbl (
+    image_id INT NOT NULL AUTO_INCREMENT,
+    image_url VARCHAR(2048) NOT NULL,               
+    image_type VARCHAR(50) NOT NULL,               
+    user_id INT NULL,                              
+    artist_id INT NULL,                             
+    commission_id INT NULL,                 
+    uploaded_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_image PRIMARY KEY (image_id),
+    CONSTRAINT fk_image_user FOREIGN KEY (user_id) REFERENCES user_tbl(account_id) ON DELETE CASCADE,
+    CONSTRAINT fk_image_artist FOREIGN KEY (artist_id) REFERENCES artist_tbl(artist_id) ON DELETE CASCADE,
+    CONSTRAINT fk_image_commission FOREIGN KEY (commission_id) REFERENCES commission_tbl(commission_id) ON DELETE CASCADE
+);
