@@ -127,3 +127,8 @@ CREATE TABLE commission_request_tbl (
 ALTER TABLE commission_tbl DROP FOREIGN KEY fk_commission_artist;
 ALTER TABLE commission_tbl MODIFY artist_id INT NULL DEFAULT NULL;
 
+--query this -charles babbage--
+alter table user_tbl add Email varchar(255);
+alter table artist_tbl add Email varchar(255);
+alter table administrator add Email varchar(255);
+alter table administrator add Phone varchar(20);
