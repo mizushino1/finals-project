@@ -1,4 +1,4 @@
-<main class="">
+<main class="mt-5">
     <div class="container-fluid">
         <div class="row">
             <div class="col home-bg" style="min-height:100vh">
@@ -67,3 +67,26 @@
         </div>
     </div>
 </main>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-4 p-0">
+            <nav class="navbar bg-black p-0 mb-5 theme-border rounded-0">
+                <div class="container-fluid p-0">
+                    <ul class="nav flex-column w-100 p-0 m-0">
+                        <li class="nav-item bg-dark w-100 p-0 m-0">
+                            <a class="nav-link active" aria-current="page" href="#"><img src="<?php echo BASE_URL; ?>public/img/about.svg" alt=""></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link w-100 p-0 m-0" href="#">Link</a>
+                        </li>
+                        <li class="nav-item bg-dark w-100 p-0 m-0">
+                            <a class="nav-link" href="#">Link</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+        </div>
+    </div>
+</div>
