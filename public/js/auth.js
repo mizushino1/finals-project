@@ -1,6 +1,7 @@
 function setRole(role) {
     document.getElementById('registerRole').value = role;
 }
+
 // ── LOGIN FETCH ──
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
@@ -46,9 +47,13 @@ if (registerForm) {
     // Logic to handle tab switching for the role
     document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
         tab.addEventListener('shown.bs.tab', function (e) {
-            const role = this.innerText.toLowerCase(); // 'user' or 'artist'
+            // Cleans tab innerText (e.g., "Artist " -> "artist")
+            const role = this.innerText.trim().toLowerCase(); 
             const wrapper = document.getElementById('artistStartAtWrapper');
  
+            // Synchronize hidden input value with active Bootstrap tab selection
+            setRole(role);
+
             if (wrapper) {
                 wrapper.classList.toggle('d-none', role !== 'artist');
             }
@@ -61,9 +66,11 @@ if (registerForm) {
         const role = document.getElementById('registerRole').value;
         const firstName = document.getElementById('registerFirstName').value.trim();
         const lastName = document.getElementById('registerLastName').value.trim();
+        const email = document.getElementById('registerEmail').value.trim(); // Added to fix SQL NOT NULL constraint
         const username = document.getElementById('registerUsername').value.trim();
         const password = document.getElementById('registerPassword').value.trim();
         const startAt = document.getElementById('registerStartAt')?.value || 0;
+        
         const authModalEl = new bootstrap.Modal(document.getElementById('authModal'));
         const modalMessage = document.getElementById('modalMessage');
         const actionBtn = document.getElementById('modalActionBtn');
@@ -72,7 +79,16 @@ if (registerForm) {
             const res = await fetch(BASE_URL + 'api/auth/register.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ role, first_name: firstName, last_name: lastName, username, password, start_at: startAt })
+                // Payload now includes 'email' matching your updated PHP registration API
+                body: JSON.stringify({ 
+                    role, 
+                    first_name: firstName, 
+                    last_name: lastName, 
+                    email,
+                    username, 
+                    password, 
+                    start_at: startAt 
+                })
             });
             const data = await res.json();
  
@@ -146,7 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
  
- 
     // ─────────────────────────────────────────────────────────────────────────
     // ── LOGIN + REGISTER SWITCH (Login <-> Register) ─────────────────────────
     // ── Hoisted here so register fetch handler above can also call switchTo ──
@@ -187,7 +202,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1000);
         });
     }
- 
  
     // ─────────────────────────────────────────────────────────────────────────
     // ── EXCLUSIVE LOGIN FUNCTIONALITY (Only runs on login.php) ───────────────
@@ -240,7 +254,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
- 
  
     // ─────────────────────────────────────────────────────────────────────────
     // ── EXCLUSIVE FORGOT PASSWORD & OTP (Only runs on forgot_password.php) ───

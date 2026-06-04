@@ -1,149 +1,420 @@
-create database artovia_db;
+CREATE DATABASE artovia_db;
+USE artovia_db;
 
-use artovia_db;
+-- =====================================
+-- ROLE TABLE
+-- =====================================
 
-create table user_tbl (
-    account_id int not null auto_increment,
-    role varchar(50) not null,
-    username varchar(100) not null,
-    password varchar(255) not null,
-    acc_creation_date date not null,
-    last_name varchar(100) not null,
-    first_name varchar(100) not null,
-    account_status varchar(10) not null,
-    card_number varchar(20) null,
-    middle_name varchar(100) null,
-    constraint pk_user primary key (account_id)
+CREATE TABLE role_tbl (
+    role_id INT AUTO_INCREMENT PRIMARY KEY,
+    role_name VARCHAR(50) NOT NULL UNIQUE
 );
 
-create table artist_tbl (
-    artist_id int not null auto_increment,
-    role varchar(50) not null,
-    username varchar(100) not null,
-    password varchar(255) not null,
-    acc_creation_date date not null,
-    last_name varchar(100) not null,
-    first_name varchar(100) not null,
-    card_number varchar(20) null,
-    account_status varchar(10) not null,
-    start_at decimal(10,2) not null,
-    constraint pk_artist primary key (artist_id)
+-- =====================================
+-- ACCOUNT TABLE
+-- =====================================
+
+CREATE TABLE account_tbl (
+    account_id INT AUTO_INCREMENT PRIMARY KEY,
+    role_id INT NOT NULL,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    middle_name VARCHAR(100),
+    last_name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    phone VARCHAR(20),
+    account_status VARCHAR(20) NOT NULL DEFAULT 'Active',
+    creation_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (role_id)
+        REFERENCES role_tbl(role_id)
 );
 
-create table administrator (
-    admin_id int not null auto_increment,
-    username varchar(100) not null,
-    password varchar(255) not null,
-    role varchar(50) not null,
-    constraint pk_administrator primary key (admin_id)
+-- =====================================
+-- USER PROFILE
+-- =====================================
+
+CREATE TABLE user_tbl (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    account_id INT NOT NULL UNIQUE,
+    card_number VARCHAR(20),
+
+    FOREIGN KEY (account_id)
+        REFERENCES account_tbl(account_id)
+        ON DELETE CASCADE
 );
 
-create table hired_artist (
-    hire_id int not null auto_increment,
-    artist_id int,
-    admin_id int,
-    hire_date date not null,
-    status varchar(50) not null,
-    constraint pk_hired_artist primary key (hire_id),
-    constraint fk_hired_artist_artist foreign key (artist_id) references artist_tbl(artist_id),
-    constraint fk_hired_artist_admin foreign key (admin_id) references administrator(admin_id)
+-- =====================================
+-- ARTIST PROFILE
+-- =====================================
+
+CREATE TABLE artist_tbl (
+    artist_id INT AUTO_INCREMENT PRIMARY KEY,
+    account_id INT NOT NULL UNIQUE,
+    starting_rate DECIMAL(10,2) NOT NULL,
+
+    FOREIGN KEY (account_id)
+        REFERENCES account_tbl(account_id)
+        ON DELETE CASCADE
 );
 
-create table commission_tbl (
-    commission_id int not null auto_increment,
-    user_id int,
-    artist_id int,
-    description text null,
-    status varchar(50) not null,
-    commission_date date not null,
-    price decimal(10,2) not null,
-    constraint pk_commission primary key (commission_id),
-    constraint fk_commission_user foreign key (user_id) references user_tbl(account_id),
-    constraint fk_commission_artist foreign key (artist_id) references artist_tbl(artist_id)
+-- =====================================
+-- ADMIN PROFILE
+-- =====================================
+
+CREATE TABLE administrator_tbl (
+    admin_id INT AUTO_INCREMENT PRIMARY KEY,
+    account_id INT NOT NULL UNIQUE,
+
+    FOREIGN KEY (account_id)
+        REFERENCES account_tbl(account_id)
+        ON DELETE CASCADE
 );
 
-create table transaction_tbl (
-    transaction_id int not null auto_increment,
-    commission_id int,
-    user_id int,
-    artist_id int,
-    total_amount decimal(10,2) not null,
-    transaction_date date not null,
-    status varchar(50) not null,
-    constraint pk_transaction primary key (transaction_id),
-    constraint fk_transaction_commission foreign key (commission_id) references commission_tbl(commission_id),
-    constraint fk_transaction_user foreign key (user_id) references user_tbl(account_id),
-    constraint fk_transaction_artist foreign key (artist_id) references artist_tbl(artist_id)
+-- =====================================
+-- STATUS LOOKUP
+-- =====================================
+
+CREATE TABLE status_tbl (
+    status_id INT AUTO_INCREMENT PRIMARY KEY,
+    status_name VARCHAR(50) NOT NULL UNIQUE
 );
 
-create table payment_tbl (
-    payment_id int not null auto_increment,
-    transaction_id int,
-    amount decimal(10,2) not null,
-    payment_method varchar(50) not null,
-    status varchar(50) not null,
-    payment_date date not null,
-    constraint pk_payment primary key (payment_id),
-    constraint fk_payment_transaction foreign key (transaction_id) references transaction_tbl(transaction_id)
+-- =====================================
+-- PAYMENT METHOD LOOKUP
+-- =====================================
+
+CREATE TABLE payment_method_tbl (
+    payment_method_id INT AUTO_INCREMENT PRIMARY KEY,
+    payment_method_name VARCHAR(50) NOT NULL UNIQUE
 );
 
-create table favorites_table (
-    favorite_id int not null auto_increment,
-    user_id int,
-    artist_id int,
-    date_added date not null,
-    constraint pk_favorites primary key (favorite_id),
-    constraint fk_favorites_user foreign key (user_id) references user_tbl(account_id),
-    constraint fk_favorites_artist foreign key (artist_id) references artist_tbl(artist_id)
+-- =====================================
+-- HIRED ARTISTS
+-- =====================================
+
+CREATE TABLE hired_artist_tbl (
+    hire_id INT AUTO_INCREMENT PRIMARY KEY,
+    artist_id INT NOT NULL,
+    admin_id INT NOT NULL,
+    hire_date DATE NOT NULL,
+    status_id INT NOT NULL,
+
+    FOREIGN KEY (artist_id)
+        REFERENCES artist_tbl(artist_id),
+
+    FOREIGN KEY (admin_id)
+        REFERENCES administrator_tbl(admin_id),
+
+    FOREIGN KEY (status_id)
+        REFERENCES status_tbl(status_id)
 );
 
-create table message_box (
-    message_id int not null auto_increment,
-    sender_id int,
-    receiver_id int,
-    message_content text not null,
-    sent_at datetime not null,
-    status varchar(20) not null,
-    constraint pk_message_box primary key (message_id),
-    constraint fk_message_sender foreign key (sender_id) references user_tbl(account_id),
-    constraint fk_message_receiver foreign key (receiver_id) references artist_tbl(artist_id)
+-- =====================================
+-- COMMISSIONS
+-- =====================================
+
+CREATE TABLE commission_tbl (
+    commission_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    artist_id INT NULL,
+    description TEXT,
+    status_id INT NOT NULL,
+    commission_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    price DECIMAL(10,2) NOT NULL,
+
+    FOREIGN KEY (user_id)
+        REFERENCES user_tbl(user_id),
+
+    FOREIGN KEY (artist_id)
+        REFERENCES artist_tbl(artist_id),
+
+    FOREIGN KEY (status_id)
+        REFERENCES status_tbl(status_id)
 );
 
--- new addition, query this bayorn --
+-- =====================================
+-- COMMISSION REQUESTS
+-- =====================================
 
 CREATE TABLE commission_request_tbl (
-    request_id     INT NOT NULL AUTO_INCREMENT,
-    commission_id  INT NOT NULL,
-    artist_id      INT NOT NULL,
-    message        TEXT NULL,
-    status         VARCHAR(50) NOT NULL DEFAULT 'pending',
-    requested_at   DATE NOT NULL,
-    CONSTRAINT pk_commission_request PRIMARY KEY (request_id),
-    CONSTRAINT fk_cr_commission FOREIGN KEY (commission_id) REFERENCES commission_tbl(commission_id),
-    CONSTRAINT fk_cr_artist     FOREIGN KEY (artist_id)     REFERENCES artist_tbl(artist_id)
+    request_id INT AUTO_INCREMENT PRIMARY KEY,
+    commission_id INT NOT NULL,
+    artist_id INT NOT NULL,
+    message TEXT,
+    status_id INT NOT NULL,
+    requested_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (commission_id)
+        REFERENCES commission_tbl(commission_id),
+
+    FOREIGN KEY (artist_id)
+        REFERENCES artist_tbl(artist_id),
+
+    FOREIGN KEY (status_id)
+        REFERENCES status_tbl(status_id)
 );
 
+-- =====================================
+-- TRANSACTIONS
+-- =====================================
 
-ALTER TABLE commission_tbl DROP FOREIGN KEY fk_commission_artist;
-ALTER TABLE commission_tbl MODIFY artist_id INT NULL DEFAULT NULL;
+CREATE TABLE transaction_tbl (
+    transaction_id INT AUTO_INCREMENT PRIMARY KEY,
+    commission_id INT NOT NULL,
+    total_amount DECIMAL(10,2) NOT NULL,
+    transaction_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    status_id INT NOT NULL,
 
---query this -charles babbage--
-alter table user_tbl add Email varchar(255);
-alter table artist_tbl add Email varchar(255);
-alter table administrator add Email varchar(255);
-alter table administrator add Phone varchar(20);
+    FOREIGN KEY (commission_id)
+        REFERENCES commission_tbl(commission_id),
 
---image table ni jay-r--
-create table image_tbl (
-    image_id INT NOT NULL AUTO_INCREMENT,
-    image_url VARCHAR(2048) NOT NULL,               
-    image_type VARCHAR(50) NOT NULL,               
-    user_id INT NULL,                              
-    artist_id INT NULL,                             
-    commission_id INT NULL,                 
+    FOREIGN KEY (status_id)
+        REFERENCES status_tbl(status_id)
+);
+
+-- =====================================
+-- PAYMENTS
+-- =====================================
+
+CREATE TABLE payment_tbl (
+    payment_id INT AUTO_INCREMENT PRIMARY KEY,
+    transaction_id INT NOT NULL,
+    payment_method_id INT NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    status_id INT NOT NULL,
+    payment_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (transaction_id)
+        REFERENCES transaction_tbl(transaction_id),
+
+    FOREIGN KEY (payment_method_id)
+        REFERENCES payment_method_tbl(payment_method_id),
+
+    FOREIGN KEY (status_id)
+        REFERENCES status_tbl(status_id)
+);
+
+-- =====================================
+-- FAVORITES
+-- =====================================
+
+CREATE TABLE favorite_tbl (
+    favorite_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    artist_id INT NOT NULL,
+    date_added DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id)
+        REFERENCES user_tbl(user_id),
+
+    FOREIGN KEY (artist_id)
+        REFERENCES artist_tbl(artist_id),
+
+    UNIQUE(user_id, artist_id)
+);
+
+-- =====================================
+-- MESSAGES
+-- =====================================
+
+CREATE TABLE message_tbl (
+    message_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    sender_account_id INT NOT NULL,
+    receiver_account_id INT NOT NULL,
+
+    message_content TEXT NOT NULL,
+
+    sent_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    status_id INT NOT NULL,
+
+    FOREIGN KEY (sender_account_id)
+        REFERENCES account_tbl(account_id),
+
+    FOREIGN KEY (receiver_account_id)
+        REFERENCES account_tbl(account_id),
+
+    FOREIGN KEY (status_id)
+        REFERENCES status_tbl(status_id)
+);
+
+-- =====================================
+-- IMAGES
+-- =====================================
+
+CREATE TABLE image_tbl (
+    image_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    image_url VARCHAR(2048) NOT NULL,
+    image_type VARCHAR(50) NOT NULL,
+
+    user_id INT NULL,
+    artist_id INT NULL,
+    commission_id INT NULL,
+
     uploaded_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT pk_image PRIMARY KEY (image_id),
-    CONSTRAINT fk_image_user FOREIGN KEY (user_id) REFERENCES user_tbl(account_id) ON DELETE CASCADE,
-    CONSTRAINT fk_image_artist FOREIGN KEY (artist_id) REFERENCES artist_tbl(artist_id) ON DELETE CASCADE,
-    CONSTRAINT fk_image_commission FOREIGN KEY (commission_id) REFERENCES commission_tbl(commission_id) ON DELETE CASCADE
+
+    FOREIGN KEY (user_id)
+        REFERENCES user_tbl(user_id)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (artist_id)
+        REFERENCES artist_tbl(artist_id)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (commission_id)
+        REFERENCES commission_tbl(commission_id)
+        ON DELETE CASCADE
 );
+
+
+CREATE TABLE account_status_tbl (
+    account_status_id INT AUTO_INCREMENT PRIMARY KEY,
+    status_name VARCHAR(20) NOT NULL UNIQUE
+);
+
+INSERT INTO account_status_tbl(status_name)
+VALUES
+('Active'),
+('Banned'),
+('Suspended');
+
+ALTER TABLE account_tbl
+ADD account_status_id INT NOT NULL AFTER role_id;
+
+ALTER TABLE account_tbl
+ADD CONSTRAINT fk_account_status
+FOREIGN KEY (account_status_id)
+REFERENCES account_status_tbl(account_status_id);
+
+ALTER TABLE account_tbl
+DROP COLUMN account_status;
+
+CREATE TABLE image_type_tbl (
+    image_type_id INT AUTO_INCREMENT PRIMARY KEY,
+    image_type_name VARCHAR(50) NOT NULL UNIQUE
+);
+
+INSERT INTO image_type_tbl(image_type_name)
+VALUES
+('Profile'),
+('Artwork'),
+('Commission'),
+('Reference');
+
+ALTER TABLE image_tbl
+ADD image_type_id INT NOT NULL;
+
+ALTER TABLE image_tbl
+ADD CONSTRAINT fk_image_type
+FOREIGN KEY (image_type_id)
+REFERENCES image_type_tbl(image_type_id);
+
+ALTER TABLE image_tbl
+DROP COLUMN image_type;
+
+CREATE TABLE category_tbl (
+    category_id INT AUTO_INCREMENT PRIMARY KEY,
+    category_name VARCHAR(100) NOT NULL UNIQUE
+);
+
+INSERT INTO category_tbl(category_name)
+VALUES
+('Anime'),
+('Chibi'),
+('Pixel Art'),
+('Watercolor'),
+('Fantasy'),
+('Logo Design'),
+('Portrait'),
+('Character Design');
+
+ALTER TABLE commission_tbl
+ADD category_id INT NULL;
+
+ALTER TABLE commission_tbl
+ADD CONSTRAINT fk_commission_category
+FOREIGN KEY (category_id)
+REFERENCES category_tbl(category_id);
+
+ALTER TABLE artist_tbl
+ADD is_available BOOLEAN NOT NULL DEFAULT TRUE;
+
+ALTER TABLE account_tbl
+ADD updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+ON UPDATE CURRENT_TIMESTAMP;
+
+ALTER TABLE commission_tbl
+ADD updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+ON UPDATE CURRENT_TIMESTAMP;
+
+ALTER TABLE transaction_tbl
+ADD updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+ON UPDATE CURRENT_TIMESTAMP;
+
+ALTER TABLE payment_tbl
+ADD updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+ON UPDATE CURRENT_TIMESTAMP;
+
+ALTER TABLE commission_request_tbl
+ADD CONSTRAINT uq_artist_commission
+UNIQUE (commission_id, artist_id);
+
+CREATE TABLE conversation_tbl (
+    conversation_id INT AUTO_INCREMENT PRIMARY KEY,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE message_tbl
+ADD conversation_id INT NULL;
+
+ALTER TABLE message_tbl
+ADD CONSTRAINT fk_message_conversation
+FOREIGN KEY (conversation_id)
+REFERENCES conversation_tbl(conversation_id);
+
+CREATE TABLE portfolio_tbl (
+    portfolio_id INT AUTO_INCREMENT PRIMARY KEY,
+    artist_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (artist_id)
+    REFERENCES artist_tbl(artist_id)
+    ON DELETE CASCADE
+);
+
+CREATE TABLE portfolio_image_tbl (
+    portfolio_image_id INT AUTO_INCREMENT PRIMARY KEY,
+    portfolio_id INT NOT NULL,
+    image_url VARCHAR(2048) NOT NULL,
+
+    FOREIGN KEY (portfolio_id)
+    REFERENCES portfolio_tbl(portfolio_id)
+    ON DELETE CASCADE
+);
+
+INSERT INTO status_tbl(status_name)
+VALUES
+('Active'),
+('Pending'),
+('Accepted'),
+('Rejected'),
+('In Progress'),
+('Completed'),
+('Cancelled'),
+('Read'),
+('Unread'),
+('Paid');
+
+
+INSERT INTO payment_method_tbl(payment_method_name)
+VALUES
+('GCash'),
+('PayPal'),
+('Credit Card'),
+('Bank Transfer');

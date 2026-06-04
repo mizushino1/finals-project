@@ -4,18 +4,51 @@ require_once '../../config/database.php';
 
 header('Content-Type: application/json');
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+// 1. Strict Administrative Authentication Gate
+if (!isset($_SESSION['user_id']) || strtolower($_SESSION['role']) !== 'admin') {
+    echo json_encode(['success' => false, 'message' => 'Unauthorized administrative access.']);
     exit;
 }
 
 $data         = json_decode(file_get_contents('php://input'), true);
-$commissionId = intval($data['commission_id']);
-$db           = getDB();
+$commissionId = isset($data['commission_id']) ? intval($data['commission_id']) : 0;
 
-$stmt = $db->prepare('DELETE FROM commission_tbl WHERE commission_id = ?');
-$stmt->execute([$commissionId]);
+if ($commissionId <= 0) {
+    echo json_encode(['success' => false, 'message' => 'Invalid commission reference ID.']);
+    exit;
+}
 
-echo json_encode(['success' => true, 'message' => 'Listing removed']);
+$db = getDB();
 
+try {
+    // 2. Begin Transaction to guarantee relational cleanup safety
+    $db->beginTransaction();
+
+    // Step A: Delete all associated artist proposals/bids for this commission first
+    $stmtDeleteRequests = $db->prepare('DELETE FROM commission_request_tbl WHERE commission_id = ?');
+    $stmtDeleteRequests->execute([$commissionId]);
+
+    // Step B: Delete the parent commission listing itself
+    $stmtDeleteCommission = $db->prepare('DELETE FROM commission_tbl WHERE commission_id = ?');
+    $stmtDeleteCommission->execute([$commissionId]);
+
+    // All steps succeeded; permanently write changes to disk
+    $db->commit();
+
+    echo json_encode([
+        'success' => true, 
+        'message' => 'Commission listing and all associated artist proposals successfully moderation-purged.'
+    ]);
+
+} catch (PDOException $e) {
+    // Rollback completely if any individual deletion fails to prevent partial data deletion
+    if ($db->inTransaction()) {
+        $db->rollBack();
+    }
+    
+    echo json_encode([
+        'success' => false, 
+        'message' => 'Administrative deletion failed: ' . $e->getMessage()
+    ]);
+}
 ?>
