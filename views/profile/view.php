@@ -1,6 +1,64 @@
 <?php
-require_once __DIR__ . '/../../config/session.php';
+// Prevent session conflict errors if initialized globally by layout templates
+if (session_status() === PHP_SESSION_NONE) {
+    require_once __DIR__ . '/../../config/session.php';
+}
 require_once __DIR__ . '/../../config/constants.php';
+require_once __DIR__ . '/../../config/database.php'; 
+
+// 1. Determine active user account context safely
+if (isset($_GET['id'])) {
+    $profile_account_id = intval($_GET['id']);
+} elseif (isset($_SESSION['account_id'])) {
+    $profile_account_id = $_SESSION['account_id']; 
+} elseif (isset($_SESSION['user_id'])) {
+    $profile_account_id = $_SESSION['user_id'];
+} else {
+    die("Profile context not found. Please log in.");
+}
+
+// 2. Fetch records matching your specific artopia_db relations
+try {
+    $db = getDB(); 
+    
+    $query = "
+        SELECT 
+            a.account_id,
+            a.username,
+            a.first_name,
+            a.last_name,
+            art.artist_id,
+            art.starting_rate,
+            art.is_available,
+            u.user_id,
+            (SELECT img.image_url 
+             FROM image_tbl img 
+             WHERE (img.user_id = u.user_id OR img.artist_id = art.artist_id) 
+               AND img.image_type_id = 1 
+             ORDER BY img.uploaded_at DESC 
+             LIMIT 1) as avatar,
+            (SELECT COUNT(*) FROM favorite_tbl f WHERE f.artist_id = art.artist_id) as followers_count
+        FROM account_tbl a
+        LEFT JOIN artist_tbl art ON a.account_id = art.account_id
+        LEFT JOIN user_tbl u ON a.account_id = u.account_id
+        WHERE a.account_id = :account_id
+    ";
+    
+    $stmt = $db->prepare($query);
+    $stmt->execute([':account_id' => $profile_account_id]);
+    $profile = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$profile) {
+        die("User profile data could not be found inside the system tables.");
+    }
+
+    // Set variable strings immediately for the HTML block below
+    $clean_username = htmlspecialchars($profile['username']);
+    $display_name   = htmlspecialchars($profile['first_name'] . ' ' . $profile['last_name']);
+    
+} catch (PDOException $e) {
+    die("Database error: " . $e->getMessage());
+}
 ?>
 
 <section class="profile-header">
@@ -8,99 +66,90 @@ require_once __DIR__ . '/../../config/constants.php';
 
         <div class="d-flex align-items-start gap-3 flex-wrap">
 
-            <!-- Avatar -->
             <img
-                src="assets/img/default-avatar.png"
+                src="<?php echo !empty($profile['avatar']) ? BASE_URL . htmlspecialchars($profile['avatar']) : BASE_URL . 'public/assets/img/default-avatar.png'; ?>"
                 alt="User avatar"
-                class="profile-avatar"
-            >
+                class="profile-avatar">
 
-            <!-- Name / bio -->
             <div class="flex-grow-1 pt-1">
-                <h1 class="profile-username mb-1">USERNAME</h1>
-                <p class="profile-bio">hello I am Jay-R Umandap</p>
+                <h1 class="profile-username mb-1"><?php echo $clean_username; ?></h1>
+                
+                <p class="profile-bio">Hello, I am <?php echo $display_name; ?></p>
+                
+                <?php if (!empty($profile['artist_id'])): ?>
+                    <span class="badge bg-success">Artist</span>
+                    <small class="text-muted ms-2">Starting Rate: ₱<?php echo number_format($profile['starting_rate'], 2); ?></small>
+                <?php endif; ?>
             </div>
 
-            <!-- Search -->
             <div class="profile-search-wrapper ms-auto mt-1">
                 <i class="fas fa-search search-icon"></i>
                 <input
                     type="search"
                     class="profile-search-input"
-                    placeholder="Search"
-                    aria-label="Search profile"
-                >
+                    placeholder="Search profile portfolio"
+                    aria-label="Search profile">
             </div>
 
         </div>
 
-        <!-- Stats + action row -->
         <div class="d-flex align-items-center flex-wrap profile-stats-row mt-3">
 
-            <!-- Followers -->
             <div class="profile-stat">
-                <span class="profile-stat-value">1.14M</span>
+                <span class="profile-stat-value"><?php echo number_format($profile['followers_count'] ?? 0); ?></span>
                 <span class="profile-stat-label">Followers</span>
             </div>
 
-            <!-- Following -->
             <div class="profile-stat">
-                <span class="profile-stat-value">100K</span>
+                <span class="profile-stat-value">0</span>
                 <span class="profile-stat-label">Following</span>
             </div>
 
-            <!-- Likes -->
             <div class="profile-stat">
-                <span class="profile-stat-value">5.14M</span>
+                <span class="profile-stat-value">0</span>
                 <span class="profile-stat-label">Likes</span>
             </div>
 
-            <!-- Reviews -->
             <div class="profile-stat">
                 <span class="profile-stat-value profile-reviews-badge">
-                    <i class="fas fa-star"></i> 4.5/5
+                    <i class="fas fa-star"></i> 5.0/5
                 </span>
                 <span class="profile-stat-label">Reviews</span>
             </div>
 
-            <!-- Actions -->
             <div class="ms-auto d-flex align-items-center gap-2">
-                <?php if (isset($_SESSION['user_id'])): ?>
-                    <button
-                        class="btn btn-follow"
-                        type="button"
-                        id="btn-follow-action"
-                        data-following="0"
-                    >
-                        <i class="fas fa-plus me-1"></i> Follow
-                    </button>
-                    <button class="btn btn-notify" type="button" aria-label="Notifications">
-                        <i class="fas fa-bell"></i>
-                    </button>
+                <?php 
+                $session_active_id = $_SESSION['account_id'] ?? $_SESSION['user_id'] ?? null;
+                if ($session_active_id): 
+                ?>
+                    <?php if ($session_active_id != $profile['account_id']): ?>
+                        <button
+                            class="btn btn-follow"
+                            type="button"
+                            id="btn-follow-action"
+                            data-following="0"
+                            data-artist-id="<?php echo $profile['artist_id'] ?? 0; ?>">
+                            <i class="fas fa-plus me-1"></i> Favorite Artist
+                        </button>
+                        <button class="btn btn-notify" type="button" aria-label="Notifications">
+                            <i class="fas fa-bell"></i>
+                        </button>
+                    <?php else: ?>
+                        <a href="<?php echo BASE_URL; ?>views/profile/edit.php" class="btn btn-outline-secondary">Edit Account Settings</a>
+                    <?php endif; ?>
                 <?php else: ?>
                     <button
                         class="btn btn-follow"
                         type="button"
                         data-bs-toggle="modal"
-                        data-bs-target="#loginPromptModal"
-                    >
-                        <i class="fas fa-plus me-1"></i> Follow
-                    </button>
-                    <button
-                        class="btn btn-notify"
-                        type="button"
-                        data-bs-toggle="modal"
-                        data-bs-target="#loginPromptModal"
-                        aria-label="Notifications"
-                    >
-                        <i class="fas fa-bell"></i>
+                        data-bs-target="#loginPromptModal">
+                        <i class="fas fa-plus me-1"></i> Favorite Artist
                     </button>
                 <?php endif; ?>
             </div>
 
         </div>
 
-        <!-- Tab navigation -->
         <ul class="nav profile-tabs" id="profileTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button
@@ -111,8 +160,7 @@ require_once __DIR__ . '/../../config/constants.php';
                     type="button"
                     role="tab"
                     aria-controls="pane-artworks"
-                    aria-selected="true"
-                >Artworks</button>
+                    aria-selected="true">Artworks</button>
             </li>
             <li class="nav-item" role="presentation">
                 <button
@@ -123,8 +171,7 @@ require_once __DIR__ . '/../../config/constants.php';
                     type="button"
                     role="tab"
                     aria-controls="pane-collaborations"
-                    aria-selected="false"
-                >Collaborations</button>
+                    aria-selected="false">Collaborations</button>
             </li>
             <li class="nav-item" role="presentation">
                 <button
@@ -135,8 +182,7 @@ require_once __DIR__ . '/../../config/constants.php';
                     type="button"
                     role="tab"
                     aria-controls="pane-showcase"
-                    aria-selected="false"
-                >Showcase</button>
+                    aria-selected="false">Showcase</button>
             </li>
         </ul>
 
@@ -146,82 +192,15 @@ require_once __DIR__ . '/../../config/constants.php';
 <main class="py-4">
     <div class="container">
         <div class="tab-content" id="profileTabContent">
-
-            <!-- Artworks -->
-            <div
-                class="tab-pane fade show active"
-                id="pane-artworks"
-                role="tabpanel"
-                aria-labelledby="tab-artworks"
-            >
-                <p class="theme-font-color">Artworks content here.</p>
+            <div class="tab-pane fade show active" id="pane-artworks" role="tabpanel">
+                <p class="theme-font-color">Artworks content linked to portfolio items will populate here.</p>
             </div>
-
-            <!-- Collaborations -->
-            <div
-                class="tab-pane fade"
-                id="pane-collaborations"
-                role="tabpanel"
-                aria-labelledby="tab-collaborations"
-            >
-                <p class="theme-font-color">Collaborations content here.</p>
+            <div class="tab-pane fade" id="pane-collaborations" role="tabpanel">
+                <p class="theme-font-color">Collaborations data content here.</p>
             </div>
-
-            <!-- Showcase -->
-            <div
-                class="tab-pane fade"
-                id="pane-showcase"
-                role="tabpanel"
-                aria-labelledby="tab-showcase"
-            >
+            <div class="tab-pane fade" id="pane-showcase" role="tabpanel">
                 <p class="theme-font-color">Showcase content here.</p>
             </div>
-
         </div>
     </div>
 </main>
-
-<!-- Login prompt modal — guests only -->
-<?php if (!isset($_SESSION['user_id'])): ?>
-<div class="modal fade" id="loginPromptModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header border-0">
-                <h5 class="modal-title">Login Required</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>You need to be logged in to follow or interact with this artist.</p>
-            </div>
-            <div class="modal-footer border-0">
-                <a href="<?= BASE_URL ?>login" class="btn btn-primary">Log in</a>
-                <a href="<?= BASE_URL ?>register" class="btn btn-outline-secondary">Register</a>
-            </div>
-        </div>
-    </div>
-</div>
-<?php endif; ?>
-
-<!-- Follow toggle script — logged in users only -->
-<?php if (isset($_SESSION['user_id'])): ?>
-<script>
-(function () {
-    const btn = document.getElementById('btn-follow-action');
-    if (!btn) return;
-
-    btn.addEventListener('click', function () {
-        const isFollowing = this.dataset.following === '1';
-
-        if (isFollowing) {
-            this.dataset.following = '0';
-            this.classList.remove('following');
-            this.innerHTML = '<i class="fas fa-plus me-1"></i> Follow';
-        } else {
-            this.dataset.following = '1';
-            this.classList.add('following');
-            this.innerHTML = '<i class="fas fa-check me-1"></i> Following';
-        }
-    });
-})();
-</script>
-<?php endif; ?>
