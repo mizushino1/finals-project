@@ -7,24 +7,8 @@
 
              <div class="col border-bottom border-dark py-4">
                  <div class="row align-items-center">
-                     <div class="col-auto">
-                         <span class="me-2">Showing</span>
-                         <select class="form-select d-inline-block w-auto theme-white">
-                             <option selected>10</option>
-                             <option value="25">25</option>
-                             <option value="50">50</option>
-                         </select>
-                     </div>
 
                      <div class="col d-flex justify-content-end gap-2">
-                         <select class="form-select theme-fill w-auto" aria-label="Filter by genre">
-                             <option selected>Filter by Genre</option>
-                             <option value="digital">Digital Art</option>
-                             <option value="traditional">Traditional</option>
-                             <option value="concept">Concept Art</option>
-                             <option value="portrait">Portrait</option>
-                         </select>
-
                          <button class="btn btn-fill">
                              Add New Commission
                          </button>
@@ -37,12 +21,19 @@
              <div class="card theme-fill border-0 p-3">
                  <div class="table-responsive">
                      <table class="table table-borderless align-middle">
+                         <select class="form-select theme-fill w-auto" aria-label="Filter by genre">
+                             <option selected>Filter by Genre</option>
+                             <option value="digital">Digital Art</option>
+                             <option value="traditional">Traditional</option>
+                             <option value="concept">Concept Art</option>
+                             <option value="portrait">Portrait</option>
+                         </select>
                          <thead>
                              <tr class="text-muted">
+                                 <th scope="col">Hired Artist</th>
                                  <th scope="col">Commission Name</th>
-                                 <th scope="col">ID</th>
-                                 <th scope="col">Price</th>
                                  <th scope="col">Genre</th>
+                                 <th scope="col">Pricing</th>
                                  <th scope="col">Status</th>
                                  <th scope="col">Action</th>
                              </tr>
@@ -52,17 +43,17 @@
                                  <td>
                                      <div class="d-flex align-items-center">
                                          <img src="public/uploads/commissions/placeholder.jpg" width="40" height="40"
-                                             class="rounded-circle me-3" alt="Art">
-                                         <span class="fw-bold">Commission Title</span>
+                                             class="rounded-circle me-3" alt="Artist">
+                                         <span class="fw-bold">Artist Name</span>
                                      </div>
                                  </td>
-                                 <td>#ATV-0001</td>
-                                 <td>$100</td>
-                                 <td>Digital Art</td>
+                                 <td>Commission Names</td>
+                                 <td>Anime</td>
+                                 <td>$100,000</td>
                                  <td>
                                      <span class="badge rounded-pill bg-warning text-dark">Pending</span>
                                  </td>
-                                 <td><i class="bi bi-three-dots"></i></td>
+                                 <td><i class="btn btn-fill">Edit</td>
                              </tr>
                          </tbody>
                      </table>
