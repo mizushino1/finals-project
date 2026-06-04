@@ -204,3 +204,5 @@ try {
         </div>
     </div>
 </main>
+
+<script src="<?php echo BASE_URL; ?>public/assets/js/profile.js"></script>
