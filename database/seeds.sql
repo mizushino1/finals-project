@@ -4,11 +4,6 @@ VALUES
 ('Artist'),
 ('Administrator');
 
-INSERT INTO account_status_tbl (status_name)
-VALUES
-('Active'),
-('Banned'),
-('Suspended');
 
 INSERT INTO account_tbl
 (
@@ -66,18 +61,6 @@ VALUES
 (1,1,'2024-01-01',1),
 (2,1,'2024-01-15',1),
 (3,1,'2024-02-01',1);
-
-INSERT INTO category_tbl
-(category_name)
-VALUES
-('Anime'),
-('Chibi'),
-('Pixel Art'),
-('Watercolor'),
-('Fantasy'),
-('Logo Design'),
-('Portrait'),
-('Character Design');
 
 INSERT INTO commission_tbl
 (
