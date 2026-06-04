@@ -1,88 +1,101 @@
-<?php require_once __DIR__ . '/../../src/middleware/auth_middleware.php'; ?>
-<main class="py-5">
-    <div class="container-fluid" style="max-width: 1200px;">
+<?php 
+require_once __DIR__ . '/../../src/middleware/auth_middleware.php'; 
+
+$user_name        = htmlspecialchars($_SESSION['user']['name'] ?? '');
+$user_username    = htmlspecialchars($_SESSION['user']['username'] ?? '');
+$user_bio         = htmlspecialchars($_SESSION['user']['bio'] ?? '');
+$user_email       = htmlspecialchars($_SESSION['user']['email'] ?? '');
+$user_phone       = htmlspecialchars($_SESSION['user']['phone'] ?? '');
+$artist_desc      = htmlspecialchars($_SESSION['user']['artist_description'] ?? '');
+$avatar_url       = $_SESSION['user']['avatar_url'] ?? '';
+?>
+
+<link rel="stylesheet" href="<?= BASE_URL ?>public/css/profile.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>public/css/settings.css">
+
+<main class="py-5 settings-main">
+    <div class="container-fluid settings-container">
         <div class="row justify-content-center">
-            <div class="col-12"
-                style="background: #ffffff; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+            <div class="col-12 settings-card">
 
-                <h2 style="border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 30px; color: #333;">
-                    Account Settings</h2>
+                <h2 class="settings-title">Account Settings</h2>
 
-                <form action="<?php echo BASE_URL; ?>/api/profile/update.php" method="POST"
-                    enctype="multipart/form-data">
+                <form action="<?= BASE_URL; ?>/api/profile/update.php" method="POST" enctype="multipart/form-data">
                     <div class="row g-4">
+                        
                         <div class="col-md-6">
-                            <div class="theme-border" style="padding: 20px; margin-bottom: 20px;">
-                                <h5 style="color: #333; margin-bottom: 15px;"><i class="bi bi-person"></i> Personal
-                                    Information</h5>
+                            
+                            <div class="settings-group-box">
+                                <h5 class="settings-section-title"><i class="bi bi-person"></i> Personal Information</h5>
+                                
                                 <div class="row">
                                     <div class="col-6 mb-3">
-                                        <label class="form-label">Full Name</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="bi bi-person"></i></span>
-                                            <input type="text" class="form-control" name="name" placeholder="Name">
+                                        <label class="settings-label">Full Name</label>
+                                        <div class="custom-input-group">
+                                            <span class="settings-addon-icon"><i class="bi bi-person"></i></span>
+                                            <input type="text" class="settings-input-override" name="name" value="<?= $user_name ?>" placeholder="Name" required>
                                         </div>
                                     </div>
                                     <div class="col-6 mb-3">
-                                        <label class="form-label">Username</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
-                                            <input type="text" class="form-control" name="username"
-                                                placeholder="Username">
+                                        <label class="settings-label">Username</label>
+                                        <div class="custom-input-group">
+                                            <span class="settings-addon-icon"><i class="bi bi-person-badge"></i></span>
+                                            <input type="text" class="settings-input-override" name="username" value="<?= $user_username ?>" placeholder="Username" required>
                                         </div>
                                     </div>
                                 </div>
+                                
                                 <div class="mb-3">
-                                    <label class="form-label">Edit Bio</label>
-                                    <div class="input-group">
-                                        <textarea class="form-control" rows="2" name="bio"
-                                            placeholder="Bio..."></textarea>
-                                    </div>
+                                    <label class="settings-label">Edit Bio</label>
+                                    <textarea class="settings-textarea-override" rows="2" name="bio" placeholder="Bio..."><?= $user_bio ?></textarea>
                                 </div>
+                                
                                 <div class="row">
                                     <div class="col-6 mb-3">
-                                        <label class="form-label">Email</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                                            <input type="email" name="email" class="form-control">
+                                        <label class="settings-label">Email</label>
+                                        <div class="custom-input-group">
+                                            <span class="settings-addon-icon"><i class="bi bi-envelope"></i></span>
+                                            <input type="email" name="email" value="<?= $user_email ?>" class="settings-input-override" required>
                                         </div>
                                     </div>
                                     <div class="col-6 mb-3">
-                                        <label class="form-label">Phone</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><i class="bi bi-telephone"></i></span>
-                                            <input type="text" name="phone" class="form-control">
+                                        <label class="settings-label">Phone</label>
+                                        <div class="custom-input-group">
+                                            <span class="settings-addon-icon"><i class="bi bi-telephone"></i></span>
+                                            <input type="text" name="phone" value="<?= $user_phone ?>" class="settings-input-override">
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="theme-border" style="padding: 20px;">
-                                <h5 style="color: #333; margin-bottom: 15px;"><i class="bi bi-lock"></i> Security</h5>
+                            <div class="settings-group-box">
+                                <h5 class="settings-section-title"><i class="bi bi-lock"></i> Security</h5>
+                                
                                 <div class="mb-3">
-                                    <label class="form-label">Current Password</label>
-                                    <div class="input-group">
-                                        <input type="password" name="current_password" class="form-control">
-                                        <span class="input-group-text eye-toggle-icon">
+                                    <label class="settings-label">Current Password</label>
+                                    <div class="custom-input-group">
+                                        <input type="password" name="current_password" class="settings-input-override">
+                                        <span class="settings-addon-icon interactive-cursor eye-toggle-icon">
                                             <i class="bi bi-eye-slash"></i>
                                         </span>
                                     </div>
                                 </div>
+                                
                                 <div class="row">
                                     <div class="col-6">
-                                        <label class="form-label">New Password</label>
-                                        <div class="input-group">
-                                            <input type="password" name="new_password" class="form-control">
-                                            <span class="input-group-text eye-toggle-icon">
+                                        <label class="settings-label">New Password</label>
+                                        <div class="custom-input-group">
+                                            <input type="password" name="new_password" class="settings-input-override">
+                                            <span class="settings-addon-icon interactive-cursor eye-toggle-icon">
                                                 <i class="bi bi-eye-slash"></i>
                                             </span>
                                         </div>
                                     </div>
                                     <div class="col-6">
-                                        <label class="form-label">Confirm Password</label>
-                                        <div class="input-group">
-                                            <input type="password" name="confirm_password" class="form-control">
-                                            <span class="input-group-text eye-toggle-icon">
+                                        <label class="settings-label">Confirm Password</label>
+                                        <div class="custom-input-group">
+                                            <input type="password" name="confirm_password" class="settings-input-override">
+                                            <span class="settings-addon-icon interactive-cursor eye-toggle-icon">
                                                 <i class="bi bi-eye-slash"></i>
                                             </span>
                                         </div>
@@ -92,56 +105,65 @@
                         </div>
 
                         <div class="col-md-6">
-                            <div class="theme-border" style=" padding: 20px; margin-bottom: 20px;">
-                                <h5 style="margin-bottom: 15px;"><i class="bi bi-person-circle"></i> Avatar / Profile
-                                    Picture</h5>
+                            
+                            <div class="settings-group-box">
+                                <h5 class="settings-section-title"><i class="bi bi-person-circle"></i> Avatar / Profile Picture</h5>
 
                                 <div class="row align-items-center">
                                     <div class="col-5 text-center">
-                                        <div
-                                            style="width: 100px; height: 100px; background: #eee; border-radius: 50%; margin: 0 auto 10px auto; border: 2px solid #ccc;">
-                                        </div>
-                                        <button type="button" id="removeAvatarBtn"
-                                            class="btn btn-outline btn-sm w-100">Remove Avatar</button>
+                                        <?php if (!empty($avatar_url)): ?>
+                                            <img src="<?= BASE_URL . htmlspecialchars($avatar_url) ?>" alt="Avatar Preview" class="profile-avatar mb-2" id="avatarPreview">
+                                            <div id="avatarPreviewPlaceholder" class="avatar-fb-placeholder mb-2 d-none align-items-center justify-content-center">
+                                                <svg viewBox="0 0 24 24" fill="#adb5bd">
+                                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                                </svg>
+                                            </div>
+                                        <?php else: ?>
+                                            <img src="" alt="Avatar Preview" class="profile-avatar mb-2 d-none" id="avatarPreview">
+                                            <div id="avatarPreviewPlaceholder" class="avatar-fb-placeholder mb-2 d-inline-flex align-items-center justify-content-center">
+                                                <svg viewBox="0 0 24 24" fill="#adb5bd">
+                                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                                </svg>
+                                            </div>
+                                        <?php endif; ?>
+
+                                        <button type="button" id="removeAvatarBtn" class="btn btn-outline-danger btn-sm w-100 btn-font-sz mt-2">Remove Avatar</button>
                                     </div>
 
                                     <div class="col-7 text-center">
-                                        <div class="p-3"
-                                            style="border: 1px dashed #aaa; border-radius: 8px; background: #fafafa;">
-                                            <p style="font-size: 0.85rem; margin-bottom: 10px;">
+                                        <div class="p-3 avatar-upload-zone">
+                                            <p class="avatar-upload-text">
                                                 <strong>Choose New Avatar</strong><br>
-                                                Drag & drop an image here or click browse here
+                                                Drag & drop an image here or click browse below
                                             </p>
-                                            <button type="button" id="uploadImageBtn"
-                                                class="btn btn-sm btn-fill fw-bold w-100">
+                                            <input type="file" name="avatar" id="avatarFileInput" accept="image/png, image/jpeg" class="hidden-file-input">
+                                            <button type="button" id="uploadImageBtn" class="btn-follow w-100 py-1 btn-font-sz">
                                                 <i class="bi bi-upload"></i> Select Image
                                             </button>
                                         </div>
-                                        <small class="text-muted" style="font-size: 0.75rem;">Recommended PNG</small>
+                                        <small class="text-muted btn-font-sz mt-1 d-block">Recommended PNG/JPG</small>
                                     </div>
                                 </div>
                             </div>
 
-                            <div style="border: 1px solid #ffcc99; border-radius: 10px; padding: 20px;">
-                                <h5 style="color: #333; margin-bottom: 15px;"><i class="bi bi-pencil-square"></i> Artist
-                                    Description</h5>
-                                <textarea class="form-control" rows="6"
-                                    placeholder="Tell us about your art..."></textarea>
-                                <small class="text-muted d-block mt-1 text-end">0/250</small>
+                            <div class="artist-box-highlight">
+                                <h5 class="settings-section-title"><i class="bi bi-pencil-square"></i> Artist Description</h5>
+                                <textarea class="settings-textarea-override" rows="6" name="artist_description" id="artistDescText" maxlength="250" placeholder="Tell us about your art..."><?= $artist_desc ?></textarea>
+                                <small class="text-muted d-block mt-1 text-end" id="charCounter">0/250</small>
                             </div>
-                            <div class="py-3"><a class="btn btn-outline"
-                                    href="<?php echo BASE_URL; ?>settings/edit-profile">Edit Profile</a></div>
+                            <div class="py-3">
+                                <a class="btn btn-outline-secondary btn-sm px-3 profile-sub-weight" href="<?php echo BASE_URL; ?>settings/edit-profile">Edit Profile View</a>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="row mt-4 align-items-center">
+                    <div class="row mt-4 align-items-center settings-footer-actions">
                         <div class="col-6 d-flex gap-2">
-                            <button type="submit" id="submit" class="btn btn-success fw-bold">Save Changes</button>
-                            <button type="button" id="clearForm" class="btn btn-danger fw-bold">Cancel</button>
+                            <button type="submit" id="submit" class="btn-follow">Save Changes</button>
+                            <button type="button" id="clearForm" class="btn btn-outline-secondary btn-sm px-3 btn-cancel-custom">Cancel</button>
                         </div>
                         <div class="col-6 text-end">
-                            <button type="button" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i>
-                                Delete Account</button>
+                            <button type="button" id="deleteAccountBtn" class="btn btn-outline-danger btn-sm btn-delete-custom"><i class="bi bi-trash"></i> Delete Account</button>
                         </div>
                     </div>
                 </form>
@@ -150,4 +172,5 @@
     </div>
 </main>
 
-<script src="<?php echo BASE_URL; ?>public/js/auth.js"></script>
+<script src="<?= BASE_URL; ?>public/js/auth.js"></script>
+<script src="<?= BASE_URL; ?>public/js/settings.js"></script>

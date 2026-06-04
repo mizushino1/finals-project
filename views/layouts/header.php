@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/otp.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/browse.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/profile.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/settings.css">
 
 </head>
 
