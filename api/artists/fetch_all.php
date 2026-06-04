@@ -4,8 +4,9 @@ require_once '../../config/database.php';
 
 header('Content-Type: application/json');
 
-// Verify Authentication (Any logged-in user, artist, or admin can view the artist marketplace)
-if (!isset($_SESSION['user_id'])) {
+// 1. Optional Authentication Check 
+// (Remove this gate if you want non-logged-in visitors to browse artists!)
+if (!isset($_SESSION['account_id'])) {
     echo json_encode(['success' => false, 'message' => 'Unauthorized access.']);
     exit;
 }
@@ -13,33 +14,35 @@ if (!isset($_SESSION['user_id'])) {
 $db = getDB();
 
 try {
-    // JOIN the tables to pull credentials from account_tbl and pricing from artist_tbl
+    // 2. Fetch all registered artists, joining their status and core account details
     $stmt = $db->prepare('
         SELECT 
-            art.artist_id, 
             a.account_id,
-            a.username, 
-            a.first_name,
-            a.last_name,
-            art.start_at, 
-            a.account_status
-        FROM artist_tbl art
-        INNER JOIN account_tbl a ON art.account_id = a.account_id
-        WHERE LOWER(a.account_status) = "active"
-        ORDER BY art.start_at ASC
+            a.username,
+            a.email,
+            s.status_name AS account_status,
+            art.artist_id,
+            art.starting_rate,
+            art.is_available
+        FROM account_tbl a
+        JOIN account_status_tbl s ON a.account_status_id = s.account_status_id
+        JOIN artist_tbl art ON a.account_id = art.account_id
+        WHERE s.status_name = "Active" AND art.is_available = 1
+        ORDER BY a.username ASC
     ');
     $stmt->execute();
-
+    
     $artists = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // 3. Dispatch unified JSON array back to browse.js
     echo json_encode([
-        'success' => true, 
-        'data' => $artists ? $artists : []
+        'success' => true,
+        'data'    => $artists
     ]);
 
 } catch (PDOException $e) {
     echo json_encode([
-        'success' => false, 
+        'success' => false,
         'message' => 'Database operation error: ' . $e->getMessage()
     ]);
 }

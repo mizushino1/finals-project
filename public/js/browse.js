@@ -6,22 +6,25 @@ document.addEventListener('DOMContentLoaded', () => {
     let allArtists = [];
 
     // ── Elements ──
-    const artistGrid        = document.getElementById('artistGrid');
+    const artistGrid = document.getElementById('artistGrid');
     const artistGridLoading = document.getElementById('artistGridLoading');
-    const artistGridError   = document.getElementById('artistGridError');
-    const artistGridEmpty   = document.getElementById('artistGridEmpty');
-    const topArtistsGrid    = document.getElementById('topArtistsGrid');
+    const artistGridError = document.getElementById('artistGridError');
+    const artistGridEmpty = document.getElementById('artistGridEmpty');
+    const topArtistsGrid = document.getElementById('topArtistsGrid');
     const topArtistsLoading = document.getElementById('topArtistsLoading');
-    const searchInput       = document.getElementById('searchInput');
-    const searchBtn         = document.getElementById('searchBtn');
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
 
     // ── Build a single artist card HTML ──
     function buildCard(artist) {
-        const isOpen   = artist.account_status === 'active';
-        const name     = artist.username      ?? 'Unknown';
-        const price    = artist.start_at      ?? '0';
+        // Aligned with account_status_tbl string output ('Active')
+        const isOpen = artist.account_status && artist.account_status.toLowerCase() === 'active';
+        const name = artist.username ?? 'Unknown';
+
+        // Aligned with your exact artist_tbl column definition ('starting_rate')
+        const price = artist.starting_rate ?? '0';
         const statusClass = isOpen ? 'open' : 'closed';
-        const statusText  = isOpen ? '● Open commission' : '● Closed commission';
+        const statusText = isOpen ? '● Open commission' : '● Closed commission';
 
         return `
         <div class="artist-card" data-id="${artist.artist_id}" data-price="${price}" data-open="${isOpen ? 1 : 0}">
@@ -41,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="artist-card__header">
                     <span class="artist-card__name">${name}</span>
                 </div>
-                <p class="artist-card__starting">Start at ₱${parseFloat(price).toLocaleString()}</p>
+                <p class="artist-card__starting">Start at ₱${parseFloat(price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                 <span class="artist-card__status artist-card__status--${statusClass}">${statusText}</span>
             </div>
             <div class="artist-card__actions">
@@ -60,16 +63,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── Wishlist toggle ──
     function attachWishlistListeners(container) {
         container.querySelectorAll('.artist-card__wishlist').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const svg    = btn.querySelector('svg');
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const svg = btn.querySelector('svg');
                 const active = btn.dataset.active === '1';
                 if (active) {
                     svg.setAttribute('fill', 'none');
-                    svg.style.color  = '';
+                    svg.style.color = '';
                     btn.dataset.active = '0';
                 } else {
                     svg.setAttribute('fill', 'currentColor');
-                    svg.style.color  = '#c9873a';
+                    svg.style.color = '#c9873a';
                     btn.dataset.active = '1';
                 }
             });
@@ -78,17 +82,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Apply filters and search to allArtists ──
     function applyFilters() {
-        const priceVal        = document.querySelector('input[name="price"]:checked')?.value ?? '0-99999';
+        // Fallback changed from '0-999999' as an explicit safety net if no radio is checked
+        const priceVal = document.querySelector('input[name="price"]:checked')?.value ?? '0-999999';
         const availabilityVal = document.querySelector('input[name="availability"]:checked')?.value ?? 'all';
-        const searchVal       = searchInput?.value.trim().toLowerCase() ?? '';
+        const searchVal = searchInput?.value.trim().toLowerCase() ?? '';
 
         const [minPrice, maxPrice] = priceVal.split('-').map(Number);
 
         const filtered = allArtists.filter(a => {
-            const price    = parseFloat(a.start_at ?? 0);
+            const price = parseFloat(a.starting_rate ?? 0);
             const matchesPrice = price >= minPrice && price <= maxPrice;
-            const matchesAvail = availabilityVal === 'all' || (availabilityVal === 'open' && a.account_status === 'active');
+            const matchesAvail = availabilityVal === 'all' ||
+                (availabilityVal === 'open' && a.account_status && a.account_status.toLowerCase() === 'active');
             const matchesSearch = !searchVal || a.username.toLowerCase().includes(searchVal);
+
             return matchesPrice && matchesAvail && matchesSearch;
         });
 
@@ -102,36 +109,40 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ── Fetch all artists from profile API ──
+    // ── Fetch all artists from API ──
     async function loadArtists() {
         try {
-            const res  = await fetch(`${BASE_URL}api/artists/fetch_all.php`);
+            const res = await fetch(`${BASE_URL}api/artists/fetch_all.php`);
             const data = await res.json();
 
             artistGridLoading.classList.add('d-none');
 
-            if (!data.success || !data.data.length) {
+            if (!data.success || !data.data || !data.data.length) {
                 artistGridEmpty.classList.remove('d-none');
                 return;
             }
 
             allArtists = data.data;
             artistGrid.classList.remove('d-none');
+
             renderCards(artistGrid, allArtists);
 
-            // Top artists = highest start_at (top 4)
+            // Top artists sorting updated to prioritize 'starting_rate'
             const top4 = [...allArtists]
-                .sort((a, b) => parseFloat(b.start_at) - parseFloat(a.start_at))
+                .sort((a, b) => parseFloat(b.starting_rate ?? 0) - parseFloat(a.starting_rate ?? 0))
                 .slice(0, 4);
 
             topArtistsLoading.classList.add('d-none');
             topArtistsGrid.classList.remove('d-none');
             renderCards(topArtistsGrid, top4);
 
+            // Sync checkbox defaults right away on launch
+            applyFilters();
+
         } catch (err) {
             artistGridLoading.classList.add('d-none');
             artistGridError.classList.remove('d-none');
-            console.error('Failed to load artists:', err);
+            console.error('Failed to load marketplace content:', err);
         }
     }
 
@@ -141,12 +152,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ── Search listeners ──
-    if (searchBtn)   searchBtn.addEventListener('click', applyFilters);
+    if (searchBtn) searchBtn.addEventListener('click', applyFilters);
     if (searchInput) searchInput.addEventListener('keydown', e => {
         if (e.key === 'Enter') applyFilters();
     });
 
     // ── Init ──
     loadArtists();
-
 });
