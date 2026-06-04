@@ -1,41 +1,36 @@
 <?php
-// 1. Initialize System Configurations and Core Lifecycle Engines
-if (session_status() === PHP_SESSION_NONE) {
-    require_once __DIR__ . '/../../config/session.php'; 
-}
+require_once __DIR__ . '/../../config/session.php';
 require_once __DIR__ . '/../../config/database.php';
-
-// 2. Import and trigger your explicit routing safeguard gate
-// This automatically verifies active contexts or gracefully halts unauthorized traffic
-require_once __DIR__ . '/../../src/middleware/auth_middleware.php'; 
+require_once __DIR__ . '/../../src/middleware/auth_middleware.php';
 
 header('Content-Type: application/json');
 
-// Verify incoming request protocol methodology matches form bindings
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['success' => false, 'message' => 'Invalid request protocol methodology.']);
+    echo json_encode(['success' => false, 'message' => 'Invalid request method']);
     exit;
 }
 
-// Fallback lookup: Ensure safe alignment with profile/fetch.php structures 
-$account_id = $_SESSION['account_id'] ?? $_SESSION['user_id'] ?? null;
+// Map session tracking fields safely.
+// $_SESSION['user_id'] holds sub-table IDs (user_id/artist_id/admin_id), NOT account_id.
+$id   = $_SESSION['user_id'] ?? null;
+$role = strtolower($_SESSION['role'] ?? '');
 
-if (!$account_id) {
-    echo json_encode(['success' => false, 'message' => 'Session identification index missing. Please re-authenticate.']);
+if (!$id) {
+    echo json_encode(['success' => false, 'message' => 'Not authenticated']);
     exit;
 }
 
-// 3. Collect sanitized input components from layout form bindings
-$name        = trim($_POST['name'] ?? '');
-$username    = trim($_POST['username'] ?? '');
-$email       = trim($_POST['email'] ?? '');
-$bio         = trim($_POST['bio'] ?? '');
-$phone       = trim($_POST['phone'] ?? '');
-$artist_desc = trim($_POST['artist_description'] ?? '');
+// Collect form inputs
+$first_name  = trim($_POST['first_name']  ?? '');
+$middle_name = trim($_POST['middle_name'] ?? '');
+$last_name   = trim($_POST['last_name']   ?? '');
+$username    = trim($_POST['username']    ?? '');
+$email       = trim($_POST['email']       ?? '');
+$phone       = trim($_POST['phone']       ?? '');
 $delete_avatar = intval($_POST['delete_avatar'] ?? 0);
 
-if (empty($name) || empty($username) || empty($email)) {
-    echo json_encode(['success' => false, 'message' => 'Required user parameter profiles are missing.']);
+if (empty($first_name) || empty($last_name) || empty($username) || empty($email)) {
+    echo json_encode(['success' => false, 'message' => 'First name, last name, username and email are required']);
     exit;
 }
 
@@ -43,83 +38,123 @@ try {
     $db = getDB();
     $db->beginTransaction();
 
-    // Parse the compound name back into structural components
-    $parts = explode(' ', $name, 2);
-    $first_name = $parts[0];
-    $last_name = $parts[1] ?? '';
-
-    // Update Master Profile Data Account structures
-    $stmt = $db->prepare("
-        UPDATE account_tbl 
-        SET username = ?, email = ?, first_name = ?, last_name = ? 
-        WHERE account_id = ?
-    ");
-    $stmt->execute([$username, $email, $first_name, $last_name, $account_id]);
-
-    // 4. Conditional Sub-Tier Context Updates (User vs Artist configurations)
-    $role = strtolower($_SESSION['role'] ?? '');
+    // 1. DYNAMIC REVERSE-LOOKUP: Trace the exact primary account_id using the session's sub-profile ID
+    $account_id = null;
     
-    if ($role === 'user' || $role === 'client') {
-        $updateUser = $db->prepare("UPDATE user_tbl SET card_number = ? WHERE account_id = ?");
-        $updateUser->execute([$phone, $account_id]);
+    if ($role === 'user') {
+        $stmt = $db->prepare('SELECT account_id FROM user_tbl WHERE user_id = ?');
+        $stmt->execute([$id]);
+        $account_id = $stmt->fetchColumn();
     } elseif ($role === 'artist') {
-        // If your database schema separates user details, you can update additional text fields here
-        // e.g., UPDATE artist_tbl SET dynamic_description = ? WHERE account_id = ?
+        $stmt = $db->prepare('SELECT account_id FROM artist_tbl WHERE artist_id = ?');
+        $stmt->execute([$id]);
+        $account_id = $stmt->fetchColumn();
+    } elseif ($role === 'admin') {
+        $stmt = $db->prepare('SELECT account_id FROM administrator_tbl WHERE admin_id = ?');
+        $stmt->execute([$id]);
+        $account_id = $stmt->fetchColumn();
     }
 
-    // 5. Explicit Security Mutation Handler (Password Update Execution)
-    if (!empty($_POST['current_password']) && !empty($_POST['new_password'])) {
-        $checkPwd = $db->prepare("SELECT password_hash FROM account_tbl WHERE account_id = ?");
-        $checkPwd->execute([$account_id]);
-        $hash = $checkPwd->fetchColumn();
+    // Safety fallback: Halt processing if the database cannot resolve who owns this identity session context
+    if (!$account_id) {
+        throw new Exception('Account context mapping mismatch error.');
+    }
 
-        if ($hash && password_verify($_POST['current_password'], $hash)) {
-            if ($_POST['new_password'] === $_POST['confirm_password']) {
-                $newHash = password_hash($_POST['new_password'], PASSWORD_ARGON2ID);
-                $updatePwd = $db->prepare("UPDATE account_tbl SET password_hash = ? WHERE account_id = ?");
-                $updatePwd->execute([$newHash, $account_id]);
-            } else {
-                throw new Exception("New confirmation fields do not match structural specifications.");
+    // 2. Securely update the master credentials/personal info row matching the resolved account record
+    $stmt = $db->prepare('
+        UPDATE account_tbl
+        SET first_name = ?, middle_name = ?, last_name = ?, username = ?, email = ?, phone = ?
+        WHERE account_id = ?
+    ');
+    $stmt->execute([$first_name, $middle_name ?: null, $last_name, $username, $email, $phone ?: null, $account_id]);
+
+    $_SESSION['username'] = $username;
+
+    // 3. Update descriptive fields on the extension tables using the session ID ($id)
+    if ($role === 'artist') {
+        $starting_rate      = floatval($_POST['starting_rate'] ?? 0);
+        $is_available       = isset($_POST['is_available']) ? 1 : 0;
+        $artist_description = trim($_POST['artist_description'] ?? '');
+
+        $stmt = $db->prepare('
+            UPDATE artist_tbl
+            SET starting_rate = ?, is_available = ?, artist_description = ?
+            WHERE artist_id = ?
+        ');
+        $stmt->execute([$starting_rate, $is_available, $artist_description ?: null, $id]);
+    }
+
+    if ($role === 'user') {
+        $card_number = trim($_POST['card_number'] ?? '');
+        $stmt = $db->prepare('
+            UPDATE user_tbl SET card_number = ? WHERE user_id = ?
+        ');
+        $stmt->execute([$card_number ?: null, $id]);
+    }
+
+    // 4. Secure Password Updating block
+    $current_password = $_POST['current_password'] ?? '';
+    $new_password     = $_POST['new_password']     ?? '';
+    $confirm_password = $_POST['confirm_password'] ?? '';
+
+    if (!empty($current_password) && !empty($new_password)) {
+        $stmt = $db->prepare('SELECT password_hash FROM account_tbl WHERE account_id = ?');
+        $stmt->execute([$account_id]);
+        $hash = $stmt->fetchColumn();
+
+        if (!password_verify($current_password, $hash)) {
+            throw new Exception('Current password is incorrect');
+        }
+        if ($new_password !== $confirm_password) {
+            throw new Exception('New passwords do not match');
+        }
+
+        $db->prepare('UPDATE account_tbl SET password_hash = ? WHERE account_id = ?')
+           ->execute([password_hash($new_password, PASSWORD_BCRYPT), $account_id]);
+    }
+
+    // 5. Image & Avatar File Management Block
+    if ($role === 'user' || $role === 'artist') {
+        $col = ($role === 'user') ? 'user_id' : 'artist_id';
+
+        if ($delete_avatar === 1) {
+            $db->prepare("DELETE FROM image_tbl WHERE {$col} = ? AND image_type_id = 1")
+               ->execute([$id]);
+
+        } elseif (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+            $ext     = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
+            $allowed = ['jpg', 'jpeg', 'png'];
+
+            if (!in_array($ext, $allowed)) {
+                throw new Exception('Only JPG and PNG files are allowed');
             }
-        } else {
-            throw new Exception("The verification password context you provided is incorrect.");
-        }
-    }
 
-    // 6. Avatar Media Asset Management
-    if ($delete_avatar === 1) {
-        $delImg = $db->prepare("DELETE FROM image_tbl WHERE account_id = ? AND image_type_id = 1");
-        $delImg->execute([$account_id]);
-    } elseif (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
-        $fileTmpPath = $_FILES['avatar']['tmp_name'];
-        $fileName = $_FILES['avatar']['name'];
-        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        
-        $newFileName = md5(time() . $account_id) . '.' . $fileExtension;
-        $uploadFileDir = __DIR__ . '/../../public/uploads/avatars/';
-        
-        if (!is_dir($uploadFileDir)) {
-            mkdir($uploadFileDir, 0755, true);
-        }
-        
-        $dest_path = $uploadFileDir . $newFileName;
+            // Generated filename hash utilizes master account_id for integrity across tracking points
+            $newFile   = md5(time() . $account_id) . '.' . $ext;
+            $uploadDir = __DIR__ . '/../../public/uploads/avatars/';
 
-        if (move_uploaded_file($fileTmpPath, $dest_path)) {
-            $relativeUrlPath = 'public/uploads/avatars/' . $newFileName;
-            
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+
+            if (!move_uploaded_file($_FILES['avatar']['tmp_name'], $uploadDir . $newFile)) {
+                throw new Exception('Failed to save avatar file');
+            }
+
+            $relUrl = 'public/uploads/avatars/' . $newFile;
+
             $db->prepare("
-                INSERT INTO image_tbl (account_id, image_url, image_type_id) 
-                VALUES (?, ?, 1) 
+                INSERT INTO image_tbl ({$col}, image_url, image_type_id, uploaded_at)
+                VALUES (?, ?, 1, NOW())
                 ON DUPLICATE KEY UPDATE image_url = ?, uploaded_at = NOW()
-            ")->execute([$account_id, $relativeUrlPath, $relativeUrlPath]);
+            ")->execute([$id, $relUrl, $relUrl]);
         }
     }
 
     $db->commit();
-    echo json_encode(['success' => true, 'message' => 'Account modifications successfully compiled.']);
+    echo json_encode(['success' => true, 'message' => 'Settings saved successfully']);
 
 } catch (Exception $e) {
-    if ($db->inTransaction()) $db->rollBack();
-    echo json_encode(['success' => false, 'message' => 'Operation aborted: ' . $e->getMessage()]);
+    if (isset($db) && $db->inTransaction()) $db->rollBack();
+    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
-?>

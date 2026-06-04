@@ -418,3 +418,6 @@ VALUES
 ('PayPal'),
 ('Credit Card'),
 ('Bank Transfer');
+
+ALTER TABLE artist_tbl
+ADD artist_description TEXT NULL AFTER is_available;

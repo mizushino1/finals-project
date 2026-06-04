@@ -1,18 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const uploadImageBtn = document.getElementById('uploadImageBtn');
-    const fileInput = document.getElementById('avatarFileInput');
-    const avatarPreview = document.getElementById('avatarPreview');
-    const avatarPlaceholder = document.getElementById('avatarPreviewPlaceholder');
-    const removeAvatarBtn = document.getElementById('removeAvatarBtn');
-    const textarea = document.getElementById('artistDescText');
-    const counter = document.getElementById('charCounter');
 
-    // Trigger file dialog window
-    if (uploadImageBtn && fileInput) {
-        uploadImageBtn.addEventListener('click', () => fileInput.click());
-    }
-document.addEventListener('DOMContentLoaded', () => {
-    // Elements Mapping
+    // ── Elements ──
+    const form = document.getElementById('settingsForm');
+    const alertBox = document.getElementById('settingsAlert');
     const uploadImageBtn = document.getElementById('uploadImageBtn');
     const fileInput = document.getElementById('avatarFileInput');
     const avatarPreview = document.getElementById('avatarPreview');
@@ -23,188 +13,192 @@ document.addEventListener('DOMContentLoaded', () => {
     const counter = document.getElementById('charCounter');
     const dropZone = document.getElementById('dropZone');
     const clearFormBtn = document.getElementById('clearForm');
-    const artistHighlightBox = document.getElementById('artistHighlightBox');
+    const artistBox = document.getElementById('artistHighlightBox');
 
-    // 1. Asynchronously load profile configuration data to populate fields securely
-    hydrateFormFromAPI();
+    // ── 1. Hydrate form from api/profile/fetch.php ──
+    async function hydrateForm() {
+        try {
+            const res = await fetch(`${BASE_URL}api/profile/fetch.php`);
+            const data = await res.json();
 
-    // Trigger explicit OS file browse selector windows
+            if (!data.success) return;
+
+            const d = data.data;
+
+            // Set both values and placeholders to meet form data rules
+            setValue('settingsFirstName', d.first_name ?? '');
+            setValue('settingsMiddleName', d.middle_name ?? '');
+            setValue('settingsLastName', d.last_name ?? '');
+            setValue('settingsUsername', d.username ?? '');
+            setValue('settingsEmail', d.email ?? '');
+            setValue('settingsPhone', d.phone ?? '');
+
+            // User Specific fields
+            if (d.card_number !== undefined) {
+                setValue('settingsCardNumber', d.card_number ?? '');
+            }
+
+            // Artist Specific fields
+            if (d.role === 'artist') {
+                setValue('settingsStartingRate', d.starting_rate ?? '');
+                setValue('artistDescText', d.artist_description ?? '');
+
+                const availToggle = document.getElementById('settingsIsAvailable');
+                if (availToggle) availToggle.checked = d.is_available == 1;
+
+                if (artistBox) artistBox.classList.remove('d-none');
+            }
+
+            // Avatar URLs
+            if (d.avatar_url) {
+                avatarPreview.src = BASE_URL + d.avatar_url;
+                avatarPreview.classList.remove('d-none');
+                avatarPlaceholder.classList.add('d-none');
+            }
+
+            updateCounter();
+
+        } catch (err) {
+            console.error('Failed to load profile:', err);
+        }
+    }
+
+    // Explicitly defines active value and baseline visual placeholders
+    function setValue(id, val) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.value = val ?? '';        // This satisfies the 'required' check
+            el.placeholder = val ?? '';  // This handles your visual background layout
+        }
+    }
+
+    // ── 2. Submit form via fetch() ──
+    if (form) {
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+
+            try {
+                const res = await fetch(`${BASE_URL}api/profile/update.php`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+
+                // Display response message
+                showAlert(data.success ? 'success' : 'danger', data.message);
+
+                // Seamlessly synchronize form with newly saved database records
+                if (data.success) {
+                    hydrateForm();
+                }
+
+            } catch (err) {
+                showAlert('danger', 'Something went wrong. Please try again.');
+            }
+        });
+    }
+
+    function showAlert(type, message) {
+        if (!alertBox) return;
+        alertBox.className = `alert alert-${type}`;
+        alertBox.textContent = message;
+        alertBox.classList.remove('d-none');
+
+        // Smoothly scrolls to the top of the card so the user can read the error/success message
+        alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+        setTimeout(() => alertBox.classList.add('d-none'), 4000);
+    }
+
+    // ── 3. Avatar: select image ──
     if (uploadImageBtn && fileInput) {
         uploadImageBtn.addEventListener('click', () => fileInput.click());
     }
 
-    // Dynamic Image Selection Engine Check
     if (fileInput) {
-        fileInput.addEventListener('change', function() {
-            processAvatarFileSelection(this.files[0]);
+        fileInput.addEventListener('change', function () {
+            processFile(this.files[0]);
         });
     }
 
-    // 2. Drag and Drop Upload Support Layer
+    function processFile(file) {
+        if (!file) return;
+        if (!['image/jpeg', 'image/png'].includes(file.type)) {
+            showAlert('danger', 'Only JPG and PNG files are allowed');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function () {
+            avatarPreview.src = this.result;
+            avatarPreview.classList.remove('d-none');
+            avatarPlaceholder.classList.add('d-none');
+            avatarPlaceholder.classList.remove('d-inline-flex');
+            if (deleteAvatarFlag) deleteAvatarFlag.value = '0';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // ── 4. Avatar: drag and drop ──
     if (dropZone && fileInput) {
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropZone.addEventListener(eventName, (e) => { e.preventDefault(); dropZone.classList.add('highlight'); }, false);
+        ['dragenter', 'dragover'].forEach(ev => {
+            dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.add('highlight'); });
         });
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, (e) => { e.preventDefault(); dropZone.classList.remove('highlight'); }, false);
+        ['dragleave', 'drop'].forEach(ev => {
+            dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.remove('highlight'); });
         });
-        dropZone.addEventListener('drop', (e) => {
-            const dt = e.dataTransfer;
-            const files = dt.files;
+        dropZone.addEventListener('drop', e => {
+            const files = e.dataTransfer.files;
             if (files.length) {
                 fileInput.files = files;
-                processAvatarFileSelection(files[0]);
+                processFile(files[0]);
             }
         });
     }
 
-    function processAvatarFileSelection(file) {
-        if (file && (file.type === "image/jpeg" || file.type === "image/png")) {
-            const reader = new FileReader();
-            reader.addEventListener('load', function() {
-                if (avatarPreview) {
-                    avatarPreview.setAttribute('src', this.result);
-                    avatarPreview.classList.remove('d-none');
-                }
-                if (avatarPlaceholder) {
-                    avatarPlaceholder.classList.remove('d-inline-flex');
-                    avatarPlaceholder.classList.add('d-none');
-                }
-                if (deleteAvatarFlag) deleteAvatarFlag.value = "0"; // Cancel pending deletion flags
-            });
-            reader.readAsDataURL(file);
-        }
-    }
-
-    // 3. Reset Engine Handling (Erasing avatar records cleanly)
+    // ── 5. Avatar: remove ──
     if (removeAvatarBtn) {
         removeAvatarBtn.addEventListener('click', () => {
-            if (fileInput) fileInput.value = ""; 
-            if (avatarPreview) {
-                avatarPreview.classList.add('d-none');
-                avatarPreview.setAttribute('src', '');
-            }
+            if (fileInput) fileInput.value = '';
+            if (avatarPreview) { avatarPreview.src = ''; avatarPreview.classList.add('d-none'); }
             if (avatarPlaceholder) {
                 avatarPlaceholder.classList.remove('d-none');
                 avatarPlaceholder.classList.add('d-inline-flex');
             }
-            if (deleteAvatarFlag) {
-                deleteAvatarFlag.value = "1"; // Send an explicit delete command to update.php
-            }
+            if (deleteAvatarFlag) deleteAvatarFlag.value = '1';
         });
     }
 
-    // Character Counter Tracking Logic
-    if (textarea && counter) {
-        const updateCounter = () => {
+    // ── 6. Character counter ──
+    function updateCounter() {
+        if (textarea && counter) {
             counter.textContent = `${textarea.value.length}/250`;
-        };
-        updateCounter();
-        textarea.addEventListener('input', updateCounter);
+        }
     }
+    if (textarea) textarea.addEventListener('input', updateCounter);
 
-    // 4. Interactive Password Visibility Toggles
-    const eyeIcons = document.querySelectorAll('.eye-toggle-icon');
-    eyeIcons.forEach(icon => {
-        icon.addEventListener('click', function() {
-            const passwordInput = this.parentElement.querySelector('input');
-            const iconSvg = this.querySelector('i');
-            
-            if (passwordInput && passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                iconSvg.classList.remove('bi-eye-slash');
-                iconSvg.classList.add('bi-eye');
-            } else if (passwordInput) {
-                passwordInput.type = 'password';
-                iconSvg.classList.remove('bi-eye');
-                iconSvg.classList.add('bi-eye-slash');
+    // ── 7. Password eye toggles ──
+    document.querySelectorAll('.eye-toggle-icon').forEach(icon => {
+        icon.addEventListener('click', function () {
+            const input = this.parentElement.querySelector('input');
+            const i = this.querySelector('i');
+            if (!input) return;
+            const show = input.type === 'password';
+            input.type = show ? 'text' : 'password';
+            if (i) {
+                i.className = show ? 'bi bi-eye' : 'bi bi-eye-slash';
             }
         });
     });
 
-    // 5. Hydration Engine via api/profile/fetch.php
-    function hydrateFormFromAPI() {
-        fetch('../../api/profile/fetch.php')
-            .then(response => response.json())
-            .then(result => {
-                if (result.success && result.data) {
-                    const info = result.data;
-                    
-                    // Fallback injection to update UI form components
-                    if (document.getElementById('settingsFormName')) {
-                        document.getElementById('settingsFormName').value = info.first_name ? `${info.first_name} ${info.last_name ?? ''}`.trim() : '';
-                    }
-                    if (document.getElementById('settingsFormUsername')) {
-                        document.getElementById('settingsFormUsername').value = info.username || '';
-                    }
-                    if (document.getElementById('settingsFormEmail')) {
-                        document.getElementById('settingsFormEmail').value = info.email || '';
-                    }
-                    if (document.getElementById('settingsFormPhone')) {
-                        document.getElementById('settingsFormPhone').value = info.card_number || ''; // links up with table context structures
-                    }
-
-                    // Hide artist field box if the target role context is simple user/client tier groups
-                    if (info.role && info.role.toLowerCase() !== 'artist' && artistHighlightBox) {
-                        artistHighlightBox.style.display = 'none';
-                    }
-                    if (textarea) updateCounter();
-                }
-            })
-            .catch(err => console.warn("Automated runtime validation bypass:", err));
-    }
-
-    // Cancel interaction action binds
+    // ── 8. Cancel button ──
     if (clearFormBtn) {
         clearFormBtn.addEventListener('click', () => {
-            if (confirm("Discard all uncommitted configuration modifications?")) {
-                window.location.reload();
-            }
-        });
-    }
-});
-    // Dynamic Client Preview Engine 
-    if (fileInput) {
-        fileInput.addEventListener('change', function() {
-            const file = this.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.addEventListener('load', function() {
-                    if (avatarPreview) {
-                        avatarPreview.setAttribute('src', this.result);
-                        avatarPreview.classList.remove('d-none');
-                    }
-                    if (avatarPlaceholder) {
-                        avatarPlaceholder.classList.remove('d-inline-flex');
-                        avatarPlaceholder.classList.add('d-none');
-                    }
-                });
-                reader.readAsDataURL(file);
-            }
+            if (confirm('Discard all changes?')) window.location.reload();
         });
     }
 
-    // Reset UI back to default icon placeholder
-    if (removeAvatarBtn) {
-        removeAvatarBtn.addEventListener('click', () => {
-            if (fileInput) fileInput.value = ""; 
-            if (avatarPreview) {
-                avatarPreview.classList.add('d-none');
-                avatarPreview.setAttribute('src', '');
-            }
-            if (avatarPlaceholder) {
-                avatarPlaceholder.classList.remove('d-none');
-                avatarPlaceholder.classList.add('d-inline-flex');
-            }
-        });
-    }
-
-    // Character Counter Tracking Logic
-    if (textarea && counter) {
-        const updateCounter = () => {
-            counter.textContent = `${textarea.value.length}/250`;
-        };
-        updateCounter();
-        textarea.addEventListener('input', updateCounter);
-    }
+    // ── Init ──
+    hydrateForm();
 });
