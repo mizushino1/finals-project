@@ -21,12 +21,12 @@ if (!$id) {
 }
 
 // Collect form inputs
-$first_name  = trim($_POST['first_name']  ?? '');
-$middle_name = trim($_POST['middle_name'] ?? '');
-$last_name   = trim($_POST['last_name']   ?? '');
-$username    = trim($_POST['username']    ?? '');
-$email       = trim($_POST['email']       ?? '');
-$phone       = trim($_POST['phone']       ?? '');
+$first_name   = trim($_POST['first_name']   ?? '');
+$middle_name  = trim($_POST['middle_name']  ?? '');
+$last_name    = trim($_POST['last_name']    ?? '');
+$username     = trim($_POST['username']     ?? '');
+$email        = trim($_POST['email']        ?? '');
+$phone        = trim($_POST['phone']        ?? '');
 $delete_avatar = intval($_POST['delete_avatar'] ?? 0);
 
 if (empty($first_name) || empty($last_name) || empty($username) || empty($email)) {
@@ -40,7 +40,7 @@ try {
 
     // 1. DYNAMIC REVERSE-LOOKUP: Trace the exact primary account_id using the session's sub-profile ID
     $account_id = null;
-    
+
     if ($role === 'user') {
         $stmt = $db->prepare('SELECT account_id FROM user_tbl WHERE user_id = ?');
         $stmt->execute([$id]);
@@ -110,7 +110,7 @@ try {
         }
 
         $db->prepare('UPDATE account_tbl SET password_hash = ? WHERE account_id = ?')
-           ->execute([password_hash($new_password, PASSWORD_BCRYPT), $account_id]);
+            ->execute([password_hash($new_password, PASSWORD_BCRYPT), $account_id]);
     }
 
     // 5. Image & Avatar File Management Block
@@ -119,8 +119,7 @@ try {
 
         if ($delete_avatar === 1) {
             $db->prepare("DELETE FROM image_tbl WHERE {$col} = ? AND image_type_id = 1")
-               ->execute([$id]);
-
+                ->execute([$id]);
         } elseif (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
             $ext     = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
             $allowed = ['jpg', 'jpeg', 'png'];
@@ -129,7 +128,6 @@ try {
                 throw new Exception('Only JPG and PNG files are allowed');
             }
 
-            // Generated filename hash utilizes master account_id for integrity across tracking points
             $newFile   = md5(time() . $account_id) . '.' . $ext;
             $uploadDir = __DIR__ . '/../../public/uploads/avatars/';
 
@@ -143,17 +141,21 @@ try {
 
             $relUrl = 'public/uploads/avatars/' . $newFile;
 
-            $db->prepare("
+            // 1. CLEAR DUPES: Explicitly remove previous avatar rows using the correct context identity variable ($id)
+            $clearOldAvatar = $db->prepare("DELETE FROM image_tbl WHERE {$col} = ? AND image_type_id = 1");
+            $clearOldAvatar->execute([$id]);
+
+            // 2. FRESH INSERT: Insert the new image path as the single source of truth
+            $insertNewAvatar = $db->prepare("
                 INSERT INTO image_tbl ({$col}, image_url, image_type_id, uploaded_at)
                 VALUES (?, ?, 1, NOW())
-                ON DUPLICATE KEY UPDATE image_url = ?, uploaded_at = NOW()
-            ")->execute([$id, $relUrl, $relUrl]);
+            ");
+            $insertNewAvatar->execute([$id, $relUrl]);
         }
     }
 
     $db->commit();
     echo json_encode(['success' => true, 'message' => 'Settings saved successfully']);
-
 } catch (Exception $e) {
     if (isset($db) && $db->inTransaction()) $db->rollBack();
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);

@@ -1,24 +1,24 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // ── Elements ──
-    const form = document.getElementById('settingsForm');
-    const alertBox = document.getElementById('settingsAlert');
-    const uploadImageBtn = document.getElementById('uploadImageBtn');
-    const fileInput = document.getElementById('avatarFileInput');
-    const avatarPreview = document.getElementById('avatarPreview');
+    const form              = document.getElementById('settingsForm');
+    const alertBox          = document.getElementById('settingsAlert');
+    const uploadImageBtn    = document.getElementById('uploadImageBtn');
+    const fileInput         = document.getElementById('avatarFileInput');
+    const avatarPreview     = document.getElementById('avatarPreview');
     const avatarPlaceholder = document.getElementById('avatarPreviewPlaceholder');
-    const removeAvatarBtn = document.getElementById('removeAvatarBtn');
-    const deleteAvatarFlag = document.getElementById('deleteAvatarFlag');
-    const textarea = document.getElementById('artistDescText');
-    const counter = document.getElementById('charCounter');
-    const dropZone = document.getElementById('dropZone');
-    const clearFormBtn = document.getElementById('clearForm');
-    const artistBox = document.getElementById('artistHighlightBox');
+    const removeAvatarBtn   = document.getElementById('removeAvatarBtn');
+    const deleteAvatarFlag  = document.getElementById('deleteAvatarFlag');
+    const textarea          = document.getElementById('artistDescText');
+    const counter           = document.getElementById('charCounter');
+    const dropZone          = document.getElementById('dropZone');
+    const clearFormBtn      = document.getElementById('clearForm');
+    const artistBox         = document.getElementById('artistHighlightBox');
 
     // ── 1. Hydrate form from api/profile/fetch.php ──
     async function hydrateForm() {
         try {
-            const res = await fetch(`${BASE_URL}api/profile/fetch.php`);
+            const res  = await fetch(`${BASE_URL}api/profile/fetch.php`);
             const data = await res.json();
 
             if (!data.success) return;
@@ -26,12 +26,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const d = data.data;
 
             // Set both values and placeholders to meet form data rules
-            setValue('settingsFirstName', d.first_name ?? '');
+            setValue('settingsFirstName',  d.first_name  ?? '');
             setValue('settingsMiddleName', d.middle_name ?? '');
-            setValue('settingsLastName', d.last_name ?? '');
-            setValue('settingsUsername', d.username ?? '');
-            setValue('settingsEmail', d.email ?? '');
-            setValue('settingsPhone', d.phone ?? '');
+            setValue('settingsLastName',   d.last_name   ?? '');
+            setValue('settingsUsername',   d.username    ?? '');
+            setValue('settingsEmail',      d.email       ?? '');
+            setValue('settingsPhone',      d.phone       ?? '');
 
             // User Specific fields
             if (d.card_number !== undefined) {
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Artist Specific fields
             if (d.role === 'artist') {
                 setValue('settingsStartingRate', d.starting_rate ?? '');
-                setValue('artistDescText', d.artist_description ?? '');
+                setValue('artistDescText',       d.artist_description ?? '');
 
                 const availToggle = document.getElementById('settingsIsAvailable');
                 if (availToggle) availToggle.checked = d.is_available == 1;
@@ -49,13 +49,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (artistBox) artistBox.classList.remove('d-none');
             }
 
-            // Avatar URLs
+            // Avatar Handling
             if (d.avatar_url) {
-                avatarPreview.src = BASE_URL + d.avatar_url;
-                avatarPreview.classList.remove('d-none');
-                avatarPlaceholder.classList.add('d-none');
+                if (avatarPreview) {
+                    // Appending unique cache parameter forces a live binary fetch request
+                    const dynamicBuster = '?t=' + new Date().getTime();
+                    avatarPreview.src = BASE_URL + d.avatar_url + dynamicBuster;
+                    avatarPreview.classList.remove('d-none');
+                }
+                if (avatarPlaceholder) {
+                    avatarPlaceholder.classList.add('d-none');
+                    avatarPlaceholder.classList.remove('d-inline-flex');
+                }
+            } else {
+                if (avatarPreview) {
+                    avatarPreview.src = '';
+                    avatarPreview.classList.add('d-none');
+                }
+                if (avatarPlaceholder) {
+                    avatarPlaceholder.classList.remove('d-none');
+                    avatarPlaceholder.classList.add('d-inline-flex');
+                }
             }
 
+            // Keep the counter updated after injection
             updateCounter();
 
         } catch (err) {
@@ -80,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const formData = new FormData(form);
 
             try {
-                const res = await fetch(`${BASE_URL}api/profile/update.php`, {
+                const res  = await fetch(`${BASE_URL}api/profile/update.php`, {
                     method: 'POST',
                     body: formData
                 });
@@ -102,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showAlert(type, message) {
         if (!alertBox) return;
-        alertBox.className = `alert alert-${type}`;
+        alertBox.className   = `alert alert-${type}`;
         alertBox.textContent = message;
         alertBox.classList.remove('d-none');
 
@@ -125,17 +142,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function processFile(file) {
         if (!file) return;
-        if (!['image/jpeg', 'image/png'].includes(file.type)) {
+
+        // Strict mime-type validation match checking
+        if (!['image/jpeg', 'image/png', 'image/jpg'].includes(file.type.toLowerCase())) {
             showAlert('danger', 'Only JPG and PNG files are allowed');
             return;
         }
+
         const reader = new FileReader();
         reader.onload = function () {
-            avatarPreview.src = this.result;
-            avatarPreview.classList.remove('d-none');
-            avatarPlaceholder.classList.add('d-none');
-            avatarPlaceholder.classList.remove('d-inline-flex');
-            if (deleteAvatarFlag) deleteAvatarFlag.value = '0';
+            // Target the avatar preview element securely
+            if (avatarPreview) {
+                avatarPreview.src = this.result; // Dynamic local Base64 string stream
+                avatarPreview.classList.remove('d-none');
+            }
+            
+            // Cleanly toggle the placeholder element if it exists in the DOM
+            if (avatarPlaceholder) {
+                avatarPlaceholder.classList.add('d-none');
+                avatarPlaceholder.classList.remove('d-inline-flex');
+            }
+
+            // Lower the removal flag value to let PHP know we are committing a file change
+            if (deleteAvatarFlag) {
+                deleteAvatarFlag.value = '0';
+            }
         };
         reader.readAsDataURL(file);
     }
@@ -143,10 +174,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── 4. Avatar: drag and drop ──
     if (dropZone && fileInput) {
         ['dragenter', 'dragover'].forEach(ev => {
-            dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.add('highlight'); });
+            dropZone.addEventListener(ev, e => { 
+                e.preventDefault(); 
+                dropZone.classList.add('highlight'); 
+            });
         });
         ['dragleave', 'drop'].forEach(ev => {
-            dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.remove('highlight'); });
+            dropZone.addEventListener(ev, e => { 
+                e.preventDefault(); 
+                dropZone.classList.remove('highlight'); 
+            });
         });
         dropZone.addEventListener('drop', e => {
             const files = e.dataTransfer.files;
@@ -160,13 +197,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── 5. Avatar: remove ──
     if (removeAvatarBtn) {
         removeAvatarBtn.addEventListener('click', () => {
-            if (fileInput) fileInput.value = '';
-            if (avatarPreview) { avatarPreview.src = ''; avatarPreview.classList.add('d-none'); }
+            if (fileInput)         fileInput.value          = '';
+            if (avatarPreview)   { avatarPreview.src        = '';   avatarPreview.classList.add('d-none'); }
             if (avatarPlaceholder) {
                 avatarPlaceholder.classList.remove('d-none');
                 avatarPlaceholder.classList.add('d-inline-flex');
             }
-            if (deleteAvatarFlag) deleteAvatarFlag.value = '1';
+            if (deleteAvatarFlag)  deleteAvatarFlag.value   = '1';
         });
     }
 
@@ -182,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.eye-toggle-icon').forEach(icon => {
         icon.addEventListener('click', function () {
             const input = this.parentElement.querySelector('input');
-            const i = this.querySelector('i');
+            const i     = this.querySelector('i');
             if (!input) return;
             const show = input.type === 'password';
             input.type = show ? 'text' : 'password';
