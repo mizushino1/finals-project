@@ -56,6 +56,10 @@ try {
     $clean_username = htmlspecialchars($profile['username']);
     $display_name   = htmlspecialchars($profile['first_name'] . ' ' . $profile['last_name']);
     
+    // Determine the avatar resource path context if it exists
+    $has_custom_avatar = !empty($profile['avatar']);
+    $avatar_source = $has_custom_avatar ? BASE_URL . htmlspecialchars($profile['avatar']) : '';
+    
 } catch (PDOException $e) {
     die("Database error: " . $e->getMessage());
 }
@@ -63,13 +67,20 @@ try {
 
 <section class="profile-header">
     <div class="container">
-
         <div class="d-flex align-items-start gap-3 flex-wrap">
-
-            <img
-                src="<?php echo !empty($profile['avatar']) ? BASE_URL . htmlspecialchars($profile['avatar']) : BASE_URL . 'public/assets/img/default-avatar.png'; ?>"
-                alt="User avatar"
-                class="profile-avatar">
+            <div class="profile-avatar-container" style="width: 130px; height: 130px; border-radius: 50%; overflow: hidden; border: 3px solid #c9873a; display: flex; align-items: center; justify-content: center; background: #e9ecef;">
+                <?php if ($has_custom_avatar): ?>
+                    <img
+                        src="<?php echo $avatar_source; ?>"
+                        alt="User avatar"
+                        class="profile-avatar"
+                        style="width: 100%; height: 100%; object-fit: cover;">
+                <?php else: ?>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="profile-avatar" style="width: 100%; height: 100%; background: #e9ecef; padding: 1.8rem; box-sizing: border-box; color: #212529;">
+                        <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+                    </svg>
+                <?php endif; ?>
+            </div>
 
             <div class="flex-grow-1 pt-1">
                 <h1 class="profile-username mb-1"><?php echo $clean_username; ?></h1>
