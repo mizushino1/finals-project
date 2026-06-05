@@ -25,12 +25,14 @@ try {
                 a.last_name
             FROM commission_tbl c
             JOIN account_tbl a ON c.user_id = a.account_id
-            WHERE LOWER(c.status) = "open"
+            WHERE c.status_id = 2   -- Pending
+WHERE c.status_id = 1   -- Active/Open
+SET status_id = 3       -- Accepted
             ORDER BY c.commission_date DESC
         ');
         $stmt->execute();
 
-    // 2. USER/CLIENT: Sees only their own submitted requests
+        // 2. USER/CLIENT: Sees only their own submitted requests
     } elseif ($role === 'user' || $role === 'client') {
         $stmt = $db->prepare('
             SELECT c.*
@@ -40,7 +42,7 @@ try {
         ');
         $stmt->execute([$id]);
 
-    // 3. ADMIN: Sees absolutely everything across the system
+        // 3. ADMIN: Sees absolutely everything across the system
     } elseif ($role === 'admin') {
         $stmt = $db->prepare('
             SELECT 
@@ -53,7 +55,6 @@ try {
             ORDER BY c.commission_date DESC
         ');
         $stmt->execute();
-        
     } else {
         echo json_encode(['success' => false, 'message' => 'Invalid account role profile.']);
         exit;
@@ -63,15 +64,13 @@ try {
     $commissions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode([
-        'success' => true, 
+        'success' => true,
         'data' => $commissions ? $commissions : []
     ]);
-
 } catch (PDOException $e) {
     // Return structured JSON error for your frontend JavaScript fetch catch block
     echo json_encode([
-        'success' => false, 
+        'success' => false,
         'message' => 'Database operation failed: ' . $e->getMessage()
     ]);
 }
-?>

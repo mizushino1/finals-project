@@ -17,41 +17,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Build a single artist card HTML ──
     function buildCard(artist) {
-        // Aligned with account_status_tbl string output ('Active')
-        const isOpen = artist.account_status && artist.account_status.toLowerCase() === 'active';
+        const isOpen = artist.is_available == 1;
         const name = artist.username ?? 'Unknown';
-
-        // Aligned with your exact artist_tbl column definition ('starting_rate')
         const price = artist.starting_rate ?? '0';
         const statusClass = isOpen ? 'open' : 'closed';
         const statusText = isOpen ? '● Open commission' : '● Closed commission';
 
+        // CHANGED: Removed border-radius:50% and explicitly forced image/svg to expand to fill its grid container width/height
+        const avatarHtml = artist.avatar_url
+            ? `<img src="${artist.avatar_url}" alt="${name}" style="width:100%; height:100%; object-fit:cover;">`
+            : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:100%; height:100%; background:#e9ecef; padding:2rem; box-sizing:border-box;">
+               <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+           </svg>`;
+
         return `
-        <div class="artist-card" data-id="${artist.artist_id}" data-price="${price}" data-open="${isOpen ? 1 : 0}">
-            <button class="artist-card__wishlist" aria-label="Add to wishlist" data-active="0">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                </svg>
-            </button>
-            <div class="artist-card__avatar">
-                <div class="artist-card__avatar-placeholder">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
-                    </svg>
-                </div>
+    <div class="artist-card" data-id="${artist.artist_id}" data-price="${price}" data-open="${isOpen ? 1 : 0}">
+        <button class="artist-card__wishlist" aria-label="Add to wishlist" data-active="0">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+        </button>
+        <div class="artist-card__avatar">
+            ${avatarHtml}
+        </div>
+        <div class="artist-card__body">
+            <div class="artist-card__header">
+                <span class="artist-card__name">${name}</span>
             </div>
-            <div class="artist-card__body">
-                <div class="artist-card__header">
-                    <span class="artist-card__name">${name}</span>
-                </div>
-                <p class="artist-card__starting">Start at ₱${parseFloat(price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                <span class="artist-card__status artist-card__status--${statusClass}">${statusText}</span>
-            </div>
-            <div class="artist-card__actions">
-                <a href="${BASE_URL}profile?id=${artist.artist_id}" class="btn btn--ghost btn--sm">View Profile</a>
-                <a href="${BASE_URL}commissions/create?artist=${artist.artist_id}" class="btn btn--accent btn--sm">Hire Artist</a>
-            </div>
-        </div>`;
+            <p class="artist-card__starting">Start at ₱${parseFloat(price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+            <span class="artist-card__status artist-card__status--${statusClass}">${statusText}</span>
+        </div>
+        <div class="artist-card__actions">
+            <a href="${BASE_URL}profile?id=${artist.artist_id}" class="btn btn--ghost btn--sm">View Profile</a>
+            <a href="${BASE_URL}commissions/create?artist=${artist.artist_id}" class="btn btn--accent btn--sm">Hire Artist</a>
+        </div>
+    </div>`;
     }
 
     // ── Render cards into a container ──
@@ -82,7 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Apply filters and search to allArtists ──
     function applyFilters() {
-        // Fallback changed from '0-999999' as an explicit safety net if no radio is checked
         const priceVal = document.querySelector('input[name="price"]:checked')?.value ?? '0-999999';
         const availabilityVal = document.querySelector('input[name="availability"]:checked')?.value ?? 'all';
         const searchVal = searchInput?.value.trim().toLowerCase() ?? '';
@@ -93,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const price = parseFloat(a.starting_rate ?? 0);
             const matchesPrice = price >= minPrice && price <= maxPrice;
             const matchesAvail = availabilityVal === 'all' ||
-                (availabilityVal === 'open' && a.account_status && a.account_status.toLowerCase() === 'active');
+                (availabilityVal === 'open' && a.is_available == 1); 
             const matchesSearch = !searchVal || a.username.toLowerCase().includes(searchVal);
 
             return matchesPrice && matchesAvail && matchesSearch;
@@ -127,7 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             renderCards(artistGrid, allArtists);
 
-            // Top artists sorting updated to prioritize 'starting_rate'
             const top4 = [...allArtists]
                 .sort((a, b) => parseFloat(b.starting_rate ?? 0) - parseFloat(a.starting_rate ?? 0))
                 .slice(0, 4);
@@ -136,7 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
             topArtistsGrid.classList.remove('d-none');
             renderCards(topArtistsGrid, top4);
 
-            // Sync checkbox defaults right away on launch
             applyFilters();
 
         } catch (err) {

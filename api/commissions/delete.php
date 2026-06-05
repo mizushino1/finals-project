@@ -4,7 +4,6 @@ require_once '../../config/database.php';
 
 header('Content-Type: application/json');
 
-// Check authentication
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'message' => 'Unauthorized access.']);
     exit;
@@ -19,49 +18,54 @@ if ($commissionId <= 0) {
 }
 
 $db   = getDB();
-$role = strtolower($_SESSION['role']); // Handle casing safely
+$role = strtolower($_SESSION['role']);
 $uid  = $_SESSION['user_id'];
 
 try {
-    // Verify eligibility before touching anything
-    if ($role === 'user' || $role === 'client') {
-        // If they are a regular user, make sure they actually own it first
+    if ($role === 'user') {
+        // Verify ownership
         $stmtCheck = $db->prepare('SELECT commission_id FROM commission_tbl WHERE commission_id = ? AND user_id = ?');
         $stmtCheck->execute([$commissionId, $uid]);
         if (!$stmtCheck->fetch(PDO::FETCH_ASSOC)) {
-            echo json_encode(['success' => false, 'message' => 'Unauthorized: You do not own this commission listing.']);
+            echo json_encode(['success' => false, 'message' => 'Unauthorized: You do not own this commission.']);
             exit;
         }
     } elseif ($role !== 'admin') {
-        // Artists or other unhandled roles are blocked completely
+        // Artists and any other roles are blocked
         echo json_encode(['success' => false, 'message' => 'Unauthorized operation.']);
         exit;
     }
 
-    // Begin transaction to safely remove data across related tables
     $db->beginTransaction();
 
-    // Step 1: Clean up child records (Artist proposals/bids linked to this commission)
-    $stmtDeleteRequests = $db->prepare('DELETE FROM commission_request_tbl WHERE commission_id = ?');
-    $stmtDeleteRequests->execute([$commissionId]);
+    // Step 1: Delete images linked to this commission
+    $db->prepare('DELETE FROM image_tbl WHERE commission_id = ?')->execute([$commissionId]);
 
-    // Step 2: Delete the parent commission item itself
-    $stmtDeleteCommission = $db->prepare('DELETE FROM commission_tbl WHERE commission_id = ?');
-    $stmtDeleteCommission->execute([$commissionId]);
+    // Step 2: Delete artist proposals/bids
+    $db->prepare('DELETE FROM commission_request_tbl WHERE commission_id = ?')->execute([$commissionId]);
 
-    // Commit changes to database
+    // Step 3: Delete payments linked to transactions of this commission
+    $db->prepare('
+        DELETE p FROM payment_tbl p
+        JOIN transaction_tbl t ON p.transaction_id = t.transaction_id
+        WHERE t.commission_id = ?
+    ')->execute([$commissionId]);
+
+    // Step 4: Delete transactions
+    $db->prepare('DELETE FROM transaction_tbl WHERE commission_id = ?')->execute([$commissionId]);
+
+    // Step 5: Delete the commission itself
+    $db->prepare('DELETE FROM commission_tbl WHERE commission_id = ?')->execute([$commissionId]);
+
     $db->commit();
 
-    echo json_encode(['success' => true, 'message' => 'Commission listing and all associated proposals deleted successfully.']);
-
+    echo json_encode(['success' => true, 'message' => 'Commission and all associated records deleted successfully.']);
 } catch (PDOException $e) {
-    // If something breaks halfway, rollback immediately to prevent fragmented deletion
     if ($db->inTransaction()) {
         $db->rollBack();
     }
     echo json_encode([
-        'success' => false, 
-        'message' => 'Database error encountered during deletion: ' . $e->getMessage()
+        'success' => false,
+        'message' => 'Deletion failed: ' . $e->getMessage()
     ]);
 }
-?>

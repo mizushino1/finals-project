@@ -33,10 +33,10 @@ try {
     $uid   = $_SESSION['user_id']; // Base profile account_id
 
     $stmt = $db->prepare('
-        INSERT INTO commission_tbl (user_id, artist_id, description, status, commission_date, price)
-        VALUES (?, NULL, ?, "open", ?, ?)
+INSERT INTO commission_tbl (user_id, artist_id, description, status_id, commission_date, price)
+VALUES (?, NULL, ?, 2, ?, ?)
     ');
-    
+
     $stmt->execute([
         $uid,
         $description,
@@ -45,15 +45,13 @@ try {
     ]);
 
     echo json_encode([
-        'success' => true, 
+        'success' => true,
         'message' => 'Commission posted successfully! Artists can now submit bids.'
     ]);
-
 } catch (PDOException $e) {
     // Deliver structured error message instead of raw system traces
     echo json_encode([
-        'success' => false, 
+        'success' => false,
         'message' => 'Failed to publish commission: ' . $e->getMessage()
     ]);
 }
-?>

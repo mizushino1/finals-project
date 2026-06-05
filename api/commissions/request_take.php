@@ -4,7 +4,6 @@ require_once '../../config/database.php';
 
 header('Content-Type: application/json');
 
-// Ensure only authorized artists can request listings
 if (!isset($_SESSION['user_id']) || strtolower($_SESSION['role']) !== 'artist') {
     echo json_encode(['success' => false, 'message' => 'Unauthorized access.']);
     exit;
@@ -20,60 +19,59 @@ if ($commissionId <= 0) {
 }
 
 $db        = getDB();
-$accountId = $_SESSION['user_id']; // Base profile account_id from session
+$accountId = $_SESSION['user_id'];
 
 try {
-    // 1. Resolve artist_id from artist_tbl using the account_id if necessary
-    // (If your table links directly on account_id, you can omit this step and use $accountId)
+    // 1. Resolve artist_id from account_id
     $stmtArtist = $db->prepare('SELECT artist_id FROM artist_tbl WHERE account_id = ?');
     $stmtArtist->execute([$accountId]);
     $artistRow  = $stmtArtist->fetch(PDO::FETCH_ASSOC);
 
     if (!$artistRow) {
-        echo json_encode(['success' => false, 'message' => 'Artist profile record could not be found.']);
+        echo json_encode(['success' => false, 'message' => 'Artist profile could not be found.']);
         exit;
     }
     $artistId = $artistRow['artist_id'];
 
-    // 2. Prevent duplicate entries: Check if artist already applied
+    // 2. Prevent duplicate proposals
     $stmtCheck = $db->prepare('
         SELECT request_id FROM commission_request_tbl
         WHERE commission_id = ? AND artist_id = ?
     ');
     $stmtCheck->execute([$commissionId, $artistId]);
-    
+
     if ($stmtCheck->fetch(PDO::FETCH_ASSOC)) {
         echo json_encode(['success' => false, 'message' => 'You have already submitted a proposal for this listing.']);
         exit;
     }
 
-    // 3. Status confirmation: Ensure the parent commission is valid and open
-    $stmtComm = $db->prepare('SELECT status FROM commission_tbl WHERE commission_id = ?');
+    // 3. Ensure commission exists and is open — status_id 1 = Active/Open
+    $stmtComm = $db->prepare('SELECT status_id FROM commission_tbl WHERE commission_id = ?');
     $stmtComm->execute([$commissionId]);
     $commission = $stmtComm->fetch(PDO::FETCH_ASSOC);
 
-    if (!$commission || strtolower($commission['status']) !== 'open') {
+    if (!$commission || $commission['status_id'] !== 1) {
         echo json_encode(['success' => false, 'message' => 'This commission is no longer accepting submissions.']);
         exit;
     }
 
-    // 4. Safe entry injection
-    $today = date('Y-m-d');
+    // 4. Insert proposal — status_id 2 = Pending
+    $now = date('Y-m-d H:i:s');
     $stmtInsert = $db->prepare('
-        INSERT INTO commission_request_tbl (commission_id, artist_id, message, status, requested_at)
-        VALUES (?, ?, ?, "pending", ?)
+        INSERT INTO commission_request_tbl (commission_id, artist_id, message, status_id, requested_at)
+        VALUES (?, ?, ?, 2, ?)
     ');
-    $stmtInsert->execute([$commissionId, $artistId, $message, $today]);
+    $stmtInsert->execute([$commissionId, $artistId, $message, $now]);
 
     echo json_encode([
-        'success' => true, 
+        'success' => true,
         'message' => 'Proposal submitted successfully! Waiting for client confirmation.'
     ]);
 
 } catch (PDOException $e) {
     echo json_encode([
-        'success' => false, 
-        'message' => 'Failed to log application details: ' . $e->getMessage()
+        'success' => false,
+        'message' => 'Failed to submit proposal: ' . $e->getMessage()
     ]);
 }
 ?>
