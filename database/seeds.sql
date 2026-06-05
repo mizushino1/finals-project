@@ -29,6 +29,22 @@ TRUNCATE TABLE user_tbl;
 -- Step 3: Turn safety checks back on
 SET FOREIGN_KEY_CHECKS = 1;
 
+-- Step 1: Temporarily clear constraints to completely wipe the slate 
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE account_status_tbl;
+TRUNCATE TABLE role_tbl;
+TRUNCATE TABLE status_tbl;
+TRUNCATE TABLE payment_method_tbl;
+TRUNCATE TABLE image_type_tbl;
+TRUNCATE TABLE category_tbl;
+TRUNCATE TABLE account_tbl;
+TRUNCATE TABLE user_tbl;
+TRUNCATE TABLE artist_tbl;
+TRUNCATE TABLE administrator_tbl;
+TRUNCATE TABLE hired_artist_tbl;
+TRUNCATE TABLE commission_tbl;
+SET FOREIGN_KEY_CHECKS = 1;
+
 
 INSERT INTO account_status_tbl (account_status_id, status_name) VALUES
 (1, 'Active'), (2, 'Banned'), (3, 'Suspended');
