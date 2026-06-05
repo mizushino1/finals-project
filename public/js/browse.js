@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <span class="artist-card__status artist-card__status--${statusClass}">${statusText}</span>
         </div>
         <div class="artist-card__actions">
-            <a href="${BASE_URL}profile?id=${artist.artist_id}" class="btn btn--ghost btn--sm">View Profile</a>
+            <a href="${BASE_URL}profile?id=${artist.account_id}&role=artist" class="btn btn--ghost btn--sm">View Profile</a>
             <a href="${BASE_URL}commissions/create?artist=${artist.artist_id}" class="btn btn--accent btn--sm">Hire Artist</a>
         </div>
     </div>`;
