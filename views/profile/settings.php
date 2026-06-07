@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../src/middleware/auth_middleware.php';
 require_once __DIR__ . '/../../config/constants.php';
-require_once __DIR__ . '/../../config/database.php'; 
+require_once __DIR__ . '/../../config/database.php';
 
 $role = strtolower($_SESSION['role'] ?? 'user');
 $account_id = $_SESSION['user_id'] ?? null;
@@ -169,43 +169,55 @@ if ($account_id) {
                         </div>
 
                         <div class="col-md-6">
+                            <div class="settings-group-box">
+                                <h5 class="settings-section-title">
+                                    <i class="bi bi-person-circle"></i> Avatar / Profile Picture
+                                </h5>
 
-                            <div class="d-flex align-items-center gap-3 mb-4">
-                                <div class="position-relative">
-                                    <?php
-                                    $cacheBuster = '?t=' . time();
-                                    $hasAvatar = !empty($profile['avatar_url']);
-                                    $avatarSrc = $hasAvatar ? BASE_URL . htmlspecialchars($profile['avatar_url']) . $cacheBuster : '';
-                                    ?>
+                                <div class="d-flex align-items-start gap-4">
+                                    <div class="d-flex flex-column align-items-center">
+                                        <div class="position-relative">
+                                            <?php
+                                            $cacheBuster = '?t=' . time();
+                                            $hasAvatar = !empty($profile['avatar_url']);
+                                            $avatarSrc = $hasAvatar ? BASE_URL . htmlspecialchars($profile['avatar_url']) . $cacheBuster : '';
+                                            ?>
+                                            <img src="<?= $avatarSrc ?>"
+                                                id="avatarPreview"
+                                                class="profile-avatar <?= $hasAvatar ? '' : 'd-none' ?>"
+                                                alt="User avatar">
 
-                                    <img src="<?= $avatarSrc ?>"
-                                         id="avatarPreview"
-                                         class="profile-avatar <?= $hasAvatar ? '' : 'd-none' ?>"
-                                         alt="User avatar">
-
-                                    <div id="avatarPreviewPlaceholder" class="profile-avatar-placeholder <?= $hasAvatar ? 'd-none' : 'd-inline-flex' ?> align-items-center justify-content-center bg-light border text-secondary rounded-circle">
-                                        <i class="bi bi-person-fill fs-2"></i>
+                                            <div id="avatarPreviewPlaceholder" class="profile-avatar-placeholder <?= $hasAvatar ? 'd-none' : 'd-inline-flex' ?> align-items-center justify-content-center bg-light border text-secondary rounded-circle">
+                                                <i class="bi bi-person-fill fs-2"></i>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-outline-danger mt-3 px-3 profile-sub-weight" id="removeAvatarBtn">Remove</button>
                                     </div>
-                                </div>
 
-                                <div>
-                                    <button type="button" class="btn btn-sm btn-follow px-3 profile-sub-weight" id="uploadImageBtn">Upload New Image</button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger px-3 ms-2 profile-sub-weight" id="removeAvatarBtn">Remove</button>
-                                    <input type="file" id="avatarFileInput" name="avatar" class="d-none" accept="image/png, image/jpeg, image/jpg">
-                                    <small class="text-muted d-block mt-2">Allowed types: PNG, JPG, JPEG. Max size: 2MB</small>
+                                    <div class="flex-grow-1">
+                                        <div class="border p-3 text-center">
+                                            <p class="mb-2 fw-bold">Choose New Avatar</p>
+                                            <small class="text-muted d-block mb-3">Drag & drop an image here or click browse here</small>
+                                            <button type="button" class="btn btn-sm btn-follow w-100 px-3 profile-sub-weight" id="uploadImageBtn">Upload New Image</button>
+                                            <input type="file" id="avatarFileInput" name="avatar" class="d-none" accept="image/png, image/jpeg, image/jpg">
+                                        </div>
+                                        <small class="text-muted mt-2 d-block text-center">Recommended PNG</small>
+                                    </div>
                                 </div>
                             </div>
 
-                            <div class="artist-box-highlight d-none" id="artistHighlightBox">
-                                <h5 class="settings-section-title"><i class="bi bi-pencil-square"></i> Artist Description</h5>
-                                <textarea class="settings-textarea-override" rows="6" name="artist_description" id="artistDescText" maxlength="250" placeholder="Tell us about your art..."></textarea>
-                                <small class="text-muted d-block mt-1 text-end" id="charCounter">0/250</small>
+                            <div class="settings-group-box">
+                                <div id="artistHighlightBox">
+                                    <h5 class="settings-section-title"><i class="bi bi-pencil-square"></i> Artist Description</h5>
+                                    <p class="text-muted small">It's about yourself and your art</p>
+                                    <textarea class="settings-textarea-override" rows="4" name="artist_description" id="artistDescText" maxlength="250" placeholder="Description........"></textarea>
+                                    <small class="text-muted d-block mt-1 text-end" id="charCounter">0/250</small>
+                                </div>
                             </div>
 
                             <div class="py-3">
                                 <a class="btn btn-outline-secondary btn-sm px-3 profile-sub-weight" href="<?= BASE_URL ?>profile">View Profile</a>
                             </div>
-
                         </div>
                     </div>
 
