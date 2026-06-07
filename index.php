@@ -41,6 +41,7 @@ $routes = [
     '/login/forgot-password' => 'views/auth/forgot_password.php',
     '/commissions/my-commissions' => 'views/commissions/my_commissions.php',
     '/commissions/create-commission' => 'views/commissions/create.php',
+    '/commissions/edit-commission' => 'views/commissions/edit.php',
 ];
  
 // Check if route exists
