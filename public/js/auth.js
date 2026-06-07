@@ -7,11 +7,11 @@ const loginForm = document.getElementById('loginForm');
 if (loginForm) {
     loginForm.addEventListener('submit', async function (e) {
         e.preventDefault();
- 
+
         const username = document.getElementById('loginUsername').value.trim();
         const password = document.getElementById('loginPassword').value.trim();
         const alert = document.getElementById('auth-alert');
- 
+
         try {
             const res = await fetch(BASE_URL + 'api/auth/login.php', {
                 method: 'POST',
@@ -19,7 +19,7 @@ if (loginForm) {
                 body: JSON.stringify({ username, password })
             });
             const data = await res.json();
- 
+
             if (data.success) {
                 // Redirect based on role
                 if (data.role === 'admin') {
@@ -39,18 +39,18 @@ if (loginForm) {
         }
     });
 }
- 
+
 // ── REGISTER FETCH ──
 const registerForm = document.getElementById('registerForm');
 if (registerForm) {
- 
+
     // Logic to handle tab switching for the role
     document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
         tab.addEventListener('shown.bs.tab', function (e) {
             // Cleans tab innerText (e.g., "Artist " -> "artist")
-            const role = this.innerText.trim().toLowerCase(); 
+            const role = this.innerText.trim().toLowerCase();
             const wrapper = document.getElementById('artistStartAtWrapper');
- 
+
             // Synchronize hidden input value with active Bootstrap tab selection
             setRole(role);
 
@@ -59,10 +59,10 @@ if (registerForm) {
             }
         });
     });
- 
+
     registerForm.addEventListener('submit', async function (e) {
         e.preventDefault();
- 
+
         const role = document.getElementById('registerRole').value;
         const firstName = document.getElementById('registerFirstName').value.trim();
         const lastName = document.getElementById('registerLastName').value.trim();
@@ -70,30 +70,38 @@ if (registerForm) {
         const username = document.getElementById('registerUsername').value.trim();
         const password = document.getElementById('registerPassword').value.trim();
         const startAt = document.getElementById('registerStartAt')?.value || 0;
-        
+
         const authModalEl = new bootstrap.Modal(document.getElementById('authModal'));
         const modalMessage = document.getElementById('modalMessage');
         const actionBtn = document.getElementById('modalActionBtn');
- 
+
+
+        document.getElementById('authModal').addEventListener('hidden.bs.modal', () => {
+            document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+            document.body.classList.remove('modal-open');
+            document.body.style.removeProperty('overflow');
+            document.body.style.removeProperty('padding-right');
+        }, { once: false });
+        
         try {
             const res = await fetch(BASE_URL + 'api/auth/register.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 // Payload now includes 'email' matching your updated PHP registration API
-                body: JSON.stringify({ 
-                    role, 
-                    first_name: firstName, 
-                    last_name: lastName, 
+                body: JSON.stringify({
+                    role,
+                    first_name: firstName,
+                    last_name: lastName,
                     email,
-                    username, 
-                    password, 
-                    start_at: startAt 
+                    username,
+                    password,
+                    start_at: startAt
                 })
             });
             const data = await res.json();
- 
+
             modalMessage.textContent = data.success ? data.message + ' You can now log in.' : data.message;
- 
+
             if (data.success) {
                 actionBtn.textContent = 'Go to Login';
                 actionBtn.onclick = () => {
@@ -104,7 +112,7 @@ if (registerForm) {
                 actionBtn.textContent = 'Close';
                 actionBtn.onclick = () => authModalEl.hide();
             }
- 
+
             authModalEl.show();
         } catch (err) {
             modalMessage.textContent = 'Something went wrong. Please try again.';
@@ -114,86 +122,93 @@ if (registerForm) {
         }
     });
 }
- 
+
 document.addEventListener('DOMContentLoaded', () => {
     const path = window.location.pathname.toLowerCase();
- 
+
     // Determine the current page context
     const isLogin = path.includes('login.php') || path.includes('/login');
     const isSettings = path.includes('settings.php') || path.includes('/settings');
     const isForgotPassword = path.includes('forgot_password.php') || path.includes('/forgot_password');
- 
+
     // If it's none of these pages, exit immediately
     if (!isLogin && !isSettings && !isForgotPassword) return;
- 
+
     // ─────────────────────────────────────────────────────────────────────────
     // ── SHARED FUNCTIONALITY: Password Eye Toggle ────────────────────────────
     // ─────────────────────────────────────────────────────────────────────────
- 
+
     // Dynamic eye icon visibility based on input length (handles autofills)
     document.querySelectorAll('.auth-input-group, .input-group').forEach(group => {
         const input = group.querySelector('input[type="password"]');
         const toggle = group.querySelector('.eye-toggle-icon');
         if (!input || !toggle) return;
- 
+
         toggle.classList.toggle('visible', input.value.length > 0);
- 
+
         input.addEventListener('input', () => {
             toggle.classList.toggle('visible', input.value.length > 0);
         });
     });
- 
+
     // Click event to toggle input masking
     document.querySelectorAll('.eye-toggle-icon').forEach(toggle => {
         toggle.addEventListener('click', () => {
             const wrapper = toggle.closest('.auth-input-group') || toggle.closest('.input-group');
             if (!wrapper) return;
- 
+
             const input = wrapper.querySelector('input[type="password"], input[type="text"]');
             if (!input) return;
- 
+
             const isPassword = input.type === 'password';
             input.type = isPassword ? 'text' : 'password';
- 
+
             const icon = toggle.querySelector('i');
             if (icon) {
                 icon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
             }
         });
     });
- 
+
     // ─────────────────────────────────────────────────────────────────────────
     // ── LOGIN + REGISTER SWITCH (Login <-> Register) ─────────────────────────
     // ── Hoisted here so register fetch handler above can also call switchTo ──
     // ─────────────────────────────────────────────────────────────────────────
- 
+
     const card = document.getElementById('authCard');
     const infoLogin = document.getElementById('infoLogin');
     const infoRegister = document.getElementById('infoRegister');
     const formLogin = document.getElementById('formLogin');
     const formRegister = document.getElementById('formRegister');
     const allContent = [infoLogin, infoRegister, formLogin, formRegister];
- 
+
     // Exposed to window so the register fetch handler (outside DOMContentLoaded) can reach it
     window.switchTo = function switchTo(mode) {
         if (!card || allContent.some(el => !el)) return;
         const toRegister = mode === 'register';
- 
+
+        // ── ADD THIS: clear alert on panel switch ──
+        const alertBox = document.getElementById('auth-alert');
+        if (alertBox) {
+            alertBox.className = 'alert w-100 px-lg-4 d-none';
+            alertBox.textContent = '';
+        }
+
         allContent.forEach(el => {
             el.style.transition = 'none';
             el.style.opacity = '0';
         });
- 
+
         requestAnimationFrame(() => {
             infoLogin.classList.toggle('d-none', toRegister);
             infoRegister.classList.toggle('d-none', !toRegister);
             formLogin.classList.toggle('d-none', toRegister);
             formRegister.classList.toggle('d-none', !toRegister);
- 
+
             card.classList.toggle('auth-card--register', toRegister);
- 
+
             const visible = toRegister ? [infoRegister, formRegister] : [infoLogin, formLogin];
- 
+
             setTimeout(() => {
                 visible.forEach(el => {
                     el.style.transition = 'opacity 0.3s ease-in-out';
@@ -202,13 +217,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 1000);
         });
     }
- 
+
     // ─────────────────────────────────────────────────────────────────────────
     // ── EXCLUSIVE LOGIN FUNCTIONALITY (Only runs on login.php) ───────────────
     // ─────────────────────────────────────────────────────────────────────────
     if (isLogin) {
         const goToRegister = document.getElementById('goToRegister');
- 
+
         // Resize guard
         let resizeTimer = null;
         window.addEventListener('resize', () => {
@@ -217,20 +232,20 @@ document.addEventListener('DOMContentLoaded', () => {
             clearTimeout(resizeTimer);
             resizeTimer = setTimeout(() => card.classList.remove('no-transition'), 150);
         });
- 
+
         // Initial page load fade-in
         if (card) {
             const visible = card.classList.contains('auth-card--register')
                 ? [infoRegister, formRegister]
                 : [infoLogin, formLogin];
- 
+
             visible.forEach(el => {
                 if (el) {
                     el.style.transition = 'none';
                     el.style.opacity = '0';
                 }
             });
- 
+
             setTimeout(() => {
                 visible.forEach(el => {
                     if (el) {
@@ -240,7 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }, 50);
         }
- 
+
         if (goToRegister) {
             goToRegister.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -254,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
- 
+
     // ─────────────────────────────────────────────────────────────────────────
     // ── EXCLUSIVE FORGOT PASSWORD & OTP (Only runs on forgot_password.php) ───
     // ─────────────────────────────────────────────────────────────────────────
@@ -262,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const card1 = document.getElementById('forgotPasswordCard');
         const card2 = document.getElementById('otpVerificationCard');
         const card3 = document.getElementById('resetPasswordCard');
- 
+
         // Multi-step form transition: Step 1 -> Step 2
         const fpForm = document.getElementById('forgotPasswordForm');
         if (fpForm) {
@@ -274,7 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }
- 
+
         // Multi-step form transition: Step 2 -> Step 3
         const otpForm = document.getElementById('otpVerificationForm');
         if (otpForm) {
@@ -286,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }
- 
+
         // Final step: Reset form submit
         const resetForm = document.getElementById('resetPasswordForm');
         if (resetForm) {
@@ -296,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = '../login';
             });
         }
- 
+
         // OTP numeric auto-advance focus logic
         const otpInputs = document.querySelectorAll('.otp-input');
         otpInputs.forEach((input, index) => {

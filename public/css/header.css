@@ -35,3 +35,11 @@ header.sticky-top {
     background: rgba(255, 255, 255, 0.1);
 }
 
+.nav-avatar-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    display: block;
+}

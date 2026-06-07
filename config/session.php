@@ -11,9 +11,9 @@ if (session_status() === PHP_SESSION_NONE) {
     // 2. Reliable HTTPS Detection (Accounting for Local environments & Reverse Proxies)
     $isSecure = false;
     if (
-        isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] === 'on' || $_SERVER['HTTPS'] == 1) ||
-        isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443 ||
-        isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https'
+        (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] === 'on' || $_SERVER['HTTPS'] == 1)) ||
+        (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443) ||
+        (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
     ) {
         $isSecure = true;
     }
