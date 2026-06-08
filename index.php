@@ -43,6 +43,7 @@ $routes = [
     '/commissions/create-commission' => 'views/commissions/create.php',
     '/commissions/edit-commission' => 'views/commissions/edit.php',
     '/commissions/delete-commission' => 'views/commissions/delete_commission.php',
+    '/commissions/drafts' => 'views/commissions/drafts.php',
 ];
  
 // Check if route exists
