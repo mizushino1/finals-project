@@ -95,7 +95,7 @@
                         <a class="nav-link text-light fw-bold fs-fluid-sm"
                             href="<?php echo BASE_URL; ?>commissions">COMMISSIONS</a>
                         <a class="nav-link text-light fw-bold fs-fluid-sm"
-                            href="<?php echo BASE_URL; ?>commissions">ARTISTS</a>
+                            href="<?php echo BASE_URL; ?>artists">ARTISTS</a>
                     </div>
                 </div>
 

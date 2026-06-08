@@ -30,6 +30,7 @@ $routes = [
     '/login'                 => 'views/auth/login.php',
     '/register'              => 'views/auth/register.php',
     '/commissions'           => 'views/commissions/browse.php',
+    '/artists'           => 'views/profile/browse.php',
     '/commissions/create'    => 'views/commissions/create.php',
     '/commissions/detail'    => 'views/commissions/detail.php',
     '/profile'               => 'views/profile/view.php',

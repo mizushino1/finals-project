@@ -210,42 +210,44 @@ INSERT INTO administrator_tbl (account_id) VALUES
 (101),(102),(103),(104),(105);
 
 -- Hired Artist Table
-INSERT INTO hired_artist_tbl (artist_id, admin_id, hire_date, status_id) VALUES
+INSERT INTO hired_artist_tbl (artist_id, user_id, date_hired, status_id) VALUES
 (1,1,'2024-01-01',1),(2,1,'2024-01-02',1),(3,1,'2024-01-03',1),(4,1,'2024-01-04',1),(5,1,'2024-01-05',1),
 (6,1,'2024-01-06',1),(7,1,'2024-01-07',1),(8,1,'2024-01-08',1),(9,1,'2024-01-09',1),(10,1,'2024-01-10',1),
 (11,1,'2024-01-11',1),(12,1,'2024-01-12',1),(13,1,'2024-01-13',1),(14,1,'2024-01-14',1),(15,1,'2024-01-15',1),
 (16,1,'2024-01-16',1),(17,1,'2024-01-17',1),(18,1,'2024-01-18',1),(19,1,'2024-01-19',1),(20,1,'2024-01-20',1),
 (21,1,'2024-01-21',1),(22,1,'2024-01-22',1),(23,1,'2024-01-23',1),(24,1,'2024-01-24',1),(25,1,'2024-01-25',1),
 (26,1,'2024-01-26',1),(27,1,'2024-01-27',1),(28,1,'2024-01-28',1),(29,1,'2024-01-29',1),(30,1,'2024-01-30',1),
-(31,1,'2024-02-01',1),(32,1,'2024-02-02',1),(33,1,'2024-02-03',1),(34,1,'2024-02-04',1),(35,1,'2024-02-05',1),
-(36,1,'2024-02-06',1),(37,1,'2024-02-07',1),(38,1,'2024-02-08',1),(39,1,'2024-02-09',1),(40,1,'2024-02-10',1),
-(41,1,'2024-02-11',1),(42,1,'2024-02-12',1),(43,1,'2024-02-13',1),(44,1,'2024-02-14',1),(45,1,'2024-02-15',1),
-(46,1,'2024-02-16',1),(47,1,'2024-02-17',1),(48,1,'2024-02-18',1),(49,1,'2024-02-19',1),(50,1,'2024-02-20',1),
-(51,1,'2024-02-21',1),(52,1,'2024-02-22',1),(53,1,'2024-02-23',1),(54,1,'2024-02-24',1),(55,1,'2024-02-25',1),
-(56,1,'2024-02-26',1),(57,1,'2024-02-27',1),(58,1,'2024-02-28',1),(59,1,'2024-03-01',1),(60,1,'2024-03-02',1),
-(61,1,'2024-03-03',1),(62,1,'2024-03-04',1),(63,1,'2024-03-05',1),(64,1,'2024-03-06',1),(65,1,'2024-03-07',1),
-(66,1,'2024-03-08',1),(67,1,'2024-03-09',1),(68,1,'2024-03-10',1),(69,1,'2024-03-11',1),(70,1,'2024-03-12',1),
-(71,1,'2024-03-13',1),(72,1,'2024-03-14',1),(73,1,'2024-03-15',1),(74,1,'2024-03-16',1),(75,1,'2024-03-17',1),
-(76,1,'2024-03-18',1),(77,1,'2024-03-19',1),(78,1,'2024-03-20',1),(79,1,'2024-03-21',1),(80,1,'2024-03-22',1),
-(81,1,'2024-03-23',1),(82,1,'2024-03-24',1),(83,1,'2024-03-25',1),(84,1,'2024-03-26',1),(85,1,'2024-03-27',1),
-(86,1,'2024-03-28',1),(87,1,'2024-03-29',1),(88,1,'2024-03-30',1),(89,1,'2024-03-31',1),(90,1,'2024-04-01',1),
-(91,1,'2024-04-02',1),(92,1,'2024-04-03',1),(93,1,'2024-04-04',1),(94,1,'2024-04-05',1),(95,1,'2024-04-06',1),
-(96,1,'2024-04-07',1),(97,1,'2024-04-08',1),(98,1,'2024-04-09',1),(99,1,'2024-04-10',1),(100,1,'2024-04-11',1);
-
+(31,1,'2024-01-31',1),(32,1,'2024-02-01',1),(33,1,'2024-02-02',1),(34,1,'2024-02-03',1),(35,1,'2024-02-04',1),
+(36,1,'2024-02-05',1),(37,1,'2024-02-06',1),(38,1,'2024-02-07',1),(39,1,'2024-02-08',1),(40,1,'2024-02-09',1),
+(41,1,'2024-02-10',1),(42,1,'2024-02-11',1),(43,1,'2024-02-12',1),(44,1,'2024-02-13',1),(45,1,'2024-02-14',1),
+(46,1,'2024-02-15',1),(47,1,'2024-02-16',1),(48,1,'2024-02-17',1),(49,1,'2024-02-18',1),(50,1,'2024-02-19',1),
+-- IDs reset back to 1 here to stay within the 1-50 range of your artist_tbl
+(1,1,'2024-02-20',1),(2,1,'2024-02-21',1),(3,1,'2024-02-22',1),(4,1,'2024-02-23',1),(5,1,'2024-02-24',1),
+(6,1,'2024-02-25',1),(7,1,'2024-02-26',1),(8,1,'2024-02-27',1),(9,1,'2024-02-28',1),(10,1,'2024-02-29',1),
+(11,1,'2024-03-01',1),(12,1,'2024-03-02',1),(13,1,'2024-03-03',1),(14,1,'2024-03-04',1),(15,1,'2024-03-05',1),
+(16,1,'2024-03-06',1),(17,1,'2024-03-07',1),(18,1,'2024-03-08',1),(19,1,'2024-03-09',1),(20,1,'2024-03-10',1),
+(21,1,'2024-03-11',1),(22,1,'2024-03-12',1),(23,1,'2024-03-13',1),(24,1,'2024-03-14',1),(25,1,'2024-03-15',1),
+(26,1,'2024-03-16',1),(27,1,'2024-03-17',1),(28,1,'2024-03-18',1),(29,1,'2024-03-19',1),(30,1,'2024-03-20',1),
+(31,1,'2024-03-21',1),(32,1,'2024-03-22',1),(33,1,'2024-03-23',1),(34,1,'2024-03-24',1),(35,1,'2024-03-25',1),
+(36,1,'2024-03-26',1),(37,1,'2024-03-27',1),(38,1,'2024-03-28',1),(39,1,'2024-03-29',1),(40,1,'2024-03-30',1),
+(41,1,'2024-03-31',1),(42,1,'2024-04-01',1),(43,1,'2024-04-02',1),(44,1,'2024-04-03',1),(45,1,'2024-04-04',1),
+(46,1,'2024-04-05',1),(47,1,'2024-04-06',1),(48,1,'2024-04-07',1),(49,1,'2024-04-08',1),(50,1,'2024-04-09',1);
 -- Commissions Table
-INSERT INTO commission_tbl (user_id, artist_id, category_id, description, status_id, price) VALUES
-(1,1,1,'Anime illustration',2,500.00),(2,2,2,'Chibi icon profile',2,350.00),(3,3,3,'Fantasy novel cover art',5,1500.00),(4,4,4,'VTuber structural model 2D',6,2500.00),(5,5,5,'Landscape concept painting',2,800.00),
-(6,6,1,'Twitch sub badges graphic',2,300.00),(7,7,2,'Mecha design high detail',5,1800.00),(8,8,3,'Game background vector',6,900.00),(9,9,4,'Comic book page ink',2,1200.00),(10,10,5,'Pixel art sprite sheets',2,400.00),
-(11,11,1,'Vector minimalist design logo',2,250.00),(12,12,2,'D&D character full body art',5,1100.00),(13,13,3,'Cyberpunk themed wallpaper',6,1300.00),(14,14,4,'Fursona dynamic pose ref',2,700.00),(15,15,5,'Children book illustration page',2,600.00),
-(16,16,1,'Dark fantasy armor setup design',2,1600.00),(17,17,2,'Pop art style custom print',5,450.00),(18,18,3,'Lo-fi aesthetic animation loop',6,2000.00),(19,19,4,'Steam profile header graphic',2,200.00),(20,20,5,'Tattoo pattern floral sleeve',2,850.00),
-(21,21,1,'Retro synthwave album poster',2,650.00),(22,22,2,'Custom emoji set Discord pack',5,350.00),(23,23,3,'Manga style spread backdrop',6,1400.00),(24,24,4,'Water color family portrait print',2,1050.00),(25,25,5,'Caricature funny drawing group',2,500.00),
-(26,26,1,'Gothic portrait canvas mock',2,950.00),(27,27,2,'Chibi matching couple icons',5,400.00),(28,28,3,'Sci-fi starship model sheet',6,1750.00),(29,29,4,'Oil painting landscape simulation',2,1250.00),(30,30,5,'Line art structural blueprint aesthetic',2,550.00),
-(31,31,1,'Anime style thumbnail splash',2,600.00),(32,32,2,'Cute animal sticker designs pack',5,300.00),(33,33,3,'High fantasy spell card framework',6,1150.00),(34,34,4,'Live2D rigging prep model design',2,3000.00),(35,35,5,'Environment concept matte painting',2,1400.00),
-(36,36,1,'Esports team mascot visual icon',2,750.00),(37,37,2,'Steampunk character outfit ref sheet',5,1350.00),(38,38,3,'Isometric room vector model illustration',6,950.00),(39,39,4,'Webtoon panel storyboard draft',2,800.00),(40,40,5,'Game item inventory UI icons asset',2,600.00),
-(41,41,1,'Minimal line art home decor design',2,300.00),(42,42,2,'RPG character custom token frame art',5,1000.00),(43,43,3,'Neon cyberpunk street view overlay',6,1650.00),(44,44,4,'Mythological creature beast painting',2,1900.00),(45,45,5,'Cute food items vector pattern design',2,450.00),
-(46,46,1,'Surrealist psychological painting print',2,1450.00),(47,47,2,'Corporate presentation custom flat vector',5,500.00),(48,48,3,'Animated pixel intro screen setup',6,2200.00),(49,49,4,'YouTube stream overlay graphics package',2,850.00),(50,50,5,'Traditional style dynamic sketch portrait',2,400.00),
-(1,51,1,'Vibrant graffiti lettering sketch canvas',2,550.00),(2,52,2,'Kawaii style magical girl illustration',5,700.00),(3,53,3,'Epic boss monster conceptual design',6,2100.00),(4,54,4,'Cute twitch emotes package of 6 items',2,450.00),(5,55,5,'Historical knight battle armor render',2,1600.00),
-(6,56,1,'Calm starry night sky scenic background',2,850.00),(7,57,2,'Futuristic cyberpunk motorcycle sheet',5,1250.00),(8,58,3,'Chibi style fantasy party group photo',6,1800.00),(9,59,4,'Abstract geometric art layout design',2,600.00),(10,60,5,'Dark watercolor gothic mansion visual',2,1100.00);
+-- Remove 'category_id' from the column list, and ensure artist_id stays <= 50
+INSERT INTO commission_tbl (user_id, artist_id, description, status_id, price) VALUES
+(1,1,'Anime illustration',2,500.00),(2,2,'Chibi icon profile',2,350.00),(3,3,'Fantasy novel cover art',5,1500.00),(4,4,'VTuber structural model 2D',6,2500.00),(5,5,'Landscape concept painting',2,800.00),
+(6,6,'Twitch sub badges graphic',2,300.00),(7,7,'Mecha design high detail',5,1800.00),(8,8,'Game background vector',6,900.00),(9,9,'Comic book page ink',2,1200.00),(10,10,'Pixel art sprite sheets',2,400.00),
+(11,11,'Vector minimalist design logo',2,250.00),(12,12,'D&D character full body art',5,1100.00),(13,13,'Cyberpunk themed wallpaper',6,1300.00),(14,14,'Fursona dynamic pose ref',2,700.00),(15,15,'Children book illustration page',2,600.00),
+(16,16,'Dark fantasy armor setup design',2,1600.00),(17,17,'Pop art style custom print',5,450.00),(18,18,'Lo-fi aesthetic animation loop',6,2000.00),(19,19,'Steam profile header graphic',2,200.00),(20,20,'Tattoo pattern floral sleeve',2,850.00),
+(21,21,'Retro synthwave album poster',2,650.00),(22,22,'Custom emoji set Discord pack',5,350.00),(23,23,'Manga style spread backdrop',6,1400.00),(24,24,'Water color family portrait print',2,1050.00),(25,25,'Caricature funny drawing group',2,500.00),
+(26,26,'Gothic portrait canvas mock',2,950.00),(27,27,'Chibi matching couple icons',5,400.00),(28,28,'Sci-fi starship model sheet',6,1750.00),(29,29,'Oil painting landscape simulation',2,1250.00),(30,30,'Line art structural blueprint aesthetic',2,550.00),
+(31,31,'Anime style thumbnail splash',2,600.00),(32,32,'Cute animal sticker designs pack',5,300.00),(33,33,'High fantasy spell card framework',6,1150.00),(34,34,'Live2D rigging prep model design',2,3000.00),(35,35,'Environment concept matte painting',2,1400.00),
+(36,36,'Esports team mascot visual icon',2,750.00),(37,37,'Steampunk character outfit ref sheet',5,1350.00),(38,38,'Isometric room vector model illustration',6,950.00),(39,39,'Webtoon panel storyboard draft',2,800.00),(40,40,'Game item inventory UI icons asset',2,600.00),
+(41,41,'Minimal line art home decor design',2,300.00),(42,42,'RPG character custom token frame art',5,1000.00),(43,43,'Neon cyberpunk street view overlay',6,1650.00),(44,44,'Mythological creature beast painting',2,1900.00),(45,45,'Cute food items vector pattern design',2,450.00),
+(46,46,'Surrealist psychological painting print',2,1450.00),(47,47,'Corporate presentation custom flat vector',5,500.00),(48,48,'Animated pixel intro screen setup',6,2200.00),(49,49,'YouTube stream overlay graphics package',2,850.00),(50,50,'Traditional style dynamic sketch portrait',2,400.00),
+-- Wrapped IDs (51-60 changed to 1-10)
+(1,1,'Vibrant graffiti lettering sketch canvas',2,550.00),(2,2,'Kawaii style magical girl illustration',5,700.00),(3,3,'Epic boss monster conceptual design',6,2100.00),(4,4,'Cute twitch emotes package of 6 items',2,450.00),(5,5,'Historical knight battle armor render',2,1600.00),
+(6,6,'Calm starry night sky scenic background',2,850.00),(7,7,'Futuristic cyberpunk motorcycle sheet',5,1250.00),(8,8,'Chibi style fantasy party group photo',6,1800.00),(9,9,'Abstract geometric art layout design',2,600.00),(10,10,'Dark watercolor gothic mansion visual',2,1100.00);
 -- ==========================================
 -- 8. COMMISSION REQUEST TABLE (100 Rows)
 -- Connects to the created commission IDs (1 to 100)
@@ -253,16 +255,25 @@ INSERT INTO commission_tbl (user_id, artist_id, category_id, description, status
 INSERT INTO commission_request_tbl (commission_id, artist_id, message, status_id) VALUES
 (1,1,'I can deliver this within 3 days easily!',2),(2,2,'I love drawing cute stuff, hope we work together.',2),(3,3,'High fantasy settings are exactly my style.',3),(4,4,'Expert in 2D models, checking in.',2),(5,5,'Can handle landscape challenges nicely.',2),
 (6,6,'Can provide variations on the twitch icons.',2),(7,7,'Experienced in industrial mecha designs.',2),(8,8,'Vector files will be fully clean layered.',2),(9,9,'Will deliver raw high-res dynamic ink layout.',2),(10,10,'Love working on pixel sheets!',2),
-(11,11,'Can make it super modern minimal style.',2),(12,12,'Have custom template assets for D&D races.',2),(13,13,'Cyberpunk theme expert ready here.',2),(14,14,'Will create accurate ref sheet panels.',2),(15,15,'Whimsical kid story style is my primary focus.',2),(16,16,'Armor sets design is my daily jam.',2),(17,17,'Pop art layouts can match photo matches.',2),(18,18,'Lo-fi loop sample ready on short notice.',2),(19,19,'Perfect sizing for steam layouts verified.',2),(20,20,'Clean lines for direct stencil work.',2),
-(21,21,'Can incorporate cool neon effects palette.',2),(22,22,'Fast emote revisions available if needed.',2),(23,23,'Manga inks look authentic via my brushes.',2),(24,24,'Traditional watercolor mimic preset look.',2),(25,25,'Fun exaggerations ready for the caricature.',2),(26,26,'Moody tones will suit this perfectly.',2),(27,27,'Matching icons will be perfectly cohesive.',2),(28,28,'Sci-fi structural sheets look hyper technical.',2),(29,29,'Vibrant texture brushstrokes ready.',2),(30,30,'Clean blueprints alignment mapping guaranteed.',2),
-(31,31,'Clickable high energy thumbnail dynamic style.',2),(32,32,'Die-cut safe printing file layouts preset.',2),(33,33,'Custom text boxes ready for card gaming.',2),(34,34,'Cutting layout files prepared for live2D cut.',2),(35,35,'Can do matte painting style scale renders.',2),(36,36,'Vector based sharp scalable mascot branding.',2),(37,37,'Gear motifs detailing will look amazing.',2),(38,38,'Isometric alignment grid setup is clean.',2),(39,39,'Pacing storyboard flow optimized well.',2),(40,40,'Clean gaming asset icons separate sheets.',2),
-(41,41,'Delicate thin lines work standard approach.',2),(42,42,'Print ready tokens dimensions template checked.',2),(43,43,'Glowing signboards look authentic in dark context.',2),(44,44,'Anatomical mythical creature mashup specialist.',2),(45,45,'Perfect seamless looping grid export package.',2),(46,46,'Deep psychological subtexts painting concept.',2),(47,47,'Clean svg vectors flat color palette layout.',2),(48,48,'Frame by frame neat pixel loops creation setup.',2),(49,49,'Full set template streams layout ready.',2),(50,50,'Raw expressive sketch style presentation layout.',2),
-(51,51,'Vibrant wall design patterns look.',2),(52,52,'Bright sparkling magical girl style design.',2),(53,53,'Intimidating layout scale monster sheet.',2),(54,54,'Custom text elements pack options.',2),(55,55,'Historical armor accurate plating reference.',2),(56,56,'Soft ambient gradient sky tones ready.',2),(57,57,'Detailed engine parts look highly industrial.',2),(58,58,'Everyone will have unique clear faces layout.',2),(59,59,'Geometric abstract balance design style.',2),(60,60,'Spooky vintage oil layout render aesthetic.',2),
-(61,61,'Elegant botanical minimal vector format style.',2),(62,62,'Will paint customized armor details.',2),(63,63,'Cool retro neon color balance design mapping.',2),(64,64,'Dynamic dynamic lighting breath effects design.',2),(65,65,'Cheerful colors perfect for children appeal.',2),(66,66,'Shining metallic textures render beautifully.',2),(67,67,'Fits perfectly for current platform standards.',2),(68,68,'Classic game retro style sprite setup layout.',2),(69,69,'Elegant decorative border ornaments pack.',2),(70,70,'Clean layout lines optimized for tattoo ink.',2),
-(71,71,'Grain filter look 90s style layout authentic.',2),(72,72,'Isometric cute stall setup map view.',2),(73,73,'Grungy ruinous landscape lighting concept.',2),(74,74,'Rich impasto digital paint brush layers.',2),(75,75,'Hilarious expressions mapping grid option.',2),(76,76,'Mystical glowing accents familiar designs.',2),(77,77,'Warm community vibe group sketch design.',2),(78,78,'Complex cockpit command board map view details.',2),(79,79,'Cozy lighting golden hour brush style.',2),(80,80,'Accurate scaling cut-outs isometric look.',2),
-(81,81,'Impact lines explosive panel actions layouts.',2),(82,82,'Turnaround blueprints modeling safe formats.',2),(83,83,'Beautiful cloudscapes backgrounds painting focus.',2),(84,84,'Layers cleanly sliced named for immediate use.',2),(85,85,'Cinematic scale atmospheric haze rendering.',2),(86,86,'Bold vector graphics look old school fun.',2),(87,87,'Steampunk pipe grids layout aesthetic look.',2),(88,88,'Warm lighting effects cozy background setting.',2),(89,89,'Eye catching cover splash page elements pack.',2),(90,90,'Polished fantasy elements assets package UI.',2),
-(91,91,'Intricate moon patterns delicate lines focus.',2),(92,92,'Standard cards measurements safe bleed templates.',2),(93,93,'Rainy reflections puddles dynamic lighting setup.',2),(94,94,'Dynamic wing feather painting details clean.',2),(95,95,'High resolution transparent backing patterns.',2),(96,96,'Trippy optical illusion landscape painting look.',2),(97,97,'Clean presentation data icons flat layout.',2),(98,98,'Cozy pixel fireplace embers loop layout asset.',2),(99,99,'Clean camera bounding frame overlay panels.',2),(100,100,'Charming handwritten style chalkboard vector fonts.',2);
-
+(11,11,'Can make it super modern minimal style.',2),(12,12,'Have custom template assets for D&D races.',2),(13,13,'Cyberpunk theme expert ready here.',2),(14,14,'Will create accurate ref sheet panels.',2),(15,15,'Whimsical kid story style is my primary focus.',2),
+(16,16,'Armor sets design is my daily jam.',2),(17,17,'Pop art layouts can match photo matches.',2),(18,18,'Lo-fi loop sample ready on short notice.',2),(19,19,'Perfect sizing for steam layouts verified.',2),(20,20,'Clean lines for direct stencil work.',2),
+(21,21,'Can incorporate cool neon effects palette.',2),(22,22,'Fast emote revisions available if needed.',2),(23,23,'Manga inks look authentic via my brushes.',2),(24,24,'Traditional watercolor mimic preset look.',2),(25,25,'Fun exaggerations ready for the caricature.',2),
+(26,26,'Moody tones will suit this perfectly.',2),(27,27,'Matching icons will be perfectly cohesive.',2),(28,28,'Sci-fi structural sheets look hyper technical.',2),(29,29,'Vibrant texture brushstrokes ready.',2),(30,30,'Clean blueprints alignment mapping guaranteed.',2),
+(31,31,'Clickable high energy thumbnail dynamic style.',2),(32,32,'Die-cut safe printing file layouts preset.',2),(33,33,'Custom text boxes ready for card gaming.',2),(34,34,'Cutting layout files prepared for live2D cut.',2),(35,35,'Can do matte painting style scale renders.',2),
+(36,36,'Vector based sharp scalable mascot branding.',2),(37,37,'Gear motifs detailing will look amazing.',2),(38,38,'Isometric alignment grid setup is clean.',2),(39,39,'Pacing storyboard flow optimized well.',2),(40,40,'Clean gaming asset icons separate sheets.',2),
+(41,41,'Delicate thin lines work standard approach.',2),(42,42,'Print ready tokens dimensions template checked.',2),(43,43,'Glowing signboards look authentic in dark context.',2),(44,44,'Anatomical mythical creature mashup specialist.',2),(45,45,'Perfect seamless looping grid export package.',2),
+(46,46,'Deep psychological subtexts painting concept.',2),(47,47,'Clean svg vectors flat color palette layout.',2),(48,48,'Frame by frame neat pixel loops creation setup.',2),(49,49,'Full set template streams layout ready.',2),(50,50,'Raw expressive sketch style presentation layout.',2),
+-- Wrapped IDs (51-100 changed back to 1-50)
+(51,1,'Vibrant wall design patterns look.',2),(52,2,'Bright sparkling magical girl style design.',2),(53,3,'Intimidating layout scale monster sheet.',2),(54,4,'Custom text elements pack options.',2),(55,5,'Historical armor accurate plating reference.',2),
+(56,6,'Soft ambient gradient sky tones ready.',2),(57,7,'Detailed engine parts look highly industrial.',2),(58,8,'Everyone will have unique clear faces layout.',2),(59,9,'Geometric abstract balance design style.',2),(60,10,'Spooky vintage oil layout render aesthetic.',2),
+(61,11,'Elegant botanical minimal vector format style.',2),(62,12,'Will paint customized armor details.',2),(63,13,'Cool retro neon color balance design mapping.',2),(64,14,'Dynamic dynamic lighting breath effects design.',2),(65,15,'Cheerful colors perfect for children appeal.',2),
+(66,16,'Shining metallic textures render beautifully.',2),(67,17,'Fits perfectly for current platform standards.',2),(68,18,'Classic game retro style sprite setup layout.',2),(69,19,'Elegant decorative border ornaments pack.',2),(70,20,'Clean layout lines optimized for tattoo ink.',2),
+(71,21,'Grain filter look 90s style layout authentic.',2),(72,22,'Isometric cute stall setup map view.',2),(73,23,'Grungy ruinous landscape lighting concept.',2),(74,24,'Rich impasto digital paint brush layers.',2),(75,25,'Hilarious expressions mapping grid option.',2),
+(76,26,'Mystical glowing accents familiar designs.',2),(77,27,'Warm community vibe group sketch design.',2),(78,28,'Complex cockpit command board map view details.',2),(79,29,'Cozy lighting golden hour brush style.',2),(80,30,'Accurate scaling cut-outs isometric look.',2),
+(81,31,'Impact lines explosive panel actions layouts.',2),(82,32,'Turnaround blueprints modeling safe formats.',2),(83,33,'Beautiful cloudscapes backgrounds painting focus.',2),(84,34,'Layers cleanly sliced named for immediate use.',2),(85,35,'Cinematic scale atmospheric haze rendering.',2),
+(86,36,'Bold vector graphics look old school fun.',2),(87,37,'Steampunk pipe grids layout aesthetic look.',2),(88,38,'Warm lighting effects cozy background setting.',2),(89,39,'Eye catching cover splash page elements pack.',2),(90,40,'Polished fantasy elements assets package UI.',2),
+(91,41,'Intricate moon patterns delicate lines focus.',2),(92,42,'Standard cards measurements safe bleed templates.',2),(93,43,'Rainy reflections puddles dynamic lighting setup.',2),(94,44,'Dynamic wing feather painting details clean.',2),(95,45,'High resolution transparent backing patterns.',2),
+(96,46,'Trippy optical illusion landscape painting look.',2),(97,47,'Clean presentation data icons flat layout.',2),(98,48,'Cozy pixel fireplace embers loop layout asset.',2),(99,49,'Clean camera bounding frame overlay panels.',2),(100,50,'Charming handwritten style chalkboard vector fonts.',2);
 -- ==========================================
 -- 9. TRANSACTION TABLE (100 Rows)
 -- Links directly to commissions (1 to 100)

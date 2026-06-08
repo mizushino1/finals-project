@@ -24,7 +24,7 @@ require_once __DIR__ . '/../config/constants.php';
                     Post a commission, pick your artist, and bring your vision to life.
                 </p>
                 <div class="hero__actions">
-                    <a href="<?= BASE_URL ?>commissions" class="btn-artovia-primary">
+                    <a href="<?= BASE_URL ?>artists" class="btn-artovia-primary">
                         Browse Artists
                     </a>
                     <?php if (!isset($_SESSION['user_id'])): ?>

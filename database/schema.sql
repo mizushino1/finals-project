@@ -97,15 +97,15 @@ CREATE TABLE payment_method_tbl (
 CREATE TABLE hired_artist_tbl (
     hire_id INT AUTO_INCREMENT PRIMARY KEY,
     artist_id INT NOT NULL,
-    admin_id INT NOT NULL,
+    user_id INT NOT NULL,
     hire_date DATE NOT NULL,
     status_id INT NOT NULL,
 
     FOREIGN KEY (artist_id)
         REFERENCES artist_tbl(artist_id),
 
-    FOREIGN KEY (admin_id)
-        REFERENCES administrator_tbl(admin_id),
+    FOREIGN KEY (user_id)
+        REFERENCES user_tbl(user_id),
 
     FOREIGN KEY (status_id)
         REFERENCES status_tbl(status_id)
@@ -421,3 +421,5 @@ VALUES
 
 ALTER TABLE artist_tbl
 ADD artist_description TEXT NULL AFTER is_available;
+
+ALTER TABLE commission_tbl ADD COLUMN category_id INT;
