@@ -1,92 +1,380 @@
-<main class="mt-5">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col home-bg" style="min-height:100vh">
-                <div class="row">
-                    <div class="col home-bg" style="min-height:100vh">
-                        <div class="row px-4">
-                            <div class="col-12">
-                                <h1 class="joan fw-light pt-4 mb-0 mt-5 header-fluid-home">
-                                    Design it. <br>
-                                    Create it. Get Paid.
-                                </h1>
-                                <p class=" ms-1 mb-0 roboto fw-bold fs-fluid-sm ">Artovia is a platform where you
-                                    can
-                                    create,
-                                    collaborate and get paid <br> for your creativity
-                                </p>
-                            </div>
-                            <div class="col-12 col-xl-10">
-                                <div class="row">
-                                    <div class="col-12 col-lg-4 my-3 d-flex flex-row">
-                                        <img src="<?php echo BASE_URL; ?>public/img/connectIcon.svg" class="me-4 img-fluid">
-                                        <p class="">
-                                            <span class="fs-fluid-xs fw-bold theme-font-color">Design with freedom </span><br>
-                                            <span class="fs-fluid-xxs">Design and Create with no limits, make your ideas come to life!</span>
-                                        </p>
+<?php
+require_once __DIR__ . '/../config/session.php';
+require_once __DIR__ . '/../config/constants.php';
+?>
 
-                                    </div>
-                                    <div class="col-12 col-lg-4 my-3 d-flex flex-row">
-                                        <img src="<?php echo BASE_URL; ?>public/img/peopleIcon.svg" class="me-4 img-fluid">
-                                        <p class="">
-                                            <span class="fs-fluid-xs fw-bold theme-font-color">Work and collaborate </span><br>
-                                            <span class="fs-fluid-xxs">Connect and collaborate with skilled and talented users worldwide.</span>
-                                        </p>
+<link rel="stylesheet" href="<?= BASE_URL ?>public/css/home.css">
 
-                                    </div>
-                                    <div class="col-12 col-lg-4 my-3 d-flex flex-row">
-                                        <img src="<?php echo BASE_URL; ?>public/img/walletIcon.svg" class="me-4 img-fluid">
-                                        <p class="">
-                                            <span class="fs-fluid-xs fw-bold theme-font-color">Get paid securely </span><br>
-                                            <span class="fs-fluid-xxs">We make sure, creators get what they deserve.</span>
-                                        </p>
+<main>
 
-                                    </div>
-                                </div>
+    <!-- ══════════════════════════════════════
+         HERO
+    ══════════════════════════════════════ -->
+    <section class="hero">
+        <img
+            src="<?= BASE_URL ?>public/img/homebg.png"
+            alt=""
+            class="hero__bg-img"
+            aria-hidden="true"
+        >
+        <div class="container hero__content">
+            <p class="hero__eyebrow">The creative commission marketplace</p>
+            <h1 class="hero__title">
+                Design it.<br>
+                Create it.<br>
+                <em>Get Paid.</em>
+            </h1>
+            <p class="hero__sub">
+                Artovia connects talented artists with clients who need unique, custom artwork.
+                Post a commission, pick your artist, and bring your vision to life.
+            </p>
+            <div class="hero__actions">
+                <a href="<?= BASE_URL ?>commissions" class="btn-artovia-primary">
+                    Browse Artists
+                </a>
+                <?php if (!isset($_SESSION['user_id'])): ?>
+                    <a href="<?= BASE_URL ?>login" class="btn-artovia-outline">
+                        Get Started
+                    </a>
+                <?php else: ?>
+                    <a href="<?= BASE_URL ?>commissions/create" class="btn-artovia-outline">
+                        Post a Commission
+                    </a>
+                <?php endif; ?>
+            </div>
 
-                            </div>
-                            <div class="col-12 d-flex flex-row">
-                                <a class="btn btn-gradient-fill fs-fluid-xs me-3">
-                                    Start Commissioning
-                                </a>
-                                <a class="btn btn-outline fs-fluid-xs  me-1">
-                                    Hire an Artist
-                                </a>
+            <!-- Feature highlights -->
+            <div class="hero__features">
+                <div class="hero__feature">
+                    <div class="hero__feature-icon">
+                        <img src="<?= BASE_URL ?>public/img/connectIcon.svg" alt="" style="width:38px;height:38px;">
+                    </div>
+                    <div>
+                        <p class="hero__feature-label">Design with Freedom</p>
+                        <p class="hero__feature-desc">Create with no limits — make your ideas come to life.</p>
+                    </div>
+                </div>
+                <div class="hero__feature">
+                    <div class="hero__feature-icon">
+                        <img src="<?= BASE_URL ?>public/img/peopleIcon.svg" alt="" style="width:38px;height:38px;">
+                    </div>
+                    <div>
+                        <p class="hero__feature-label">Work and Collaborate</p>
+                        <p class="hero__feature-desc">Connect with skilled artists worldwide.</p>
+                    </div>
+                </div>
+                <div class="hero__feature">
+                    <div class="hero__feature-icon">
+                        <img src="<?= BASE_URL ?>public/img/walletIcon.svg" alt="" style="width:38px;height:38px;">
+                    </div>
+                    <div>
+                        <p class="hero__feature-label">Get Paid Securely</p>
+                        <p class="hero__feature-desc">Every transaction is safe and tracked.</p>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Stats pills -->
+            <div class="hero__stats">
+                <div class="hero__stat">
+                    <div class="hero__stat-icon">
+                        <i class="bi bi-brush" style="color:var(--clr-gold-dark);font-size:1rem;"></i>
+                    </div>
+                    <div>
+                        <div class="hero__stat-num">500+</div>
+                        <div class="hero__stat-label">Active Artists</div>
+                    </div>
+                </div>
+                <div class="hero__stat">
+                    <div class="hero__stat-icon">
+                        <i class="bi bi-check2-circle" style="color:var(--clr-gold-dark);font-size:1rem;"></i>
+                    </div>
+                    <div>
+                        <div class="hero__stat-num">2,400+</div>
+                        <div class="hero__stat-label">Commissions Done</div>
+                    </div>
+                </div>
+                <div class="hero__stat">
+                    <div class="hero__stat-icon">
+                        <i class="bi bi-star" style="color:var(--clr-gold-dark);font-size:1rem;"></i>
+                    </div>
+                    <div>
+                        <div class="hero__stat-num">98%</div>
+                        <div class="hero__stat-label">Satisfaction Rate</div>
+                    </div>
+                </div>
+                <div class="hero__stat">
+                    <div class="hero__stat-icon">
+                        <i class="bi bi-wallet2" style="color:var(--clr-gold-dark);font-size:1rem;"></i>
+                    </div>
+                    <div>
+                        <div class="hero__stat-num">₱1.2M+</div>
+                        <div class="hero__stat-label">Paid to Artists</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-
-                            </div>
-
-
-
-                        </div>
-
+    <!-- ══════════════════════════════════════
+         FEATURES STRIP
+    ══════════════════════════════════════ -->
+    <div class="features-strip">
+        <div class="container-fluid p-0">
+            <div class="features-strip__grid">
+                <div class="features-strip__item">
+                    <div class="features-strip__icon">
+                        <img src="<?= BASE_URL ?>public/img/connectIcon.svg" alt="" style="width:44px;height:44px;">
+                    </div>
+                    <div>
+                        <p class="features-strip__label">Design with Freedom</p>
+                        <p class="features-strip__desc">Create with no limits — make your ideas come to life with artists who match your vision.</p>
+                    </div>
+                </div>
+                <div class="features-strip__item">
+                    <div class="features-strip__icon">
+                        <img src="<?= BASE_URL ?>public/img/peopleIcon.svg" alt="" style="width:44px;height:44px;">
+                    </div>
+                    <div>
+                        <p class="features-strip__label">Work and Collaborate</p>
+                        <p class="features-strip__desc">Connect with skilled and talented artists worldwide, built around your project needs.</p>
+                    </div>
+                </div>
+                <div class="features-strip__item">
+                    <div class="features-strip__icon">
+                        <img src="<?= BASE_URL ?>public/img/walletIcon.svg" alt="" style="width:44px;height:44px;">
+                    </div>
+                    <div>
+                        <p class="features-strip__label">Get Paid Securely</p>
+                        <p class="features-strip__desc">We make sure creators get what they deserve — every transaction is safe and tracked.</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</main>
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-4 p-0">
-            <nav class="navbar bg-black p-0 mb-5 theme-border rounded-0">
-                <div class="container-fluid p-0">
-                    <ul class="nav flex-column w-100 p-0 m-0">
-                        <li class="nav-item bg-dark w-100 p-0 m-0">
-                            <a class="nav-link active" aria-current="page" href="#"><img src="<?php echo BASE_URL; ?>public/img/about.svg" alt=""></a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link w-100 p-0 m-0" href="#">Link</a>
-                        </li>
-                        <li class="nav-item bg-dark w-100 p-0 m-0">
-                            <a class="nav-link" href="#">Link</a>
-                        </li>
-                    </ul>
+    <!-- ══════════════════════════════════════
+         STATS BAND
+    ══════════════════════════════════════ -->
+    <div class="stats-band">
+        <div class="container-fluid p-0">
+            <div class="stats-band__grid">
+                <div class="stats-band__item">
+                    <div class="stats-band__num">500+</div>
+                    <div class="stats-band__label">Active Artists</div>
                 </div>
-            </nav>
-
+                <div class="stats-band__item">
+                    <div class="stats-band__num">2,400+</div>
+                    <div class="stats-band__label">Commissions Done</div>
+                </div>
+                <div class="stats-band__item">
+                    <div class="stats-band__num">98%</div>
+                    <div class="stats-band__label">Satisfaction Rate</div>
+                </div>
+                <div class="stats-band__item">
+                    <div class="stats-band__num">₱1.2M+</div>
+                    <div class="stats-band__label">Paid to Artists</div>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+
+    <!-- ══════════════════════════════════════
+         HOW IT WORKS
+    ══════════════════════════════════════ -->
+    <section class="section">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-5">
+                    <p class="section__eyebrow">How it works</p>
+                    <div class="gold-divider"></div>
+                    <h2 class="section__title">From idea to finished artwork in four steps</h2>
+                    <p class="section__body">
+                        Artovia makes the commission process simple and transparent for both clients and artists.
+                    </p>
+                </div>
+                <div class="col-lg-6 offset-lg-1">
+                    <div class="steps">
+                        <div class="step">
+                            <div class="step__num">1</div>
+                            <div>
+                                <p class="step__title">Post your commission</p>
+                                <p class="step__desc">Describe what you want, set your budget, and publish your request for artists to see.</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step__num">2</div>
+                            <div>
+                                <p class="step__title">Artists send requests</p>
+                                <p class="step__desc">Interested artists apply to take your commission with a message and their portfolio.</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step__num">3</div>
+                            <div>
+                                <p class="step__title">Choose your artist</p>
+                                <p class="step__desc">Review all applicants and accept the one that fits your vision best.</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step__num">4</div>
+                            <div>
+                                <p class="step__title">Receive your artwork</p>
+                                <p class="step__desc">Collaborate, review, and complete payment securely once you're happy with the result.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════
+         BROWSE BY CATEGORY
+    ══════════════════════════════════════ -->
+    <section class="section section--alt">
+        <div class="container">
+            <div class="text-center mb-5">
+                <p class="section__eyebrow">Explore styles</p>
+                <div class="gold-divider mx-auto"></div>
+                <h2 class="section__title">Find the art style you're looking for</h2>
+            </div>
+            <div class="d-flex flex-wrap gap-3 justify-content-center">
+                <?php
+                $categories = [
+                    ['Anime',            'bi-stars'],
+                    ['Chibi',            'bi-emoji-smile'],
+                    ['Pixel Art',        'bi-grid-3x3'],
+                    ['Watercolor',       'bi-droplet-half'],
+                    ['Fantasy',          'bi-brilliance'],
+                    ['Logo Design',      'bi-pentagon'],
+                    ['Portrait',         'bi-person-bounding-box'],
+                    ['Character Design', 'bi-brush'],
+                ];
+                foreach ($categories as [$name, $icon]): ?>
+                    <a href="<?= BASE_URL ?>commissions?category=<?= urlencode($name) ?>" class="category-chip">
+                        <span class="category-chip__dot"></span>
+                        <i class="bi <?= $icon ?>"></i>
+                        <?= $name ?>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════
+         FEATURED ARTISTS
+    ══════════════════════════════════════ -->
+    <section class="section">
+        <div class="container">
+            <div class="d-flex align-items-end justify-content-between mb-5 flex-wrap gap-3">
+                <div>
+                    <p class="section__eyebrow">Featured Artists</p>
+                    <div class="gold-divider"></div>
+                    <h2 class="section__title mb-0">Top talent on Artovia</h2>
+                </div>
+                <a href="<?= BASE_URL ?>commissions" class="btn-artovia-outline">
+                    View All Artists
+                </a>
+            </div>
+            <!-- Skeleton placeholders — replaced by home.js -->
+            <div class="top-artists__grid" id="featuredArtistsGrid">
+                <?php for ($i = 0; $i < 4; $i++): ?>
+                    <div class="artist-card">
+                        <div class="artist-card__avatar"></div>
+                        <div class="artist-card__body">
+                            <div class="artist-card__header">
+                                <span class="artist-card__name" style="opacity:.3;">Loading...</span>
+                            </div>
+                            <p class="artist-card__starting" style="opacity:.3;">—</p>
+                        </div>
+                        <div class="artist-card__actions">
+                            <a href="#" class="btn btn--ghost btn--sm" style="opacity:.3;">View Profile</a>
+                            <a href="#" class="btn btn--accent btn--sm" style="opacity:.3;">Hire Artist</a>
+                        </div>
+                    </div>
+                <?php endfor; ?>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════
+         TESTIMONIALS
+    ══════════════════════════════════════ -->
+    <section class="section section--alt">
+        <div class="container">
+            <div class="text-center mb-5">
+                <p class="section__eyebrow">What people say</p>
+                <div class="gold-divider mx-auto"></div>
+                <h2 class="section__title">Loved by artists and clients alike</h2>
+            </div>
+            <div class="row g-4">
+                <?php
+                $testimonials = [
+                    [
+                        'text'     => 'I posted my first commission and had 5 artists apply within a day. The quality of work blew me away — I\'ve already posted three more.',
+                        'name'     => 'Sofia L.',
+                        'role'     => 'Commission Client',
+                        'initials' => 'SL',
+                    ],
+                    [
+                        'text'     => 'As an artist, Artovia is the best platform I\'ve used. Clients come to me with clear briefs and payment is always on time. Highly recommend.',
+                        'name'     => 'Jay-R U.',
+                        'role'     => 'Freelance Artist',
+                        'initials' => 'JU',
+                    ],
+                    [
+                        'text'     => 'I needed a logo for my small business and found a perfect match in under 24 hours. The whole process felt professional and stress-free.',
+                        'name'     => 'Carlos R.',
+                        'role'     => 'Small Business Owner',
+                        'initials' => 'CR',
+                    ],
+                ];
+                foreach ($testimonials as $t): ?>
+                    <div class="col-md-4">
+                        <div class="testimonial">
+                            <p class="testimonial__text"><?= $t['text'] ?></p>
+                            <div class="testimonial__author">
+                                <div class="testimonial__avatar"><?= $t['initials'] ?></div>
+                                <div>
+                                    <p class="testimonial__name"><?= $t['name'] ?></p>
+                                    <p class="testimonial__role"><?= $t['role'] ?></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════
+         CTA
+    ══════════════════════════════════════ -->
+    <section class="cta-section">
+        <div class="container position-relative">
+            <h2 class="cta-section__title">Your next great artwork<br>starts here.</h2>
+            <p class="cta-section__sub">Join thousands of artists and clients already creating on Artovia.</p>
+            <div class="cta-section__actions">
+                <?php if (!isset($_SESSION['user_id'])): ?>
+                    <a href="<?= BASE_URL ?>login" class="btn-artovia-light">
+                        Create an Account
+                    </a>
+                    <a href="<?= BASE_URL ?>commissions" class="btn-artovia-ghost">
+                        Browse Artists
+                    </a>
+                <?php else: ?>
+                    <a href="<?= BASE_URL ?>commissions/create" class="btn-artovia-light">
+                        Post a Commission
+                    </a>
+                    <a href="<?= BASE_URL ?>commissions" class="btn-artovia-ghost">
+                        Browse Artists
+                    </a>
+                <?php endif; ?>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<script src="<?= BASE_URL ?>public/js/home.js"></script>

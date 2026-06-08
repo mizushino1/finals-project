@@ -1,34 +1,58 @@
-/* Avatar */
+/* ══════════════════════════════════════════════════════════════
+   PROFILE.CSS  — Artist / user profile page
+   Depends on variables defined in main.css
+══════════════════════════════════════════════════════════════ */
+
+/* ── Profile header wrapper ────────────────────────────────── */
+.profile-header {
+    background-color: var(--clr-bg-alt);
+    border-bottom: 1px solid var(--clr-border-strong);
+    padding: 28px 0 0;
+}
+
+[data-bs-theme="dark"] .profile-header {
+    background-color: #111112;
+}
+
+/* ── Avatar ────────────────────────────────────────────────── */
 .profile-avatar {
     width: 90px;
     height: 90px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid #e2c092;
-    background-color: #1a1a1a;
+    border: 3px solid var(--clr-gold);
+    background-color: var(--clr-surface);
     flex-shrink: 0;
 }
 
-/* Username */
+/* ── Username ──────────────────────────────────────────────── */
 .profile-username {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-ui);
     font-weight: 700;
     font-size: 1.1rem;
-    color: #e2c092;
+    color: var(--clr-gold);
     margin-bottom: 2px;
     line-height: 1.2;
 }
 
-/* Bio text */
+/* ── Bio ───────────────────────────────────────────────────── */
 .profile-bio {
+    font-family: var(--font-body);
     font-size: 0.85rem;
-    color: #aaaaaa;
+    color: var(--clr-text-muted);
     line-height: 1.45;
     margin-bottom: 0;
     max-width: 340px;
 }
 
-/* Stat items */
+/* ── Stats row ─────────────────────────────────────────────── */
+.profile-stats-row {
+    border-top: 1px solid var(--clr-border);
+    border-bottom: 1px solid var(--clr-border);
+    padding: 10px 0;
+    gap: 20px;
+}
+
 .profile-stat {
     display: flex;
     flex-direction: column;
@@ -37,16 +61,16 @@
 }
 
 .profile-stat-value {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-ui);
     font-weight: 700;
     font-size: 1rem;
-    color: #ffffff;
+    color: var(--clr-text-primary);
     line-height: 1.2;
 }
 
 .profile-stat-label {
     font-size: 0.7rem;
-    color: #888888;
+    color: var(--clr-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.06em;
     margin-top: 2px;
@@ -54,77 +78,68 @@
 
 .profile-stat-sub {
     font-size: 0.7rem;
-    color: #888888;
+    color: var(--clr-text-muted);
     margin-top: 1px;
 }
 
-/* Stat divider */
-.profile-stats-row {
-    border-top: 1px solid #2a2a2a;
-    border-bottom: 1px solid #2a2a2a;
-    padding: 10px 0;
-    gap: 20px;
-}
-
-/* Follow button */
+/* ── Follow button ─────────────────────────────────────────── */
 .btn-follow {
-    background-color: #e2c092;
-    color: #111111;
+    background-color: var(--clr-gold);
+    color: var(--clr-text-primary);
     border: none;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-ui);
     font-weight: 700;
     font-size: 0.82rem;
     letter-spacing: 0.08em;
     padding: 7px 20px;
-    transition: background-color 0.25s ease, transform 0.3s ease, box-shadow 0.3s ease;
     white-space: nowrap;
+    transition:
+        background-color var(--transition-base),
+        transform        var(--transition-base),
+        box-shadow       var(--transition-base);
 }
 
 .btn-follow:hover {
-    background-color: #c9a070;
+    background-color: var(--clr-gold-dark);
+    color: var(--clr-text-primary);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(226, 192, 146, 0.25);
-    color: #111111;
+    box-shadow: 0 6px 20px rgba(201, 168, 108, 0.25);
 }
 
 .btn-follow.following {
     background-color: transparent;
-    border: 1px solid #e2c092;
-    color: #e2c092;
+    border: 1px solid var(--clr-gold);
+    color: var(--clr-gold);
 }
 
 .btn-follow.following:hover {
-    background-color: rgba(226, 192, 146, 0.08);
+    background-color: rgba(201, 168, 108, 0.08);
 }
 
-/* Notification bell */
+/* ── Notify bell ───────────────────────────────────────────── */
 .btn-notify {
     background: transparent;
-    border: 1px solid #333;
-    border-radius: 6px;
-    color: #888;
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-sm);
+    color: var(--clr-text-muted);
     width: 34px;
     height: 34px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: border-color 0.2s ease, color 0.2s ease;
     padding: 0;
+    transition:
+        border-color var(--transition-fast),
+        color        var(--transition-fast);
 }
 
 .btn-notify:hover {
-    border-color: #e2c092;
-    color: #e2c092;
+    border-color: var(--clr-gold);
+    color: var(--clr-gold);
 }
 
-/* Profile header wrapper */
-.profile-header {
-    background-color: #111112;
-    border-bottom: 1px solid #8b7d5a33;
-    padding: 28px 0 0 0;
-}
-
-/* Tab nav */
+/* ── Profile tabs ──────────────────────────────────────────── */
 .profile-tabs {
     border-bottom: none;
     gap: 4px;
@@ -132,18 +147,18 @@
 }
 
 .profile-tabs .nav-link {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-ui);
     font-size: 0.78rem;
     font-weight: 600;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: #777777;
+    color: var(--clr-text-muted);
     border: none;
     border-radius: 0;
     padding: 10px 20px;
     position: relative;
     background: transparent;
-    transition: color 0.2s ease;
+    transition: color var(--transition-fast);
 }
 
 .profile-tabs .nav-link::after {
@@ -153,25 +168,16 @@
     left: 0;
     right: 0;
     height: 2px;
-    background-color: #e2c092;
+    background-color: var(--clr-gold);
     transform: scaleX(0);
-    transition: transform 0.25s ease;
+    transition: transform var(--transition-base);
 }
 
-.profile-tabs .nav-link:hover {
-    color: #cccccc;
-}
+.profile-tabs .nav-link:hover       { color: var(--clr-text-secondary); }
+.profile-tabs .nav-link.active      { color: var(--clr-gold); background: transparent; }
+.profile-tabs .nav-link.active::after { transform: scaleX(1); }
 
-.profile-tabs .nav-link.active {
-    color: #e2c092;
-    background: transparent;
-}
-
-.profile-tabs .nav-link.active::after {
-    transform: scaleX(1);
-}
-
-/* Search bar */
+/* ── Profile search ────────────────────────────────────────── */
 .profile-search-wrapper {
     position: relative;
     max-width: 260px;
@@ -183,37 +189,38 @@
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: #666;
+    color: var(--clr-text-muted);
     pointer-events: none;
     font-size: 0.85rem;
 }
 
 .profile-search-input {
-    background-color: #1a1a1a;
-    border: 1px solid #2e2e2e;
-    border-radius: 6px;
-    color: #e0e0e0;
+    background-color: var(--clr-bg-card);
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-sm);
+    color: var(--clr-text-primary);
+    font-family: var(--font-body);
     font-size: 0.82rem;
     padding: 7px 12px 7px 34px;
     width: 100%;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        border-color var(--transition-fast),
+        box-shadow   var(--transition-fast);
 }
 
-.profile-search-input::placeholder {
-    color: #555;
-}
+.profile-search-input::placeholder { color: var(--clr-text-muted); }
 
 .profile-search-input:focus {
     outline: none;
-    border-color: #e2c092;
-    box-shadow: 0 0 0 3px rgba(226, 192, 146, 0.12);
-    background-color: #1a1a1a;
-    color: #e0e0e0;
+    border-color: var(--clr-gold);
+    box-shadow: 0 0 0 3px rgba(201, 168, 108, 0.12);
+    background-color: var(--clr-bg-card);
+    color: var(--clr-text-primary);
 }
 
-/* Reviews badge */
+/* ── Reviews badge ─────────────────────────────────────────── */
 .profile-reviews-badge {
-    color: #e2c092;
+    color: var(--clr-gold);
     font-size: 0.78rem;
     font-weight: 600;
 }

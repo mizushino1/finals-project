@@ -1,120 +1,118 @@
-/* ── Login Page ── */
+/* ══════════════════════════════════════════════════════════════
+   LOGIN.CSS  — Auth card (login / register slide panel)
+   Depends on variables defined in main.css
+══════════════════════════════════════════════════════════════ */
 
-/* Card shell */
+/* ── Auth card shell ───────────────────────────────────────── */
 .auth-card {
-    background-color: #0d0d0d;
+    background-color: var(--clr-bg-card);
     border-radius: 30px;
     overflow: hidden;
     min-height: 600px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    box-shadow: var(--shadow-lg);
     position: relative;
     display: flex;
 }
 
-/* Left info panel */
+[data-bs-theme="dark"] .auth-card {
+    background-color: #0d0d0d;
+}
+
+/* ── Info panel (left — dark) ──────────────────────────────── */
 .info-side {
     background-color: transparent;
-    color: #ffffff;
+    color: var(--clr-text-inverse);
     border-top-left-radius: 30px;
     border-bottom-left-radius: 30px;
     z-index: 9;
 }
 
-/* Right form panel */
+/* ── Form panel (right — light) ────────────────────────────── */
 .form-side {
-    background-color: #ffffff;
+    background-color: var(--clr-bg-card);
     border-top-right-radius: 30px;
     border-bottom-right-radius: 30px;
     z-index: 10;
 }
 
-/* "Log In" heading */
+/* ── Form title ────────────────────────────────────────────── */
 .form-title {
-    color: #dfba94;
-    font-family: Georgia, serif;
-    font-weight: bold;
+    color: var(--clr-gold);
+    font-family: var(--font-display);
+    font-weight: 700;
     font-size: 2.8rem;
 }
 
-/* Input groups */
+/* ── Input groups ──────────────────────────────────────────── */
 .auth-input-group {
-    border: 1px solid #f1d9be;
-    border-radius: 6px;
+    border: 1px solid var(--clr-gold-light);
+    border-radius: var(--radius-sm);
 }
 
 .auth-input-group .input-group-text {
     background: transparent;
     border: none;
-    color: #999;
+    color: var(--clr-text-muted);
 }
 
-.auth-input-group .input-group-text i {
-    color: #999;
-}
+.auth-input-group .input-group-text i { color: var(--clr-text-muted); }
 
 .auth-input-group .form-control {
     border: none;
     background: transparent;
     box-shadow: none;
+    color: var(--clr-text-primary);
 }
 
 .auth-input-group .form-control:focus {
     box-shadow: none;
 }
 
-/* "Forgot Password?" link */
+/* ── Forgot password link ──────────────────────────────────── */
 .forgot-password-link {
-    color: #dfba94;
+    color: var(--clr-gold);
     text-decoration: underline;
     text-underline-offset: 4px;
     font-size: 0.9rem;
     font-weight: 500;
+    transition: color var(--transition-fast);
 }
 
-.forgot-password-link:hover {
-    color: #c9a070;
-}
+.forgot-password-link:hover { color: var(--clr-gold-dark); }
 
-/* "or login with" separator text */
+/* ── Divider text ──────────────────────────────────────────── */
 .login-divider-text {
     font-size: 0.8rem;
     letter-spacing: 0.5px;
+    color: var(--clr-text-muted);
 }
 
-/* Social login icons */
+/* ── Social icons ──────────────────────────────────────────── */
 .social-icon-wrapper {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
     font-size: 1.7rem;
-    transition: transform 0.2s ease;
+    transition: transform var(--transition-fast);
 }
 
-.social-icon-wrapper:hover {
-    transform: scale(1.1);
-}
+.social-icon-wrapper:hover { transform: scale(1.1); }
 
-.social-logo {
-    width: 32px;
-    height: 32px;
-    object-fit: contain;
-}
+.social-logo         { width: 32px; height: 32px; object-fit: contain; }
+.social-logo--rounded { border-radius: 4px; }
 
-.social-logo--rounded {
-    border-radius: 4px;
-}
-
-/* ── Panel slide transition ── */
+/* ── Panel slide transition ────────────────────────────────── */
 .info-side,
 .form-side {
     width: 50%;
-    transition: transform 1s ease-in-out,
-                border-radius 1s ease-in-out;
+    transition:
+        transform 1s ease-in-out,
+        border-radius 1s ease-in-out;
     will-change: transform;
 }
 
-/* ── Login state (default) ── */
+/* Login state (default) */
 .auth-card:not(.auth-card--register) .info-side {
     transform: translateX(0);
     border-radius: 30px 0 0 30px;
@@ -124,7 +122,7 @@
     border-radius: 0 30px 30px 0;
 }
 
-/* ── Register state ── */
+/* Register state */
 .auth-card--register .info-side {
     transform: translateX(100%);
     border-radius: 0 30px 30px 0;
@@ -134,57 +132,45 @@
     border-radius: 30px 0 0 30px;
 }
 
-/* ── Content blocks: hidden by default, JS controls opacity ── */
-/* CSS no longer drives the fade — JS sets opacity and transition inline
-   so the reveal is always tied to transitionend, not a CSS timer. */
+/* Content opacity — controlled by JS after slide */
 .form-content,
-.info-content {
-    opacity: 0; /* JS fades these in after the slide completes */
+.info-content { opacity: 0; }
+
+/* No-transition guard (resize) */
+.auth-card.no-transition .info-side,
+.auth-card.no-transition .form-side { transition: none !important; }
+
+/* ── Tab nav (inside auth card) ────────────────────────────── */
+.nav-tabs .nav-link {
+    border: none !important;
+    color: var(--clr-text-muted);
+    font-weight: 400;
+    transition: color var(--transition-fast);
 }
 
-/* ── Responsive: stack on mobile, no slide ── */
+.nav-tabs .nav-link.active {
+    color: var(--clr-text-primary);
+    font-weight: 700;
+    border-bottom: 2px solid var(--clr-gold) !important;
+    background: transparent;
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--clr-text-secondary);
+    border: none;
+}
+
+/* ── Responsive: stack on mobile ───────────────────────────── */
 @media (max-width: 767.98px) {
-    .auth-card {
-        flex-direction: column;
-    }
+    .auth-card { flex-direction: column; }
+
     .info-side,
     .form-side {
         width: 100%;
         transform: none !important;
         transition: border-radius 0.3s ease;
     }
-    .info-side {
-        border-radius: 30px 30px 0 0 !important;
-    }
-    .form-side {
-        border-radius: 0 0 30px 30px !important;
-    }
-}
 
-/* ── Resize guard ── */
-.auth-card.no-transition .info-side,
-.auth-card.no-transition .form-side {
-    transition: none !important;
-}
-
-
-.nav-tabs .nav-link {
-    border: none !important;
-    color: #adb5bd; /* A subtle gray */
-    font-weight: normal;
-    transition: color 0.2s ease-in-out;
-}
-
-/* Style for the Active tab */
-.nav-tabs .nav-link.active {
-    color: #000000; /* Solid black */
-    font-weight: bold;
-    border-bottom: 2px solid #e2c092 !important; /* Black underline */
-    background: transparent;
-}
-
-/* Hover effect to make it feel interactive */
-.nav-tabs .nav-link:hover {
-    color: #495057; /* Slightly darker gray on hover */
-    border: none;
+    .info-side { border-radius: 30px 30px 0 0 !important; }
+    .form-side { border-radius: 0 0 30px 30px !important; }
 }

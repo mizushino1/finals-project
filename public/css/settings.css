@@ -1,56 +1,64 @@
-/* Layout and Containers */
+/* ══════════════════════════════════════════════════════════════
+   SETTINGS.CSS  — Account / artist settings page
+   Depends on variables defined in main.css
+══════════════════════════════════════════════════════════════ */
+
+/* ── Page wrapper ──────────────────────────────────────────── */
 .settings-main {
-    background-color: #f8f9fa; 
-    min-height: 100vh; 
-    color: #333333;
+    background-color: var(--clr-bg-alt);
+    min-height: 100vh;
+    color: var(--clr-text-primary);
 }
 
-.settings-container {
-    max-width: 1200px;
-}
+.settings-container { max-width: 1200px; }
 
+/* ── Settings card ─────────────────────────────────────────── */
 .settings-card {
-    background: #ffffff; 
-    padding: 40px; 
-    border-radius: 20px; 
-    border: 1px solid #e0e0e0; 
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    background: var(--clr-bg-card);
+    padding: 40px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--clr-border);
+    box-shadow: var(--shadow-sm);
 }
 
-/* Typography and Section Headers */
+/* ── Section headings ──────────────────────────────────────── */
 .settings-title {
-    border-bottom: 2px solid #f0f0f0; 
-    padding-bottom: 20px; 
-    margin-bottom: 30px; 
-    color: #333333; 
-    font-family: 'Poppins', sans-serif; 
+    font-family: var(--font-ui);
     font-weight: 700;
+    color: var(--clr-text-primary);
+    border-bottom: 2px solid var(--clr-border);
+    padding-bottom: 20px;
+    margin-bottom: 30px;
 }
 
 .settings-section-title {
-    color: #c9a070; 
-    margin-bottom: 15px; 
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-ui);
     font-weight: 600;
+    color: var(--clr-gold-dark);
+    margin-bottom: 15px;
 }
 
-/* Content Blocks and Input Groups Fix */
+[data-bs-theme="dark"] .settings-section-title {
+    color: var(--clr-gold);
+}
+
+/* ── Group boxes ───────────────────────────────────────────── */
 .settings-group-box {
-    border: 1px solid #eef0f2; 
-    padding: 20px; 
-    margin-bottom: 20px; 
-    border-radius: 8px;
-    background-color: #ffffff;
+    border: 1px solid var(--clr-border);
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: var(--radius-sm);
+    background-color: var(--clr-bg-card);
 }
 
 .artist-box-highlight {
-    border: 1px solid rgba(226, 192, 146, 0.4); 
-    border-radius: 8px; 
-    padding: 20px; 
-    background-color: #fdfbf7;
+    border: 1px solid var(--clr-border-strong);
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    background-color: var(--clr-bg-alt);
 }
 
-/* Flexbox for input-group layout alignment */
+/* ── Input layout ──────────────────────────────────────────── */
 .custom-input-group {
     display: flex !important;
     flex-direction: row !important;
@@ -58,137 +66,136 @@
     width: 100%;
 }
 
+/* ── Input overrides ───────────────────────────────────────── */
 .settings-input-override {
-    background-color: #ffffff !important;
-    border: 1px solid #cccccc !important;
-    color: #333333 !important;
-    border-top-right-radius: 6px !important;
-    border-bottom-right-radius: 6px !important;
-    border-top-left-radius: 0px !important;
-    border-bottom-left-radius: 0px !important;
+    background-color: var(--clr-bg-card) !important;
+    border: 1px solid var(--clr-border) !important;
+    color: var(--clr-text-primary) !important;
+    border-top-right-radius: var(--radius-sm) !important;
+    border-bottom-right-radius: var(--radius-sm) !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
     font-size: 0.82rem;
     padding: 7px 12px;
     flex: 1 1 auto;
     width: 1%;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        border-color var(--transition-fast),
+        box-shadow   var(--transition-fast);
 }
 
 .settings-input-override:focus {
     outline: none;
-    border-color: #e2c092 !important;
-    box-shadow: 0 0 0 3px rgba(226, 192, 146, 0.2) !important;
+    border-color: var(--clr-gold) !important;
+    box-shadow: 0 0 0 3px rgba(201, 168, 108, 0.15) !important;
 }
 
-/* Normalized Custom Textareas styling */
 .settings-textarea-override {
-    background-color: #ffffff !important;
-    border: 1px solid #cccccc !important;
-    color: #333333 !important;
-    border-radius: 6px !important;
+    background-color: var(--clr-bg-card) !important;
+    border: 1px solid var(--clr-border) !important;
+    color: var(--clr-text-primary) !important;
+    border-radius: var(--radius-sm) !important;
     font-size: 0.82rem;
     padding: 10px 12px;
     width: 100% !important;
     display: block;
     resize: vertical;
     overflow-y: auto;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        border-color var(--transition-fast),
+        box-shadow   var(--transition-fast);
 }
 
 .settings-textarea-override:focus {
     outline: none;
-    border-color: #e2c092 !important;
-    box-shadow: 0 0 0 3px rgba(226, 192, 146, 0.2) !important;
+    border-color: var(--clr-gold) !important;
+    box-shadow: 0 0 0 3px rgba(201, 168, 108, 0.15) !important;
 }
 
+/* ── Input addon icon ──────────────────────────────────────── */
 .settings-addon-icon {
-    background: #f1f3f5; 
-    border: 1px solid #cccccc;
+    background: var(--clr-surface);
+    border: 1px solid var(--clr-border);
     border-right: none;
-    color: #666666;
+    color: var(--clr-text-muted);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0 12px;
-    border-top-left-radius: 6px;
-    border-bottom-left-radius: 6px;
+    border-top-left-radius: var(--radius-sm);
+    border-bottom-left-radius: var(--radius-sm);
 }
 
+/* ── Form labels ───────────────────────────────────────────── */
 .settings-label {
-    color: #666666; 
+    font-family: var(--font-body);
+    color: var(--clr-text-muted);
     font-size: 0.8rem;
     font-weight: 500;
     display: block;
     margin-bottom: 0.5rem;
 }
 
-/* Avatar Management Elements */
+/* ── Avatar management ─────────────────────────────────────── */
 .avatar-fb-placeholder {
-    background-color: #e9ecef; 
-    border: 3px solid #e2c092; 
-    overflow: hidden; 
-    width: 90px; 
-    height: 90px; 
+    background-color: var(--clr-surface);
+    border: 3px solid var(--clr-gold);
+    overflow: hidden;
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
     margin: 0 auto;
 }
 
 .avatar-fb-placeholder svg {
-    width: 100%; 
-    height: 100%; 
+    width: 100%;
+    height: 100%;
     margin-top: 10px;
 }
 
-.profile-avatar {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #e2c092;
-}
-
 .avatar-upload-zone {
-    border: 1px dashed #cccccc; 
-    border-radius: 8px; 
-    background: #f8f9fa;
+    border: 1px dashed var(--clr-border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--clr-bg-alt);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     min-height: 120px;
+    transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.avatar-upload-zone:hover {
+    border-color: var(--clr-gold);
+    background: rgba(201, 168, 108, 0.04);
 }
 
 .avatar-upload-text {
-    font-size: 0.85rem; 
-    margin-bottom: 12px; 
-    color: #666666;
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+    color: var(--clr-text-muted);
     line-height: 1.4;
 }
 
-.hidden-file-input {
-    display: none !important;
-}
+.hidden-file-input { display: none !important; }
 
-/* Form Action Controls */
+/* ── Footer actions ────────────────────────────────────────── */
 .settings-footer-actions {
-    border-top: 1px solid #f0f0f0; 
+    border-top: 1px solid var(--clr-border);
     padding-top: 20px;
 }
 
-.btn-font-sz {
-    font-size: 0.75rem;
-}
+.btn-font-sz    { font-size: 0.75rem; }
 
 .btn-cancel-custom {
-    border-radius: 6px; 
-    font-weight: 700; 
+    border-radius: var(--radius-sm);
+    font-weight: 700;
     font-size: 0.82rem;
 }
 
 .btn-delete-custom {
-    font-weight: 600; 
+    font-weight: 600;
     font-size: 0.82rem;
 }
 
-.interactive-cursor {
-    cursor: pointer;
-}
+.interactive-cursor { cursor: pointer; }

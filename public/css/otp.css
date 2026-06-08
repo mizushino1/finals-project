@@ -1,66 +1,66 @@
-/* ── Modal backdrop ── */
-.modal-backdrop.show {
-    opacity: 0.75 !important;
-}
+/* ══════════════════════════════════════════════════════════════
+   OTP.CSS  — OTP modal, forgot-password flow, auth inputs
+   Depends on variables defined in main.css
+   Note: these modals always render on a dark background,
+   so some rules intentionally stay dark-absolute rather
+   than theme-relative.
+══════════════════════════════════════════════════════════════ */
 
-/* ── Modal card ── */
+/* ── Modal backdrop ────────────────────────────────────────── */
+.modal-backdrop.show { opacity: 0.75 !important; }
+
+/* ── Modal card ────────────────────────────────────────────── */
 .modal-content.auth-card {
     background-color: #050505 !important;
-    border: 2px solid #d4af37 !important;
-    border-radius: 12px !important;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8) !important;
+    border: 2px solid var(--clr-gold) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-lg) !important;
     max-width: 540px;
     width: 100%;
 }
 
-.modal-dialog {
-    max-width: 540px !important;
-}
+.modal-dialog { max-width: 540px !important; }
 
-/* Disable Bootstrap's slide-in so the modal appears instantly */
+/* Disable Bootstrap slide */
 .modal.fade .modal-dialog {
     transition: none !important;
     transform: none !important;
 }
 
-/* ── Close button ── */
+/* ── Close button ──────────────────────────────────────────── */
 .btn-close-white {
     filter: invert(1) grayscale(1);
     opacity: 0.5;
-    transition: opacity 0.2s ease;
+    transition: opacity var(--transition-fast);
 }
+.btn-close-white:hover { opacity: 1; }
 
-.btn-close-white:hover {
-    opacity: 1;
-}
-
-/* ── Shared auth typography ── */
+/* ── Auth typography ───────────────────────────────────────── */
 .auth-title {
-    color: #ffffff !important;
+    color: var(--clr-text-inverse) !important;
     font-size: 1.75rem;
     font-weight: 700;
     letter-spacing: 0.03em;
+    font-family: var(--font-ui);
 }
 
 .auth-subtitle {
-    color: rgba(255, 255, 255, 0.5) !important;
+    color: rgba(255, 255, 255, 0.50) !important;
     font-size: 0.875rem;
     font-weight: 400;
 }
 
 .auth-label {
-    color: rgba(255, 255, 255, 0.6) !important;
+    color: rgba(255, 255, 255, 0.60) !important;
     font-size: 0.8rem;
     font-weight: 500;
     letter-spacing: 0.08em;
     text-transform: uppercase;
 }
 
-.fs-7 {
-    font-size: 0.8rem !important;
-}
+.fs-7 { font-size: 0.8rem !important; }
 
-/* ── Custom input group ── */
+/* ── Custom input group wrapper ────────────────────────────── */
 .input-group-custom {
     position: relative;
     display: flex;
@@ -71,73 +71,73 @@
 .input-icon {
     position: absolute;
     left: 16px;
-    color: #6c757d;
+    color: var(--clr-text-muted);
     z-index: 5;
     display: flex;
     align-items: center;
     pointer-events: none;
 }
 
-/* ── Auth text input ── */
+/* ── Light auth input ──────────────────────────────────────── */
 .auth-input {
-    background-color: #ffffff !important;
-    color: #121212 !important;
-    border: 1px solid #ced4da !important;
-    border-radius: 8px !important;
+    background-color: var(--clr-bg-card) !important;
+    color: var(--clr-text-primary) !important;
+    border: 1px solid var(--clr-border) !important;
+    border-radius: var(--radius-sm) !important;
     padding: 12px 16px 12px 45px !important;
     font-size: 0.95rem !important;
     height: 48px;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        border-color var(--transition-fast),
+        box-shadow   var(--transition-fast);
 }
 
 .auth-input:focus {
-    background-color: #ffffff !important;
-    color: #121212 !important;
-    border-color: #d4af37 !important;
-    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.25) !important;
+    background-color: var(--clr-bg-card) !important;
+    color: var(--clr-text-primary) !important;
+    border-color: var(--clr-gold) !important;
+    box-shadow: 0 0 0 3px rgba(201, 168, 108, 0.20) !important;
     outline: none !important;
 }
 
-.auth-input::placeholder {
-    color: #adb5bd !important;
-}
+.auth-input::placeholder { color: var(--clr-text-muted) !important; }
 
-/* ── Dark-variant auth input (forgot password flow) ── */
+/* ── Dark auth input (forgot-password flow) ────────────────── */
 .auth-input-dark {
     background-color: transparent !important;
-    color: #ffffff !important;
+    color: var(--clr-text-inverse) !important;
     border: none !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.30) !important;
     border-radius: 0 !important;
     padding: 10px 40px 10px 0 !important;
     font-size: 0.95rem !important;
-    transition: border-color 0.2s ease;
     box-shadow: none !important;
+    transition: border-color var(--transition-fast);
 }
 
 .auth-input-dark:focus {
-    border-color: #d4af37 !important;
+    border-color: var(--clr-gold) !important;
     box-shadow: none !important;
     outline: none !important;
     background-color: transparent !important;
-    color: #ffffff !important;
+    color: var(--clr-text-inverse) !important;
 }
 
-.auth-input-dark::placeholder {
-    color: rgba(255, 255, 255, 0.3) !important;
-}
+.auth-input-dark::placeholder { color: rgba(255, 255, 255, 0.30) !important; }
 
-/* Input groups for the dark flow */
+/* ── Dark input group wrapper ──────────────────────────────── */
 .auth-input-group-dark {
     border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     overflow: hidden;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        border-color var(--transition-fast),
+        box-shadow   var(--transition-fast);
 }
 
 .auth-input-group-dark:focus-within {
-    border-color: rgba(212, 175, 55, 0.6);
-    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12);
+    border-color: rgba(201, 168, 108, 0.60);
+    box-shadow: 0 0 0 3px rgba(201, 168, 108, 0.12);
 }
 
 .auth-input-group-dark .input-group-text {
@@ -149,29 +149,27 @@
 .auth-input-group-dark .form-control {
     background: transparent;
     border: none;
-    color: #fff;
+    color: var(--clr-text-inverse);
     box-shadow: none;
 }
 
 .auth-input-group-dark .form-control:focus {
     background: transparent;
-    color: #fff;
+    color: var(--clr-text-inverse);
     box-shadow: none;
 }
 
 .auth-input-group-dark .form-control::placeholder {
-    color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.30);
 }
 
-/* ── OTP inputs ── */
-.otp-container {
-    gap: 10px;
-}
+/* ── OTP inputs ────────────────────────────────────────────── */
+.otp-container { gap: 10px; }
 
 .otp-input {
     background-color: transparent !important;
-    color: #ffffff !important;
-    border: 2px solid rgba(255, 255, 255, 0.5) !important;
+    color: var(--clr-text-inverse) !important;
+    border: 2px solid rgba(255, 255, 255, 0.50) !important;
     border-radius: 10px !important;
     height: 56px !important;
     width: 48px !important;
@@ -179,60 +177,56 @@
     font-weight: 700 !important;
     padding: 0 !important;
     text-align: center;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition:
+        border-color var(--transition-fast),
+        box-shadow   var(--transition-fast);
 }
 
 .otp-input:focus {
     background-color: transparent !important;
-    color: #ffffff !important;
-    border-color: #d4af37 !important;
-    box-shadow: 0 0 10px rgba(212, 175, 55, 0.4) !important;
+    color: var(--clr-text-inverse) !important;
+    border-color: var(--clr-gold) !important;
+    box-shadow: 0 0 10px rgba(201, 168, 108, 0.40) !important;
     outline: none !important;
 }
 
-/* ── Password toggle icon ── */
-
-
-/* ── Forgot-password page wrapper ── */
-.fp-page {
-    background: var(--black);
-    padding: 20px;
-}
-
-/* ── Gold text link ── */
+/* ── Gold text link ────────────────────────────────────────── */
 .gold-text {
-    color: #d4af37 !important;
-    transition: color 0.15s ease;
+    color: var(--clr-gold) !important;
+    transition: color var(--transition-fast);
 }
 
 .gold-text:hover {
-    color: #f0d878 !important;
+    color: var(--clr-gold-light) !important;
     text-decoration: underline !important;
 }
 
-/* ── Forgot-password flow cards ── */
+/* ── Forgot-password page wrapper ──────────────────────────── */
+.fp-page {
+    background: #000000;
+    padding: 20px;
+}
+
+/* ── Forgot-password card ──────────────────────────────────── */
 .fp-card {
     background: #0a0a0a;
-    border: 2px solid #d4af37;
-    border-radius: 12px;
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6),
-                0 0 24px rgba(212, 175, 55, 0.08);
+    border: 2px solid var(--clr-gold);
+    border-radius: var(--radius-md);
+    box-shadow:
+        0 8px 40px rgba(0, 0, 0, 0.60),
+        0 0 24px rgba(201, 168, 108, 0.08);
     max-width: 520px;
     width: 100%;
     padding: 2.5rem 2rem;
 }
 
-@media (min-width: 576px) {
-    .fp-card {
-        padding: 3rem 2.5rem;
-    }
-}
+@media (min-width: 576px) { .fp-card { padding: 3rem 2.5rem; } }
 
 .fp-card__title {
-    font-family: Georgia, serif;
+    font-family: var(--font-display);
     font-size: 1.85rem;
     font-weight: 700;
-    color: #d4af37;
+    color: var(--clr-gold);
     text-transform: uppercase;
     letter-spacing: 0.06em;
     margin-bottom: 0.4rem;
@@ -244,14 +238,14 @@
     margin-bottom: 2rem;
 }
 
-/* OTP strip inside fp-card */
+/* OTP strip */
 .fp-otp-strip {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 8px;
     background: rgba(255, 255, 255, 0.03);
-    border: 2px solid #d4af37;
+    border: 2px solid var(--clr-gold);
     border-radius: 50px;
     padding: 0.6rem 1rem;
 }
@@ -269,6 +263,6 @@
     justify-content: space-between;
     align-items: center;
     font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.4);
+    color: rgba(255, 255, 255, 0.40);
     margin-top: 0.75rem;
 }

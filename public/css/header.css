@@ -1,38 +1,110 @@
+/* ══════════════════════════════════════════════════════════════
+   HEADER.CSS  — Navbar / site header
+   Depends on variables defined in main.css
+══════════════════════════════════════════════════════════════ */
+
+/* ── Sticky wrapper ────────────────────────────────────────── */
 header.sticky-top {
-    z-index: 1030; /* Bootstrap's default navbar z-index */
+    z-index: 1030;
 }
 
 .navbar .dropdown-menu {
     z-index: 1031;
     overflow: visible;
 }
-/* ── Navbar ── */
+
+/* ── Artovia fixed nav ─────────────────────────────────────── */
+.artovia-nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1030;
+    padding: 1rem 0;
+    background: rgba(250, 248, 244, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--clr-border);
+    transition: background var(--transition-base);
+}
+
+[data-bs-theme="dark"] .artovia-nav {
+    background: rgba(15, 13, 10, 0.85);
+}
+
+/* ── Logo ──────────────────────────────────────────────────── */
+.artovia-nav__logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+}
+
+.artovia-nav__logo-icon  { width: 32px; height: auto; }
+
+.artovia-nav__logo-text {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    color: var(--clr-text-primary);
+    letter-spacing: 0.02em;
+}
+
+/* Legacy logo filter (for <img> logos) */
 .navbar-logo {
     filter: invert(1);
     height: 2rem;
 }
 
+/* ── Nav links ─────────────────────────────────────────────── */
+.artovia-nav__links {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
 
+.artovia-nav__links a {
+    font-family: var(--font-ui);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--clr-text-secondary);
+    text-decoration: none;
+    letter-spacing: 0.03em;
+    transition: color var(--transition-fast);
+}
+
+.artovia-nav__links a:hover { color: var(--clr-gold); }
+
+/* ── User avatar / dropdown ────────────────────────────────── */
 .nav-user-avatar i {
-    transition: opacity 0.2s ease;
+    transition: opacity var(--transition-fast);
 }
 
-.nav-user-avatar:hover i {
-    opacity: 0.75;
-}
+.nav-user-avatar:hover i { opacity: 0.75; }
 
-.nav-kebab-btn:focus {
-    box-shadow: none;
-}
+.nav-kebab-btn:focus { box-shadow: none; }
 
 .nav-user-dropdown .dropdown-menu {
     min-width: 160px;
     backdrop-filter: blur(12px);
-    z-index: 9999 !important;  /* add this */
-    position: absolute;         /* ensure it's not in flow */
+    background: var(--clr-bg-card);
+    border: 1px solid var(--clr-border);
+    z-index: 9999 !important;
+    position: absolute;
 }
+
+.nav-user-dropdown .dropdown-item {
+    color: var(--clr-text-secondary);
+    font-size: 0.85rem;
+}
+
 .nav-user-dropdown .dropdown-item:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--clr-surface);
+    color: var(--clr-text-primary);
+}
+
+[data-bs-theme="dark"] .nav-user-dropdown .dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .nav-avatar-img {
@@ -40,6 +112,6 @@ header.sticky-top {
     height: 36px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    border: 2px solid var(--clr-border-strong);
     display: block;
 }
