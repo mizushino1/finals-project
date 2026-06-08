@@ -1,9 +1,4 @@
 <?php require_once __DIR__ . '/../../src/middleware/auth_middleware.php'; ?>
-<link rel="stylesheet" href="<?= BASE_URL ?>public/css/browse.css">
-
-<script>
-    const USER_ROLE = '<?= $_SESSION['role'] ?? 'guest' ?>';
-</script>
 
 <main class="container-xl px-3 px-sm-4 py-4">
 

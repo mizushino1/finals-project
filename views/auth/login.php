@@ -119,9 +119,9 @@ if (isset($_SESSION['user_id'])) {
                                 </div>
 
                                 <div class="mb-4 d-none" id="artistStartAtWrapper">
-                                    <label class="form-label-static">Starting Price ($)</label>
+                                    <label class="form-label-static">Starting Price (₱)</label>
                                     <div class="input-group auth-input-group">
-                                        <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
+                                        <span class="input-group-text"><i class="">₱</i></span>
                                         <input type="number" class="form-control" id="registerStartAt" placeholder="0.00" min="0" step="0.01">
                                     </div>
                                 </div>

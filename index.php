@@ -1,4 +1,5 @@
 <?php
+ob_start();
 require_once 'config/session.php';
 require_once 'config/constants.php'; // Defines BASE_URL
  

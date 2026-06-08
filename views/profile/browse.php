@@ -1,5 +1,4 @@
 <?php require_once __DIR__ . '/../../src/middleware/auth_middleware.php'; ?>
-<link rel="stylesheet" href="<?= BASE_URL ?>public/css/browse.css">
 
 <main class="container-xl px-3 px-sm-4 py-4">
 
