@@ -33,7 +33,7 @@
 
 /* ── Form title ────────────────────────────────────────────── */
 .form-title {
-    color: var(--clr-gold);
+    color: #c9a86c;
     font-family: var(--font-display);
     font-weight: 700;
     font-size: 2.8rem;
@@ -48,16 +48,16 @@
 .auth-input-group .input-group-text {
     background: transparent;
     border: none;
-    color: var(--clr-text-muted);
+    color: #8a7a65;
 }
 
-.auth-input-group .input-group-text i { color: var(--clr-text-muted); }
+.auth-input-group .input-group-text i { color: #8a7a65; }
 
 .auth-input-group .form-control {
     border: none;
     background: transparent;
     box-shadow: none;
-    color: var(--clr-text-primary);
+    color: #1a1612;
 }
 
 .auth-input-group .form-control:focus {
@@ -145,7 +145,7 @@
 }
 
 .nav-tabs .nav-link.active {
-    color: var(--clr-text-primary);
+    color: #1a1612;
     font-weight: 700;
     border-bottom: 2px solid var(--clr-gold) !important;
     background: transparent;

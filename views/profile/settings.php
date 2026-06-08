@@ -206,14 +206,16 @@ if ($account_id) {
                                 </div>
                             </div>
 
-                            <div class="settings-group-box">
-                                <div id="artistHighlightBox">
-                                    <h5 class="settings-section-title"><i class="bi bi-pencil-square"></i> Artist Description</h5>
-                                    <p class="text-muted small">It's about yourself and your art</p>
-                                    <textarea class="settings-textarea-override" rows="4" name="artist_description" id="artistDescText" maxlength="250" placeholder="Description........"></textarea>
-                                    <small class="text-muted d-block mt-1 text-end" id="charCounter">0/250</small>
+                            <?php if ($role === 'artist'): ?>
+                                <div class="settings-group-box">
+                                    <div id="artistHighlightBox">
+                                        <h5 class="settings-section-title"><i class="bi bi-pencil-square"></i> Artist Description</h5>
+                                        <p class="text-muted small">It's about yourself and your art</p>
+                                        <textarea class="settings-textarea-override" rows="4" name="artist_description" id="artistDescText" maxlength="250" placeholder="Description........"></textarea>
+                                        <small class="text-muted d-block mt-1 text-end" id="charCounter">0/250</small>
+                                    </div>
                                 </div>
-                            </div>
+                            <?php endif; ?>
 
                             <div class="py-3">
                                 <a class="btn btn-outline-secondary btn-sm px-3 profile-sub-weight" href="<?= BASE_URL ?>profile">View Profile</a>

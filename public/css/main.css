@@ -153,8 +153,23 @@ p, .roboto {
     line-height: 1;
 }
 
+.welcome-text-static {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #c9a86c;
+    line-height: 1;
+}
+
 .info-desc {
     color: var(--clr-text-secondary);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    max-width: 90%;
+}
+
+.info-desc-static {
+    color: #bdb0a0;
     font-size: 1.05rem;
     line-height: 1.6;
     max-width: 90%;
@@ -166,6 +181,16 @@ p, .roboto {
     color: var(--clr-text-secondary);
     margin-bottom: 4px;
 }
+
+.form-label-static {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #4a3f30;
+    margin-bottom: 4px;
+}
+
+
+
 
 .border-none { border: none !important; }
 
@@ -246,6 +271,36 @@ p, .roboto {
     box-shadow: var(--shadow-md);
 }
 
+.btn-outline-static {
+    font-family: var(--font-ui);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 0.7rem 1.8rem;
+    background: transparent;
+    color: #1a1612;
+    border: 2px solid var(--clr-gold);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    transition:
+        background var(--transition-base),
+        color var(--transition-base),
+        transform var(--transition-slow),
+        box-shadow var(--transition-slow);
+    cursor: pointer;
+}
+
+.btn-outline-static:hover {
+    background: var(--clr-gold);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+
 /* Filled gold — "btn-fill" legacy alias */
 .btn-fill,
 .btn-artovia-gold {
@@ -271,6 +326,32 @@ p, .roboto {
 .btn-artovia-gold:hover {
     background: var(--clr-text-primary);
     color: var(--clr-gold);
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-fill-static {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 0.7rem 1.8rem;
+    background: var(--clr-gold);
+    color: #1a1612;
+    border: 2px solid var(--clr-border-strong);
+    border-radius: var(--radius-sm);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+        background var(--transition-base),
+        color var(--transition-base),
+        transform var(--transition-slow),
+        box-shadow var(--transition-slow);
+    cursor: pointer;
+}
+.btn-fill-static:hover {
+    background: #1a1612;
+    color: #f5ede0;
     transform: translateY(-5px);
     box-shadow: var(--shadow-lg);
 }

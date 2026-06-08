@@ -16,18 +16,18 @@ if (isset($_SESSION['user_id'])) {
                         <div class="info-content" id="infoLogin">
                             <div class="d-flex flex-row align-items-center mb-3">
                                 <img src="<?= BASE_URL ?>public/img/icon.svg" class="large-brand-icon me-3" alt="Artovia Icon">
-                                <span class="welcome-text">WELCOME</span>
+                                <span class="welcome-text-static">WELCOME</span>
                             </div>
-                            <p class="info-desc mb-4">Please log in to your existing account or create a new account if you don't have one yet.</p>
-                            <button class="btn btn-fill px-4 py-2" id="goToRegister">Create Account</button>
+                            <p class="info-desc-static mb-4">Please log in to your existing account or create a new account if you don't have one yet.</p>
+                            <button class="btn btn-fill-static px-4 py-2" id="goToRegister">Create Account</button>
                         </div>
-                        <div class="info-content d-none" id="infoRegister">
+                        <div class="info-content-static d-none" id="infoRegister">
                             <div class="d-flex flex-row align-items-center mb-3">
                                 <img src="<?= BASE_URL ?>public/img/icon.svg" class="large-brand-icon me-3" alt="Artovia Icon">
-                                <span class="welcome-text">JOIN US</span>
+                                <span class="welcome-text-static">JOIN US</span>
                             </div>
-                            <p class="info-desc mb-4">If you already have an account, proceed to log in.</p>
-                            <button class="btn btn-fill px-4 py-2 login-trigger">Log In</button>
+                            <p class="info-desc-static mb-4">If you already have an account, proceed to log in.</p>
+                            <button class="btn btn-fill-static px-4 py-2 login-trigger">Log In</button>
                         </div>
                     </div>
 
@@ -39,14 +39,14 @@ if (isset($_SESSION['user_id'])) {
                             <h1 class="form-title mb-4">Log In</h1>
                             <form class="w-100 px-lg-4" id="loginForm">
                                 <div class="mb-3">
-                                    <label class="form-label">Username</label>
+                                    <label class="form-label-static">Username</label>
                                     <div class="input-group auth-input-group">
                                         <span class="input-group-text"><i class="bi bi-person"></i></span>
                                         <input type="text" class="form-control" id="loginUsername" placeholder="Username" required>
                                     </div>
                                 </div>
                                 <div class="mb-4">
-                                    <label class="form-label">Password</label>
+                                    <label class="form-label-static">Password</label>
                                     <div class="input-group auth-input-group">
                                         <span class="input-group-text"><i class="bi bi-lock"></i></span>
                                         <input type="password" class="form-control" id="loginPassword" placeholder="Password" required>
@@ -54,7 +54,7 @@ if (isset($_SESSION['user_id'])) {
                                     </div>
                                 </div>
                                 <div class="text-center mb-4 d-flex flex-column align-items-center">
-                                    <button type="submit" class="btn btn-outline px-5 py-2 mb-3">LOGIN</button>
+                                    <button type="submit" class="btn btn-outline-static px-5 py-2 mb-3">LOGIN</button>
                                     <a href="<?= BASE_URL ?>login/forgot-password" class="forgot-password-link">Forgot Password?</a>
                                 </div>
                             </form>
@@ -64,7 +64,7 @@ if (isset($_SESSION['user_id'])) {
                             <h1 class="form-title mb-4">Register</h1>
                             <form class="w-100 px-lg-4" id="registerForm">
                                 <div class="mb-3">
-                                    <label class="form-label">Account Type</label>
+                                    <label class="form-label-static">Account Type</label>
                                     <ul class="nav nav-tabs border-0 mb-3" id="roleTab" role="tablist">
                                         <li class="nav-item" role="presentation">
                                             <button class="nav-link active" id="user-tab" data-bs-toggle="tab" data-bs-target="#user-content" type="button" role="tab">User</button>
@@ -78,14 +78,14 @@ if (isset($_SESSION['user_id'])) {
 
                                 <div class="row">
                                     <div class="mb-3 col">
-                                        <label class="form-label">First Name</label>
+                                        <label class="form-label-static">First Name</label>
                                         <div class="input-group auth-input-group">
                                             <span class="input-group-text"><i class="bi bi-person"></i></span>
                                             <input type="text" class="form-control" id="registerFirstName" placeholder="John" required>
                                         </div>
                                     </div>
                                     <div class="mb-3 col">
-                                        <label class="form-label">Last Name</label>
+                                        <label class="form-label-static">Last Name</label>
                                         <div class="input-group auth-input-group">
                                             <span class="input-group-text"><i class="bi bi-person"></i></span>
                                             <input type="text" class="form-control" id="registerLastName" placeholder="Doe" required>
@@ -94,7 +94,7 @@ if (isset($_SESSION['user_id'])) {
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label">Email Address</label>
+                                    <label class="form-label-static">Email Address</label>
                                     <div class="input-group auth-input-group">
                                         <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                                         <input type="email" class="form-control" id="registerEmail" placeholder="email@example.com" required>
@@ -102,7 +102,7 @@ if (isset($_SESSION['user_id'])) {
                                 </div>
 
                                 <div class="mb-3">
-                                    <label class="form-label">Username</label>
+                                    <label class="form-label-static">Username</label>
                                     <div class="input-group auth-input-group">
                                         <span class="input-group-text"><i class="bi bi-at"></i></span>
                                         <input type="text" class="form-control" id="registerUsername" placeholder="Username" required>
@@ -110,7 +110,7 @@ if (isset($_SESSION['user_id'])) {
                                 </div>
 
                                 <div class="mb-4">
-                                    <label class="form-label">Password</label>
+                                    <label class="form-label-static">Password</label>
                                     <div class="input-group auth-input-group">
                                         <span class="input-group-text"><i class="bi bi-lock"></i></span>
                                         <input type="password" class="form-control" id="registerPassword" placeholder="••••••••" required>
@@ -119,7 +119,7 @@ if (isset($_SESSION['user_id'])) {
                                 </div>
 
                                 <div class="mb-4 d-none" id="artistStartAtWrapper">
-                                    <label class="form-label">Starting Price ($)</label>
+                                    <label class="form-label-static">Starting Price ($)</label>
                                     <div class="input-group auth-input-group">
                                         <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
                                         <input type="number" class="form-control" id="registerStartAt" placeholder="0.00" min="0" step="0.01">
@@ -127,7 +127,7 @@ if (isset($_SESSION['user_id'])) {
                                 </div>
 
                                 <div class="text-center mb-4 d-flex flex-column align-items-center">
-                                    <button type="submit" class="btn btn-outline px-5 py-2">REGISTER</button>
+                                    <button type="submit" class="btn btn-outline-static px-5 py-2">REGISTER</button>
                                 </div>
                             </form>
                         </div>
