@@ -21,9 +21,15 @@
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/settings.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/home.css">
 
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('artovia-theme') || 'dark';
+            document.documentElement.setAttribute('data-bs-theme', savedTheme);
+        })();
+    </script>
 </head>
 
-<body>
+<body data-bs-theme="dark">
     <header class="sticky-top">
         <nav class="navbar navbar-expand-md glass-card-dark">
             <div class="container-fluid">
@@ -31,16 +37,13 @@
                     <img src="<?php echo BASE_URL; ?>public/img/logo.svg" alt="" class="navbar-logo">
                 </a>
 
-                <!-- Mobile: right-side controls -->
                 <div class="navbar-nav d-flex flex-row d-md-none text-end justify-self-end align-items-center">
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <div class="dropdown nav-user-dropdown me-2">
                             <div class="d-flex align-items-center gap-2">
-                                <!-- Avatar icon → goes to profile -->
                                 <a href="<?php echo BASE_URL; ?>profile" class="nav-user-avatar" title="View Profile">
                                     <i class="bi bi-person-circle text-light" style="font-size:1.6rem; line-height:1;"></i>
                                 </a>
-                                <!-- Username + kebab trigger -->
                                 <button class="btn p-0 border-0 d-flex align-items-center gap-1 text-light nav-kebab-btn"
                                     data-bs-toggle="dropdown" aria-expanded="false" title="Options">
                                     <span class="fw-bold fs-fluid-xs"><?php echo htmlspecialchars($_SESSION['username']); ?></span>
@@ -51,6 +54,14 @@
                                         <a class="dropdown-item text-light" href="<?php echo BASE_URL; ?>settings">
                                             <i class="bi bi-gear me-2"></i>Settings
                                         </a>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item text-light theme-toggle-btn d-none" data-set-theme="light">
+                                            <i class="bi bi-sun-fill me-2"></i>Light Mode
+                                        </button>
+                                        <button class="dropdown-item text-light theme-toggle-btn d-none" data-set-theme="dark">
+                                            <i class="bi bi-moon-stars-fill me-2"></i>Dark Mode
+                                        </button>
                                     </li>
                                     <li>
                                         <hr class="dropdown-divider border-secondary my-1">
@@ -64,6 +75,9 @@
                             </div>
                         </div>
                     <?php else: ?>
+                        <button class="btn text-light me-2 p-1 border-0 dynamic-theme-solo" title="Toggle Theme">
+                            <i class="bi bi-sun-fill fs-5"></i>
+                        </button>
                         <a class="btn d-inline-block my-auto mx-2 text-light fw-bold glass-card fs-fluid-xs h-50"
                             href="<?php echo BASE_URL; ?>login">LOG IN</a>
                     <?php endif; ?>
@@ -85,16 +99,13 @@
                     </div>
                 </div>
 
-                <!-- Desktop: right-side controls -->
                 <div class="navbar-nav d-none d-md-flex align-items-center">
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <div class="dropdown nav-user-dropdown">
                             <div class="d-flex align-items-center gap-2">
-                                <!-- Avatar icon → goes to profile -->
                                 <a href="<?php echo BASE_URL; ?>profile" class="nav-user-avatar" title="View Profile">
                                     <i class="bi bi-person-circle text-light" style="font-size:1.75rem; line-height:1;"></i>
                                 </a>
-                                <!-- Username + kebab trigger -->
                                 <button class="btn p-0 border-0 d-flex align-items-center gap-1 text-light nav-kebab-btn"
                                     data-bs-toggle="dropdown" aria-expanded="false" title="Options">
                                     <span class="fw-bold fs-fluid-xs"><?php echo htmlspecialchars($_SESSION['username']); ?></span>
@@ -105,6 +116,14 @@
                                         <a class="dropdown-item text-light" href="<?php echo BASE_URL; ?>settings">
                                             <i class="bi bi-gear me-2"></i>Settings
                                         </a>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item text-light theme-toggle-btn d-none" data-set-theme="light">
+                                            <i class="bi bi-sun-fill me-2"></i>Light Mode
+                                        </button>
+                                        <button class="dropdown-item text-light theme-toggle-btn d-none" data-set-theme="dark">
+                                            <i class="bi bi-moon-stars-fill me-2"></i>Dark Mode
+                                        </button>
                                     </li>
                                     <li>
                                         <hr class="dropdown-divider border-secondary my-1">
@@ -118,6 +137,9 @@
                             </div>
                         </div>
                     <?php else: ?>
+                        <button class="btn text-light me-3 p-1 border-0 dynamic-theme-solo" title="Toggle Theme">
+                            <i class="bi bi-sun-fill fs-5"></i>
+                        </button>
                         <a class="btn text-light fw-bold glass-card fs-fluid-xs" href="<?php echo BASE_URL; ?>login">LOG IN</a>
                     <?php endif; ?>
                 </div>
@@ -126,4 +148,55 @@
     </header>
     <script>
         const BASE_URL = '<?= BASE_URL ?>';
+        document.addEventListener('DOMContentLoaded', () => {
+            const getTheme = () => localStorage.getItem('artovia-theme') || 'dark';
+            
+            const setTheme = (theme) => {
+                // Apply to root element for Bootstrap 5.3 rules, and backup body attribute
+                document.documentElement.setAttribute('data-bs-theme', theme);
+                document.body.setAttribute('data-bs-theme', theme);
+                localStorage.setItem('artovia-theme', theme);
+                updateThemeUI(theme);
+            };
+
+            const updateThemeUI = (currentTheme) => {
+                // 1. Manage interactive dropdown layout options
+                document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
+                    const targetTheme = btn.getAttribute('data-set-theme');
+                    if (targetTheme === currentTheme) {
+                        btn.classList.add('d-none');
+                    } else {
+                        btn.classList.remove('d-none');
+                    }
+                });
+
+                // 2. Manage single icon button state for logged-out viewers
+                document.querySelectorAll('.dynamic-theme-solo i').forEach(icon => {
+                    if (currentTheme === 'dark') {
+                        icon.className = 'bi bi-sun-fill';
+                    } else {
+                        icon.className = 'bi bi-moon-stars-fill';
+                    }
+                });
+            };
+
+            // Setup dropdown button event handlers
+            document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    setTheme(btn.getAttribute('data-set-theme'));
+                });
+            });
+
+            // Setup fallback solo button event handlers
+            document.querySelectorAll('.dynamic-theme-solo').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const nextTheme = getTheme() === 'dark' ? 'light' : 'dark';
+                    setTheme(nextTheme);
+                });
+            });
+
+            // Run alignment configuration on mount
+            setTheme(getTheme());
+        });
     </script>

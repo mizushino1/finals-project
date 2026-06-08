@@ -11,108 +11,104 @@ require_once __DIR__ . '/../config/constants.php';
          HERO
     ══════════════════════════════════════ -->
     <section class="hero">
-        <img
-            src="<?= BASE_URL ?>public/img/homebg.png"
-            alt=""
-            class="hero__bg-img"
-            aria-hidden="true">
-        <div class="container hero__content">
-            <p class="hero__eyebrow">The creative commission marketplace</p>
-            <h1 class="hero__title">
-                Design it.<br>
-                Create it.<br>
-                <em>Get Paid.</em>
-            </h1>
-            <p class="hero__sub">
-                Artovia connects talented artists with clients who need unique, custom artwork.
-                Post a commission, pick your artist, and bring your vision to life.
-            </p>
-            <div class="hero__actions">
-                <a href="<?= BASE_URL ?>commissions" class="btn-artovia-primary">
-                    Browse Artists
-                </a>
-                <?php if (!isset($_SESSION['user_id'])): ?>
-                    <a href="<?= BASE_URL ?>login" class="btn-artovia-outline">
-                        Get Started
+        <div class="hero__bg-img" aria-hidden="true"></div>
+            <div class="container hero__content">
+                <p class="hero__eyebrow">The creative commission marketplace</p>
+                <h1 class="hero__title">
+                    Design it.<br>
+                    Create it.<br>
+                    <em>Get Paid.</em>
+                </h1>
+                <p class="hero__sub">
+                    Artovia connects talented artists with clients who need unique, custom artwork.
+                    Post a commission, pick your artist, and bring your vision to life.
+                </p>
+                <div class="hero__actions">
+                    <a href="<?= BASE_URL ?>commissions" class="btn-artovia-primary">
+                        Browse Artists
                     </a>
-                <?php else: ?>
-                    <a href="<?= BASE_URL ?>commissions/create" class="btn-artovia-outline">
-                        Post a Commission
-                    </a>
-                <?php endif; ?>
-            </div>
+                    <?php if (!isset($_SESSION['user_id'])): ?>
+                        <a href="<?= BASE_URL ?>login" class="btn-artovia-outline">
+                            Get Started
+                        </a>
+                    <?php else: ?>
+                        <a href="<?= BASE_URL ?>commissions/create" class="btn-artovia-outline">
+                            Post a Commission
+                        </a>
+                    <?php endif; ?>
+                </div>
 
-            <!-- Feature highlights -->
-            <div class="hero__features">
-                <div class="hero__feature">
-                    <div class="hero__feature-icon">
-                        <img src="<?= BASE_URL ?>public/img/connectIcon.svg" alt="" style="width:38px;height:38px;">
+                <!-- Feature highlights -->
+                <div class="hero__features">
+                    <div class="hero__feature">
+                        <div class="hero__feature-icon">
+                            <img src="<?= BASE_URL ?>public/img/connectIcon.svg" alt="" style="width:38px;height:38px;">
+                        </div>
+                        <div>
+                            <p class="hero__feature-label">Design with Freedom</p>
+                            <p class="hero__feature-desc">Create with no limits — make your ideas come to life.</p>
+                        </div>
                     </div>
-                    <div>
-                        <p class="hero__feature-label">Design with Freedom</p>
-                        <p class="hero__feature-desc">Create with no limits — make your ideas come to life.</p>
+                    <div class="hero__feature">
+                        <div class="hero__feature-icon">
+                            <img src="<?= BASE_URL ?>public/img/peopleIcon.svg" alt="" style="width:38px;height:38px;">
+                        </div>
+                        <div>
+                            <p class="hero__feature-label">Work and Collaborate</p>
+                            <p class="hero__feature-desc">Connect with skilled artists worldwide.</p>
+                        </div>
+                    </div>
+                    <div class="hero__feature">
+                        <div class="hero__feature-icon">
+                            <img src="<?= BASE_URL ?>public/img/walletIcon.svg" alt="" style="width:38px;height:38px;">
+                        </div>
+                        <div>
+                            <p class="hero__feature-label">Get Paid Securely</p>
+                            <p class="hero__feature-desc">Every transaction is safe and tracked.</p>
+                        </div>
                     </div>
                 </div>
-                <div class="hero__feature">
-                    <div class="hero__feature-icon">
-                        <img src="<?= BASE_URL ?>public/img/peopleIcon.svg" alt="" style="width:38px;height:38px;">
-                    </div>
-                    <div>
-                        <p class="hero__feature-label">Work and Collaborate</p>
-                        <p class="hero__feature-desc">Connect with skilled artists worldwide.</p>
-                    </div>
-                </div>
-                <div class="hero__feature">
-                    <div class="hero__feature-icon">
-                        <img src="<?= BASE_URL ?>public/img/walletIcon.svg" alt="" style="width:38px;height:38px;">
-                    </div>
-                    <div>
-                        <p class="hero__feature-label">Get Paid Securely</p>
-                        <p class="hero__feature-desc">Every transaction is safe and tracked.</p>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Stats pills -->
-            <div class="hero__stats">
-                <div class="hero__stat">
-                    <div class="hero__stat-icon">
-                        <i class="bi bi-brush" style="color:var(--clr-gold-dark);font-size:1rem;"></i>
+                <!-- Stats pills -->
+                <div class="hero__stats">
+                    <div class="hero__stat">
+                        <div class="hero__stat-icon">
+                            <i class="bi bi-brush" style="color:var(--clr-gold-dark);font-size:1rem;"></i>
+                        </div>
+                        <div>
+                            <div class="hero__stat-num">500+</div>
+                            <div class="hero__stat-label">Active Artists</div>
+                        </div>
                     </div>
-                    <div>
-                        <div class="hero__stat-num">500+</div>
-                        <div class="hero__stat-label">Active Artists</div>
+                    <div class="hero__stat">
+                        <div class="hero__stat-icon">
+                            <i class="bi bi-check2-circle" style="color:var(--clr-gold-dark);font-size:1rem;"></i>
+                        </div>
+                        <div>
+                            <div class="hero__stat-num">2,400+</div>
+                            <div class="hero__stat-label">Commissions Done</div>
+                        </div>
                     </div>
-                </div>
-                <div class="hero__stat">
-                    <div class="hero__stat-icon">
-                        <i class="bi bi-check2-circle" style="color:var(--clr-gold-dark);font-size:1rem;"></i>
+                    <div class="hero__stat">
+                        <div class="hero__stat-icon">
+                            <i class="bi bi-star" style="color:var(--clr-gold-dark);font-size:1rem;"></i>
+                        </div>
+                        <div>
+                            <div class="hero__stat-num">98%</div>
+                            <div class="hero__stat-label">Satisfaction Rate</div>
+                        </div>
                     </div>
-                    <div>
-                        <div class="hero__stat-num">2,400+</div>
-                        <div class="hero__stat-label">Commissions Done</div>
-                    </div>
-                </div>
-                <div class="hero__stat">
-                    <div class="hero__stat-icon">
-                        <i class="bi bi-star" style="color:var(--clr-gold-dark);font-size:1rem;"></i>
-                    </div>
-                    <div>
-                        <div class="hero__stat-num">98%</div>
-                        <div class="hero__stat-label">Satisfaction Rate</div>
-                    </div>
-                </div>
-                <div class="hero__stat">
-                    <div class="hero__stat-icon">
-                        <i class="bi bi-wallet2" style="color:var(--clr-gold-dark);font-size:1rem;"></i>
-                    </div>
-                    <div>
-                        <div class="hero__stat-num">₱1.2M+</div>
-                        <div class="hero__stat-label">Paid to Artists</div>
+                    <div class="hero__stat">
+                        <div class="hero__stat-icon">
+                            <i class="bi bi-wallet2" style="color:var(--clr-gold-dark);font-size:1rem;"></i>
+                        </div>
+                        <div>
+                            <div class="hero__stat-num">₱1.2M+</div>
+                            <div class="hero__stat-label">Paid to Artists</div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
     </section>
 
     <!-- ══════════════════════════════════════

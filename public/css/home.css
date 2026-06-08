@@ -15,39 +15,55 @@
 
 .hero__bg-img {
     position: absolute;
-    top: 0; right: 0;
+    top: 0; 
+    right: 0;
     width: 55%;
     height: 100%;
-    object-fit: cover;
-    object-position: center center;
+    background-image: url('../img/homebg.png');
+    background-size: cover;
+    background-position: center center;
     opacity: 0.9;
+    z-index: 1; /* Explicitly bottom image layer */
 }
 
+/* Dark Mode Background Swap */
+[data-bs-theme="dark"] .hero__bg-img {
+    background-image: url('../img/homebg_dark.png');
+}
+
+/* ── Light Mode Overlay ── */
 .hero::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-        to right,
-        var(--clr-bg) 35%,
-        rgba(250, 248, 244, 0.6) 55%,
-        transparent 100%
-    );
+    background: linear-gradient(to right,
+            var(--clr-bg) 35%,
+            rgba(250, 248, 244, 0.6) 55%,
+            transparent 100%);
     pointer-events: none;
+    z-index: 2; /* Crucial: Forces overlay over the image */
 }
 
+/* ── Dark Mode Fixed Overlay ── */
 [data-bs-theme="dark"] .hero::after {
-    background: linear-gradient(
-        to right,
-        var(--clr-bg) 38%,
-        rgba(15, 13, 10, 0.7) 58%,
-        transparent 100%
-    );
+    z-index: 2; /* Reinforces layer order */
+    background: linear-gradient(to right,
+            /* 1. Fully solid dark background zone covering text area */
+            var(--clr-bg) 0%,
+            var(--clr-bg) 50%,
+            
+            /* 2. Soft Easing: Converts your exact dark theme token into transparency */
+            color-mix(in srgb, var(--clr-bg) 80%, transparent) 68%,
+            color-mix(in srgb, var(--clr-bg) 40%, transparent) 82%,
+            color-mix(in srgb, var(--clr-bg) 12%, transparent) 93%,
+            
+            /* 3. Smooth Exit edge */
+            transparent 100%);
 }
 
 .hero__content {
     position: relative;
-    z-index: 2;
+    z-index: 4;
     padding-top: 6rem;
 }
 
@@ -208,7 +224,9 @@
     background: var(--clr-bg);
 }
 
-.section--alt { background: var(--clr-bg-alt); }
+.section--alt {
+    background: var(--clr-bg-alt);
+}
 
 .section__eyebrow {
     font-family: var(--font-ui);
@@ -266,8 +284,13 @@
     transition: background var(--transition-base);
 }
 
-.features-strip__item:last-child { border-right: none; }
-.features-strip__item:hover      { background: var(--clr-surface); }
+.features-strip__item:last-child {
+    border-right: none;
+}
+
+.features-strip__item:hover {
+    background: var(--clr-surface);
+}
 
 .features-strip__icon {
     width: 44px;
@@ -288,7 +311,9 @@
     margin-bottom: 0.3rem;
 }
 
-[data-bs-theme="dark"] .features-strip__label { color: var(--clr-gold); }
+[data-bs-theme="dark"] .features-strip__label {
+    color: var(--clr-gold);
+}
 
 .features-strip__desc {
     font-family: var(--font-body);
@@ -374,7 +399,9 @@
     border-right: 1px solid var(--clr-border);
 }
 
-.stats-band__item:last-child { border-right: none; }
+.stats-band__item:last-child {
+    border-right: none;
+}
 
 .stats-band__num {
     font-family: var(--font-display);
@@ -384,7 +411,9 @@
     margin-bottom: 0.5rem;
 }
 
-[data-bs-theme="dark"] .stats-band__num { color: var(--clr-gold); }
+[data-bs-theme="dark"] .stats-band__num {
+    color: var(--clr-gold);
+}
 
 .stats-band__label {
     font-family: var(--font-body);
@@ -496,7 +525,9 @@
     z-index: 1;
 }
 
-[data-bs-theme="dark"] .cta-section__title { color: var(--clr-text-primary); }
+[data-bs-theme="dark"] .cta-section__title {
+    color: var(--clr-text-primary);
+}
 
 .cta-section__sub {
     font-family: var(--font-body);
@@ -510,7 +541,9 @@
     z-index: 1;
 }
 
-[data-bs-theme="dark"] .cta-section__sub { color: var(--clr-text-muted); }
+[data-bs-theme="dark"] .cta-section__sub {
+    color: var(--clr-text-muted);
+}
 
 .cta-section__actions {
     position: relative;
@@ -523,18 +556,45 @@
 
 /* ── Responsive overrides (Structure managed via Bootstrap columns) ── */
 @media (max-width: 991px) {
-    .hero__bg-img { width: 100%; opacity: 0.15; }
-    .hero::after  { background: rgba(250, 248, 244, 0.85); }
-    [data-bs-theme="dark"] .hero::after { background: rgba(15, 13, 10, 0.88); }
+    .hero__bg-img {
+        width: 100%;
+        opacity: 0.15;
+    }
 
-    .features-strip__grid { grid-template-columns: 1fr; }
-    .features-strip__item { border-right: none; border-bottom: 1px solid var(--clr-border); }
+    .hero::after {
+        background: rgba(250, 248, 244, 0.85);
+    }
 
-    .stats-band__grid { grid-template-columns: repeat(2, 1fr); }
+    [data-bs-theme="dark"] .hero::after {
+        background: rgba(15, 13, 10, 0.88);
+    }
+
+    .features-strip__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .features-strip__item {
+        border-right: none;
+        border-bottom: 1px solid var(--clr-border);
+    }
+
+    .stats-band__grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 767px) {
-    .hero__features       { gap: 1.25rem; flex-direction: column; }
-    .stats-band__grid     { grid-template-columns: 1fr 1fr; }
-    .stats-band__item     { border-right: none; border-bottom: 1px solid var(--clr-border); }
+    .hero__features {
+        gap: 1.25rem;
+        flex-direction: column;
+    }
+
+    .stats-band__grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .stats-band__item {
+        border-right: none;
+        border-bottom: 1px solid var(--clr-border);
+    }
 }
