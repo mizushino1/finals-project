@@ -521,7 +521,7 @@
     flex-wrap: wrap;
 }
 
-/* ── Responsive ────────────────────────────────────────────── */
+/* ── Responsive overrides (Structure managed via Bootstrap columns) ── */
 @media (max-width: 991px) {
     .hero__bg-img { width: 100%; opacity: 0.15; }
     .hero::after  { background: rgba(250, 248, 244, 0.85); }

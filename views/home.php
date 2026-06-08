@@ -15,8 +15,7 @@ require_once __DIR__ . '/../config/constants.php';
             src="<?= BASE_URL ?>public/img/homebg.png"
             alt=""
             class="hero__bg-img"
-            aria-hidden="true"
-        >
+            aria-hidden="true">
         <div class="container hero__content">
             <p class="hero__eyebrow">The creative commission marketplace</p>
             <h1 class="hero__title">
@@ -269,7 +268,7 @@ require_once __DIR__ . '/../config/constants.php';
         <div class="container">
             <div class="d-flex align-items-end justify-content-between mb-5 flex-wrap gap-3">
                 <div>
-                    <p class="section__eyebrow">Featured Artists</p>
+                    <p class="section__eyebrow m-0">Featured Artists</p>
                     <div class="gold-divider"></div>
                     <h2 class="section__title mb-0">Top talent on Artovia</h2>
                 </div>
@@ -277,20 +276,23 @@ require_once __DIR__ . '/../config/constants.php';
                     View All Artists
                 </a>
             </div>
-            <!-- Skeleton placeholders — replaced by home.js -->
-            <div class="top-artists__grid" id="featuredArtistsGrid">
+
+            <div class="row g-2 g-sm-3 row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4" id="featuredArtistsGrid">
                 <?php for ($i = 0; $i < 4; $i++): ?>
-                    <div class="artist-card">
-                        <div class="artist-card__avatar"></div>
-                        <div class="artist-card__body">
-                            <div class="artist-card__header">
-                                <span class="artist-card__name" style="opacity:.3;">Loading...</span>
+                    <div class="col">
+                        <div class="artist-card artist-card--skeleton h-100 border rounded-3 overflow-hidden d-flex flex-column bg-card position-relative shadow-sm" style="opacity: 0.65;">
+                            <div class="artist-card__cover position-relative bg-surface" style="height: 110px;">
+                                <div class="skeleton sk-avatar rounded-circle position-absolute start-0 end-0 mx-auto" style="bottom:-27px; width:54px; height:54px; background: var(--clr-bg-alt);"></div>
                             </div>
-                            <p class="artist-card__starting" style="opacity:.3;">—</p>
-                        </div>
-                        <div class="artist-card__actions">
-                            <a href="#" class="btn btn--ghost btn--sm" style="opacity:.3;">View Profile</a>
-                            <a href="#" class="btn btn--accent btn--sm" style="opacity:.3;">Hire Artist</a>
+                            <div class="artist-card__body p-3 pt-4 flex-grow-1 d-flex flex-column gap-2" style="padding-top: 1.8rem !important;">
+                                <div class="skeleton sk-line w-75 rounded" style="height:12px; background: var(--clr-bg-alt);"></div>
+                                <div class="skeleton sk-line w-50 rounded" style="height:10px; background: var(--clr-bg-alt);"></div>
+                                <div class="skeleton sk-line w-100 rounded my-1" style="height:10px; background: var(--clr-bg-alt);"></div>
+                            </div>
+                            <div class="artist-card__actions d-flex p-3 pt-0 gap-2 mt-auto">
+                                <div class="skeleton flex-grow-1 rounded-2" style="height:32px; background: var(--clr-bg-alt);"></div>
+                                <div class="skeleton flex-grow-1 rounded-2" style="height:32px; background: var(--clr-bg-alt);"></div>
+                            </div>
                         </div>
                     </div>
                 <?php endfor; ?>
