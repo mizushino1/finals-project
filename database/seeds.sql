@@ -29,22 +29,6 @@ TRUNCATE TABLE user_tbl;
 -- Step 3: Turn safety checks back on
 SET FOREIGN_KEY_CHECKS = 1;
 
--- Step 1: Temporarily clear constraints to completely wipe the slate 
-SET FOREIGN_KEY_CHECKS = 0;
-TRUNCATE TABLE account_status_tbl;
-TRUNCATE TABLE role_tbl;
-TRUNCATE TABLE status_tbl;
-TRUNCATE TABLE payment_method_tbl;
-TRUNCATE TABLE image_type_tbl;
-TRUNCATE TABLE category_tbl;
-TRUNCATE TABLE account_tbl;
-TRUNCATE TABLE user_tbl;
-TRUNCATE TABLE artist_tbl;
-TRUNCATE TABLE administrator_tbl;
-TRUNCATE TABLE hired_artist_tbl;
-TRUNCATE TABLE commission_tbl;
-SET FOREIGN_KEY_CHECKS = 1;
-
 
 INSERT INTO account_status_tbl (account_status_id, status_name) VALUES
 (1, 'Active'), (2, 'Banned'), (3, 'Suspended');
@@ -210,7 +194,7 @@ INSERT INTO administrator_tbl (account_id) VALUES
 (101),(102),(103),(104),(105);
 
 -- Hired Artist Table
-INSERT INTO hired_artist_tbl (artist_id, user_id, date_hired, status_id) VALUES
+INSERT INTO hired_artist_tbl (artist_id, user_id, hire_date, status_id) VALUES
 (1,1,'2024-01-01',1),(2,1,'2024-01-02',1),(3,1,'2024-01-03',1),(4,1,'2024-01-04',1),(5,1,'2024-01-05',1),
 (6,1,'2024-01-06',1),(7,1,'2024-01-07',1),(8,1,'2024-01-08',1),(9,1,'2024-01-09',1),(10,1,'2024-01-10',1),
 (11,1,'2024-01-11',1),(12,1,'2024-01-12',1),(13,1,'2024-01-13',1),(14,1,'2024-01-14',1),(15,1,'2024-01-15',1),
@@ -247,7 +231,16 @@ INSERT INTO commission_tbl (user_id, artist_id, description, status_id, price) V
 (46,46,'Surrealist psychological painting print',2,1450.00),(47,47,'Corporate presentation custom flat vector',5,500.00),(48,48,'Animated pixel intro screen setup',6,2200.00),(49,49,'YouTube stream overlay graphics package',2,850.00),(50,50,'Traditional style dynamic sketch portrait',2,400.00),
 -- Wrapped IDs (51-60 changed to 1-10)
 (1,1,'Vibrant graffiti lettering sketch canvas',2,550.00),(2,2,'Kawaii style magical girl illustration',5,700.00),(3,3,'Epic boss monster conceptual design',6,2100.00),(4,4,'Cute twitch emotes package of 6 items',2,450.00),(5,5,'Historical knight battle armor render',2,1600.00),
-(6,6,'Calm starry night sky scenic background',2,850.00),(7,7,'Futuristic cyberpunk motorcycle sheet',5,1250.00),(8,8,'Chibi style fantasy party group photo',6,1800.00),(9,9,'Abstract geometric art layout design',2,600.00),(10,10,'Dark watercolor gothic mansion visual',2,1100.00);
+(6,6,'Calm starry night sky scenic background',2,850.00),(7,7,'Futuristic cyberpunk motorcycle sheet',5,1250.00),(8,8,'Chibi style fantasy party group photo',6,1800.00),(9,9,'Abstract geometric art layout design',2,600.00),(10,10,'Dark watercolor gothic mansion visual',2,1100.00),
+-- Commissions 61-100 (user_ids wrap 11-50, artist_ids 11-50)
+(11,11,'Elegant botanical print design',2,550.00),(12,12,'Heroic RPG character full render',5,700.00),(13,13,'Vaporwave neon city wallpaper',6,2100.00),(14,14,'Dragon rider dynamic portrait',2,450.00),(15,15,'Storybook animal characters page',2,1600.00),
+(16,16,'Medieval paladin armor concept',2,850.00),(17,17,'Retro pop album cover mock',5,1250.00),(18,18,'Chill lo-fi rain loop animation',6,1800.00),(19,19,'Stream alert overlay graphics',2,600.00),(20,20,'Floral tattoo arm sleeve design',2,1100.00),
+(21,21,'Synthwave sunset poster print',2,650.00),(22,22,'Custom twitch emote set pack',5,350.00),(23,23,'Post-apocalyptic ruins backdrop',6,1700.00),(24,24,'Realism oil portrait commission',2,1500.00),(25,25,'Caricature birthday sketch group',2,550.00),
+(26,26,'Gothic witch portrait painting',2,650.00),(27,27,'Couple chibi avatar matching set',5,1200.00),(28,28,'Sci-fi command bridge layout',6,2000.00),(29,29,'Autumn forest impressionism art',2,1150.00),(30,30,'Technical blueprint drafting sheet',2,1850.00),
+(31,31,'Action manga cover splash art',2,1400.00),(32,32,'Merchandise turnaround flat vector',5,500.00),(33,33,'Fantasy continent map design',6,1600.00),(34,34,'Vtuber layered costume design',2,2200.00),(35,35,'Atmospheric sci-fi desert art',2,1750.00),
+(36,36,'Vintage arcade neon lettering',2,600.00),(37,37,'Steampunk airship concept sheet',5,1450.00),(38,38,'Cozy isometric room illustration',6,1250.00),(39,39,'Webtoon panel storyboard series',2,900.00),(40,40,'Fantasy UI inventory icons set',2,1100.00),
+(41,41,'Minimal moon constellation art',2,350.00),(42,42,'Tabletop RPG token frame pack',5,850.00),(43,43,'Cyberpunk neon alleyway scene',6,1500.00),(44,44,'Griffin creature portrait render',2,1300.00),(45,45,'Seamless tile pattern background',2,500.00),
+(46,46,'Surrealist dreamscape oil print',2,1650.00),(47,47,'Clean corporate infographic set',5,700.00),(48,48,'Pixel campfire ambient loop art',6,1400.00),(49,49,'Full streaming overlay frame pack',2,1200.00),(50,50,'Chalkboard chalk art typography',2,450.00);
 -- ==========================================
 -- 8. COMMISSION REQUEST TABLE (100 Rows)
 -- Connects to the created commission IDs (1 to 100)
@@ -389,7 +382,7 @@ INSERT INTO message_tbl (sender_account_id, receiver_account_id, message_content
 (45,95,'Need seamless tiles patterns backgrounds.',8,45),(95,45,'Will structure them to repeat smoothly without seams.',8,45),
 (46,96,'Do you paint dreamlike surrealist shapes?',8,46),(96,46,'Abstract layouts are perfect for creative exploration.',8,46),
 (47,97,'Need clean flat data infographic blocks.',8,47),(97,47,'Will output clean vector boxes easy to read.',8,47),
-(48,98,'Pixel campfire loop for stream holding screens?',8,48),(48,98,'Can make it super relaxing with ambient lighting.',8,48),
+(48,98,'Pixel campfire loop for stream holding screens?',8,48),(98,48,'Can make it super relaxing with ambient lighting.',8,48),
 (49,99,'Do you bundle streaming frames layouts packs?',8,49),(99,49,'Yes, webcam frame, chat area, and alerts included.',8,49),
 (50,100,'Need hand-drawn chalkboard style look.',8,50),(100,50,'Will mimic texture chalk effects cleanly on dark boards.',8,50);
 
@@ -468,4 +461,27 @@ INSERT INTO image_tbl (image_url, image_type_id, user_id, artist_id, commission_
 ('https://example.com/sys-img-91.jpg',4,16,NULL,16),('https://example.com/sys-img-92.jpg',4,17,NULL,17),('https://example.com/sys-img-93.jpg',4,18,NULL,18),('https://example.com/sys-img-94.jpg',4,19,NULL,19),('https://example.com/sys-img-95.jpg',4,20,NULL,20),
 ('https://example.com/sys-img-96.jpg',4,21,NULL,21),('https://example.com/sys-img-97.jpg',4,22,NULL,22),('https://example.com/sys-img-98.jpg',4,23,NULL,23),('https://example.com/sys-img-99.jpg',4,24,NULL,24),('https://example.com/sys-img-100.jpg',4,25,NULL,25);
 
+-- admin boy --
+DELETE FROM account_tbl WHERE username = 'admin';
 
+INSERT INTO account_tbl (
+    username, 
+    password_hash, 
+    role_id, 
+    account_status_id, 
+    first_name, 
+    last_name, 
+    email
+) 
+VALUES (
+    'admin', 
+    'password', 
+    3,                 
+    1,                 
+    'System', 
+    'Admin', 
+    'admin@artovia.com'
+);
+
+INSERT INTO administrator_tbl (account_id) 
+VALUES (LAST_INSERT_ID());
