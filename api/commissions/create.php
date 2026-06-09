@@ -4,7 +4,8 @@ require_once '../../config/database.php';
 
 header('Content-Type: application/json');
 
-if (!isset($_SESSION['user_id']) || ($_SESSION['role'] !== 'user' && $_SESSION['role'] !== 'client')) {
+// Ensure the session is authenticated and has a valid role
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || ($_SESSION['role'] !== 'user' && $_SESSION['role'] !== 'client')) {
     echo json_encode(['success' => false, 'message' => 'Unauthorized access.']);
     exit;
 }
@@ -36,24 +37,18 @@ if (empty($categoryId)) {
     exit;
 }
 
-$db  = getDB();
-$uid = $_SESSION['user_id'];
+$db          = getDB();
+$userId      = $_SESSION['user_id'];
+$sessionRole = $_SESSION['role']; // Captures exactly whether they are a 'user' or 'client'
 
-// Resolve user_tbl.user_id from the session account_id
 try {
-    $userStmt = $db->prepare('SELECT user_id FROM user_tbl WHERE account_id = ? LIMIT 1');
-    $userStmt->execute([$uid]);
-    $userRow = $userStmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$userRow) {
-        echo json_encode(['success' => false, 'message' => 'User profile not found.']);
-        exit;
-    }
-
-    $userId = $userRow['user_id'];
-
     // Combine title + description into the description field
     $fullDescription = $title . "\n\n" . $description;
+
+    /* Optional Branching Note:
+       If your 'commission_tbl' eventually gets a 'posted_by_role' column, 
+       you can just add it to the column definition matrix below ($sessionRole).
+    */
 
     $stmt = $db->prepare('
         INSERT INTO commission_tbl

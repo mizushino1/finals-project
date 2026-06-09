@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/home.css">
 
     <script>
+        window.USER_ROLE = "<?php echo isset($_SESSION['role']) ? $_SESSION['role'] : 'guest'; ?>";
         (function() {
             const savedTheme = localStorage.getItem('artovia-theme') || 'dark';
             document.documentElement.setAttribute('data-bs-theme', savedTheme);

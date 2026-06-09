@@ -104,27 +104,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Contextual action button router
         let actionBtn = '';
-        if (CURRENT_ROLE === 'artist' && parseInt(c.status_id) === 1) {
-            actionBtn = `<button type="button" 
-                            class="btn-artovia-primary take-commission-btn py-1 px-3 fs-fluid-xs rounded-2"
-                            data-commission-id="${c.commission_id}">
-                            Take
-                         </button>`;
-        } else if ((CURRENT_ROLE === 'user' || CURRENT_ROLE === 'client') && c.request_id) {
-            actionBtn = `<button type="button" 
-                            class="btn-artovia-primary assign-artist-btn py-1 px-3 fs-fluid-xs rounded-2"
-                            data-commission-id="${c.commission_id}" 
-                            data-request-id="${c.request_id}">
-                            Accept Bid
-                         </button>`;
+
+        if (CURRENT_ROLE === 'artist') {
+            // Artists should only see "Take" if the commission is actively Open (status 1)
+            if (parseInt(c.status_id) === 1) {
+                actionBtn = `<button type="button" 
+                                class="btn-artovia-primary take-commission-btn py-1 px-3 fs-fluid-xs rounded-2"
+                                data-commission-id="${c.commission_id}">
+                                Take
+                             </button>`;
+            } else {
+                // If the commission is already accepted/in progress, show non-interactive view
+                actionBtn = `<a href="${APP_BASE_URL}commissions/view?id=${c.commission_id}" class="btn-artovia-outline py-1 px-3 fs-fluid-xs rounded-2">View</a>`;
+            }
+
         } else if (CURRENT_ROLE === 'user' || CURRENT_ROLE === 'client') {
-            actionBtn = `<a href="${APP_BASE_URL}commissions/manage?id=${c.commission_id}" class="btn-artovia-outline py-1 px-3 fs-fluid-xs rounded-2">Manage</a>`;
+            // Client/User view routing
+            if (c.request_id && parseInt(c.status_id) === 1) {
+                // Display the active inbound artist pitch and its decision paths
+                actionBtn = `
+                    <div class="w-100 mt-2 bg-light p-2 rounded border fs-fluid-xxs text-dark mb-2">
+                        <strong class="text-muted d-block mb-1 text-start" style="font-size: 0.75rem;">Artist Pitch:</strong>
+                        <p class="text-secondary m-0 text-start italic" style="font-size: 0.85rem; font-style: italic;">
+                            "${c.message || 'No custom pitch message attached.'}"
+                        </p>
+                    </div>
+                    <div class="d-flex gap-2 w-100">
+                        <button type="button" 
+                                class="btn btn-sm btn-outline-danger decline-artist-btn flex-grow-1 py-1 fs-fluid-xs rounded-2"
+                                data-request-id="${c.request_id}">
+                                Decline
+                        </button>
+                        <button type="button" 
+                                class="btn btn-sm btn-success assign-artist-btn flex-grow-1 py-1 fs-fluid-xs rounded-2"
+                                data-commission-id="${c.commission_id}" 
+                                data-request-id="${c.request_id}">
+                                Accept
+                        </button>
+                    </div>`;
+            } else {
+                // Default fallback option for a user's posted management index if no bids exist yet
+                actionBtn = `<a href="${APP_BASE_URL}commissions/manage?id=${c.commission_id}" class="btn-artovia-outline py-1 px-3 fs-fluid-xs rounded-2">Manage</a>`;
+            }
+
+        } else if (CURRENT_ROLE === 'admin') {
+            actionBtn = `<a href="${APP_BASE_URL}commissions/manage?id=${c.commission_id}" class="btn-danger text-white py-1 px-3 fs-fluid-xs rounded-2">Moderate</a>`;
+
         } else {
-            actionBtn = `<button type="button" 
-                            class="btn-artovia-primary take-commission-btn py-1 px-3 fs-fluid-xs rounded-2"
-                            data-commission-id="${c.commission_id}">
-                            Take
-                         </button>`;
+            // True Guest/Logged-out user fallback route options
+            actionBtn = `<a href="${APP_BASE_URL}commissions/view?id=${c.commission_id}" class="btn-artovia-outline py-1 px-3 fs-fluid-xs rounded-2">View Details</a>`;
         }
 
         if (compact) {
@@ -390,6 +418,45 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    async function handleDeclineArtist(button) {
+        const requestId = parseInt(button.getAttribute('data-request-id'));
+        if (!requestId) return;
+
+        if (!confirm('Are you sure you want to decline this artist\'s request application?')) {
+            return;
+        }
+
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = 'Dropping...';
+
+        try {
+            const res = await fetch(`${APP_BASE_URL}api/commissions/update_status.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    request_id: requestId,
+                    status: 'rejected' 
+                })
+            });
+            const data = await res.json();
+
+            if (data && data.success) {
+                showSuccessModal('Request Declined', data.message || 'The request has been updated.');
+                loadCommissions(); // Live refresh
+            } else {
+                alert(data?.message || 'Failed to decline request.');
+                button.disabled = false;
+                button.textContent = originalText;
+            }
+        } catch (err) {
+            console.error('Decline handler error:', err);
+            alert('A network error occurred. Please try again.');
+            button.disabled = false;
+            button.textContent = originalText;
+        }
+    }
+
     // ── Artist Take Commission Request Handler ────────────────
 
     // ── Artist Take Commission Request Handler (Form Modal) ──
@@ -399,7 +466,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const modalId = 'takeCommissionFormModal';
         let modalEl = document.getElementById(modalId);
-        
+
         // Dynamic generation of the application text form modal
         if (!modalEl) {
             modalEl = document.createElement('div');
@@ -407,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
             modalEl.className = 'modal fade';
             modalEl.setAttribute('tabindex', '-1');
             modalEl.setAttribute('aria-hidden', 'true');
-            
+
             modalEl.innerHTML = `
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content border-0 shadow-lg p-4 bg-card" style="border-radius: 1rem;">
@@ -437,11 +504,14 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.appendChild(modalEl);
         }
 
+        // CRITICAL: Bind the current active commission_id to the modal element directly
+        modalEl.setAttribute('data-active-commission-id', commissionId);
+
         // Reset variables and view states every time the entry form opens
         const textarea = document.getElementById('takeCommissionMessage');
         const alertBox = document.getElementById('takeFormAlert');
         const submitBtn = document.getElementById('submitTakeRequestBtn');
-        
+
         textarea.value = '';
         alertBox.classList.add('d-none');
         submitBtn.disabled = false;
@@ -459,6 +529,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // Bind the form execution processing event 
         clonedBtn.addEventListener('click', async () => {
             const messageText = textarea.value.trim();
+            
+            // CRITICAL FETCH: Pull the precise ID fresh from the DOM attribute
+            const activeCommissionId = parseInt(modalEl.getAttribute('data-active-commission-id'));
+
+            if (!activeCommissionId) {
+                alertBox.textContent = 'Error: Commission identifier lost. Please close and re-open the window.';
+                alertBox.className = 'alert alert-danger fs-fluid-xs';
+                alertBox.classList.remove('d-none');
+                return;
+            }
 
             if (!messageText) {
                 alertBox.textContent = 'Please write a short message before sending your request.';
@@ -475,20 +555,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const res = await fetch(`${APP_BASE_URL}api/commissions/fetch_request.php`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        commission_id: commissionId,
+                    body: JSON.stringify({
+                        commission_id: activeCommissionId, // Sent reliably every time
                         message: messageText
                     })
                 });
                 const data = await res.json();
 
                 if (data && data.success) {
-                    // Turn off the interactive input view pane
                     bsFormModal.hide();
-                    
-                    // Fire up the successful verification modal 
                     showSuccessModal('Request Sent!', data.message || 'Your application has been sent to the client.');
-                    loadCommissions(); 
+                    loadCommissions();
                 } else {
                     alertBox.textContent = data?.message || 'Failed to submit request.';
                     alertBox.className = 'alert alert-danger fs-fluid-xs';
@@ -505,7 +582,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 clonedBtn.textContent = 'Send Request';
             }
         });
-    }
+    }   
 
     // ── Modal Form Handling ───────────────────────────────────
 
@@ -593,6 +670,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target) {
             if (e.target.classList.contains('assign-artist-btn')) {
                 handleAssignArtist(e.target);
+            }
+            if (e.target.classList.contains('decline-artist-btn')) {
+                handleDeclineArtist(e.target); // Connects your decline handler
             }
             if (e.target.classList.contains('take-commission-btn')) {
                 handleTakeCommission(e.target);
