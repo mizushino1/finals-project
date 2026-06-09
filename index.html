@@ -31,38 +31,71 @@
         </nav>
     </header>
 
-    <main class="d-flex justify-content-center align-items-center">
-        <div class="container-fluid">
-            <div class="row my-5 py-5 justify-content-center">
-                <div class="col-lg-5 col-md-8">
-                    <div class="card p-3 my-5" style="border: 3px solid #ffcc80; border-radius: 10px;">
-                        <div class="d-flex align-items-start gap-2 my-2 mx-2">
+    <main class="py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div class="card border-3 mx-auto py-5 my-5" style="height: fit-content; width: 750px; border-color: gold;">
+                        <div class="col-12">
+                            <h2 class="ms-5 mb-0">CREATE COMMISSION</h2>
+                        </div>
 
-                            <div class="position-relative border border-2 p-5"
-                                style="width: 150px; height: 150px; border-radius: 8px;">
-                                <i class="bi bi-heart position-absolute" style="top: 5px; right: 5px;"></i>
-                            </div>
+                        <div class="col-12">
+                            <label class="form-label p-3 mb-0 pb-0" style="margin-left: 75px; font-weight: 450">Commission
+                                Name</label>
+                            <input class="w-75 mb-2" style="margin-left: 90px; height: 35px;" style="background-color: transparent;" type="text">
 
-                            <div class="flex-grow-1">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h2 class="mb-0">Bentito</h2>
-                                    <button class="btn border border-2 btn-sm">View Profile</button>
+                            <div class="row g-2 align-items-center">
+                                <div class="col-auto">
+                                    <label class="form-label" style="margin-left: 398px; margin-top:5.5px;">Genre</label>
+                                </div>
+                                <div class="col-auto mb-0">
+                                    <select class="form-control form-select theme-fill" style="width: 200px;"
+                                        aria-label="Filter by genre">
+                                        <option value="digital">Digital Art</option>
+                                        <option value="traditional">Traditional</option>
+                                        <option value="concept">Concept Art</option>
+                                        <option value="portrait">Portrait</option>
+                                    </select>
                                 </div>
 
-                                <p class="mb-2"><strong style="font-size: larger;">Description:</strong><br>
-                                    HAHAHA HAHAHA HAHAHA HAHAHA
-                                </p>
-
-                                <div class="mb-3">
-                                    <p class="mb-0" style="font-size: large;"><strong>Genre:</strong> Anime</p>
-                                    <p class="mb-0" style="font-size: large;"><strong>Offer:</strong> $500 - $1000</p>
-                                    <p class="mb-0" style="font-size: large;"><strong>Deadline:</strong> July 28, 2026</p>
-                                    <p class="mb-0" style="font-size: large;"><strong>Time:</strong> 11:59 pm</p>
+                                <div class="col-auto mt-0">
+                                    <label class="form-label mb-0"
+                                        style="margin-left: 90px; font-weight: 450">Description</label>
+                                    <textarea class="p-1" style="margin-left: 90px; height: 150px; width: 558px;  overflow-y: auto; resize: none;" type="text"
+                                        placeholder="Description here...."></textarea>
                                 </div>
 
-                                <div class="d-flex gap-3">
-                                    <button class="btn btn-success px-5">Accept</button>
-                                    <button class="btn btn-danger px-5">Decline</button>
+                                <div class="col-auto mb-0">
+                                    <h6 class="form-label"
+                                        style="margin-left: 223px; font-weight: 450">Budget</label>
+                                    <label class="col-form-label" style="margin-left: 115px; font-weight: 450">Upload
+                                        (Optional)</label>
+                                </div>
+
+                                <div class="col-auto d-flex align-items-center mt-0">
+                                    <input class="theme-fill mb-2"
+                                        style="margin-left: 175px; height: 35px; width: 150px;" type="text"
+                                        placeholder="$100,000">
+                                    <button class="btn mb-2"
+                                        style="margin-left: 35px; height: 35px; width: 200px; background-color: #fcd6a1; font-weight: 500;">
+                                        Select Image
+                                    </button>
+                                </div>
+
+                                <button type="submit" class="btn mb-2 border-black"
+                                    style="width: 557px; margin-left: 92px; background-color: #f3c688; font-weight: 500;">POST
+                                    COMMISSION</button>
+
+                                <div class="d-flex align-items-center" style="margin-left: 90px; gap: 20px;">
+                                    <div class="col-auto">
+                                        <button type="button" class="btn btn-success" style="width: 268px;">Save
+                                            Draft</button>
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="button" class="btn btn-danger"
+                                            style="width: 268px;">Cancel</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>

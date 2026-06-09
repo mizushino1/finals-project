@@ -1,39 +1,56 @@
 <?php require_once __DIR__ . '/../../src/middleware/auth_middleware.php'; ?>
 
-<main class="d-flex justify-content-center align-items-center">
+<main class="d-flex justify-content-center align-items-center" style="min-height: 100vh; background-color: var(--clr-bg);">
     <div class="container-fluid">
-        <div class="row my-5 py-5 justify-content-center">
-            <div class="col-lg-5 col-md-8">
-                <div class="card p-3 my-5" style="border: 3px solid #ffcc80; border-radius: 10px;">
-                    <div class="d-flex align-items-start gap-2 my-2 mx-2">
-
-                        <div class="position-relative border border-2 p-5"
-                            style="width: 150px; height: 150px; border-radius: 8px;">
-                            <i class="bi bi-heart position-absolute" style="top: 5px; right: 5px;"></i>
-                        </div>
-
+        <div class="row justify-content-center">
+            <!-- Adjusted col-lg-5 and col-md-7 to make the total card width smaller -->
+            <div class="col-lg-5 col-md-7">
+                
+                <div class="card p-4 theme-border" style="background-color: var(--clr-bg-card);">
+                    
+                    <!-- Header -->
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="rounded-circle me-3" style="width: 50px; height: 50px; background-color: var(--clr-bg-alt); border: 2px solid var(--clr-gold);"></div>
                         <div class="flex-grow-1">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <h2 class="mb-0">Bentito</h2>
-                                <button class="btn border border-2 btn-sm">View Profile</button>
-                            </div>
+                            <h2 class="mb-0 fs-5" style="color: var(--clr-text-primary);">Bentito</h2>
+                            <p class="mb-0" style="color: var(--clr-text-muted); font-size: 0.8rem;">Commissioner's Name</p>
+                        </div>
+                        <button class="btn-artovia-outline btn-sm">View Profile</button>
+                    </div>
 
-                            <p class="mb-2"><strong style="font-size: larger;">Description:</strong><br>
-                                HAHAHA HAHAHA HAHAHA HAHAHA
-                            </p>
+                    <hr style="color: var(--clr-border-strong);">
 
+                    <!-- Grid Section -->
+                    <div class="row g-2"> 
+                        <div class="col-7">
                             <div class="mb-3">
-                                <p class="mb-0" style="font-size: large;"><strong>Genre:</strong> Anime</p>
-                                <p class="mb-0" style="font-size: large;"><strong>Offer:</strong> $500 - $1000</p>
-                                <p class="mb-0" style="font-size: large;"><strong>Deadline:</strong> July 28, 2026</p>
-                                <p class="mb-0" style="font-size: large;"><strong>Time:</strong> 11:59 pm</p>
+                                <p class="form-label mb-1" style="font-size: 0.85rem;">Description</p>
+                                <p style="color: var(--clr-text-secondary); line-height: 1.4; font-size: 0.9rem;">
+                                    HAHAHA HAHAHA HAHAHA HAHAHA
+                                </p>
                             </div>
 
-                            <div class="d-flex gap-3">
-                                <button class="btn btn-success px-5">Accept</button>
-                                <button class="btn btn-danger px-5">Decline</button>
+                            <div class="mb-4">
+                                <p class="mb-1" style="color: var(--clr-text-muted); font-size: 0.8rem;"><strong>Genre:</strong> <span style="color: var(--clr-text-primary);">Anime</span></p>
+                                <p class="mb-1" style="color: var(--clr-text-muted); font-size: 0.8rem;"><strong>Offer:</strong> <span style="color: var(--clr-text-primary);">$500 - $1000</span></p>
+                                <p class="mb-1" style="color: var(--clr-text-muted); font-size: 0.8rem;"><strong>Deadline:</strong> <span style="color: var(--clr-text-primary);">July 28, 2026</span></p>
+                                <p class="mb-1" style="color: var(--clr-text-muted); font-size: 0.8rem;"><strong>Time:</strong> <span style="color: var(--clr-text-primary);">11:59 pm</span></p>
                             </div>
                         </div>
+
+                        <div class="col-5">
+                            <div class="theme-border d-flex align-items-center justify-content-center h-100" 
+                                 style="background-color: var(--clr-bg-alt); border-radius: var(--radius-md); min-height: 140px;">
+                                <span style="color: var(--clr-text-muted); font-size: 0.8rem;">Image Preview</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr style="color: var(--clr-border-strong);">
+
+                    <div class="d-flex gap-2">
+                        <button class="btn-artovia-primary flex-fill btn-sm">Accept</button>
+                        <button class="btn-artovia-outline flex-fill btn-sm">Decline</button>
                     </div>
                 </div>
             </div>

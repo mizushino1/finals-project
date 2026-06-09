@@ -196,7 +196,7 @@ p, .roboto {
 
 /* ── 6. Border & fill helpers ──────────────────────────────── */
 .theme-border {
-    border: 1px solid var(--clr-gold) !important;
+    border: 2px solid var(--clr-gold) !important;
     border-radius: var(--radius-md);
 }
 

@@ -1,6 +1,6 @@
-<main class="min-vh-100 d-flex flex-column justify-content-center align-items-center position-relative fp-page">
+<main class="min-vh-100 d-flex flex-column justify-content-center align-items-center position-relative">
 
-    <div id="deleteCommission" class="card theme-gradient-fill p-4 text-center border-3 border-black" style="width: 600px;">
+    <div id="deleteCommission" class="card auth-input-group p-4 text-center border-3 border-black" style="width: 600px;">
         <div class="mb-4">
             <h3 class="fw-bold">DELETE COMMISSION?</h3>
             <p>Are you sure you want to permanently delete this commission?</p>
