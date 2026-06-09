@@ -467,3 +467,5 @@ INSERT INTO image_tbl (image_url, image_type_id, user_id, artist_id, commission_
 ('https://example.com/sys-img-86.jpg',4,11,NULL,11),('https://example.com/sys-img-87.jpg',4,12,NULL,12),('https://example.com/sys-img-88.jpg',4,13,NULL,13),('https://example.com/sys-img-89.jpg',4,14,NULL,14),('https://example.com/sys-img-90.jpg',4,15,NULL,15),
 ('https://example.com/sys-img-91.jpg',4,16,NULL,16),('https://example.com/sys-img-92.jpg',4,17,NULL,17),('https://example.com/sys-img-93.jpg',4,18,NULL,18),('https://example.com/sys-img-94.jpg',4,19,NULL,19),('https://example.com/sys-img-95.jpg',4,20,NULL,20),
 ('https://example.com/sys-img-96.jpg',4,21,NULL,21),('https://example.com/sys-img-97.jpg',4,22,NULL,22),('https://example.com/sys-img-98.jpg',4,23,NULL,23),('https://example.com/sys-img-99.jpg',4,24,NULL,24),('https://example.com/sys-img-100.jpg',4,25,NULL,25);
+
+
