@@ -25,7 +25,7 @@
 
                         <div class="mb-3">
                             <label class="form-label">Description</label>
-                            <textarea class="form-control theme-border" rows="6" 
+                            <textarea class="form-control theme-border hide-scrollbar" rows="6" 
                                       style="resize: none; overflow-y: auto; border-width: 1px !important;" 
                                       placeholder="Description here...."></textarea>
                         </div>

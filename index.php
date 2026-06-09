@@ -37,6 +37,7 @@ $routes = [
     '/profile'               => 'views/profile/view.php',
     '/messages'              => 'views/messages/inbox.php',
     '/payments/checkout'     => 'views/payments/checkout.php',
+    '/payments/history'     => 'views/payments/history.php',
     '/admin'                 => 'views/admin/dashboard.php',
     '/settings'              => 'views/profile/settings.php',
     '/settings/edit-profile' => 'views/profile/edit.php',
