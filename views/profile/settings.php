@@ -11,25 +11,28 @@ if ($account_id) {
     try {
         $db = getDB();
         if ($role === 'user') {
+            // Keep user query the same
             $stmt = $db->prepare('
-                SELECT (SELECT img.image_url 
-                        FROM image_tbl img 
-                        WHERE img.user_id = u.user_id AND img.image_type_id = 1 
-                        ORDER BY img.uploaded_at DESC LIMIT 1) AS avatar_url
-                FROM account_tbl a
-                JOIN user_tbl u ON a.account_id = u.account_id
-                WHERE a.account_id = ?
-            ');
+        SELECT (SELECT img.image_url 
+                FROM image_tbl img 
+                WHERE img.user_id = u.user_id AND img.image_type_id = 1 
+                ORDER BY img.uploaded_at DESC LIMIT 1) AS avatar_url
+        FROM account_tbl a
+        JOIN user_tbl u ON a.account_id = u.account_id
+        WHERE a.account_id = ?
+    ');
         } else {
+            // UPDATED: Added art.artist_description to the selection list
             $stmt = $db->prepare('
-                SELECT (SELECT img.image_url 
-                        FROM image_tbl img 
-                        WHERE img.artist_id = art.artist_id AND img.image_type_id = 1 
-                        ORDER BY img.uploaded_at DESC LIMIT 1) AS avatar_url
-                FROM account_tbl a
-                JOIN artist_tbl art ON a.account_id = art.account_id
-                WHERE a.account_id = ?
-            ');
+        SELECT art.artist_description,
+               (SELECT img.image_url 
+                FROM image_tbl img 
+                WHERE img.artist_id = art.artist_id AND img.image_type_id = 1 
+                ORDER BY img.uploaded_at DESC LIMIT 1) AS avatar_url
+        FROM account_tbl a
+        JOIN artist_tbl art ON a.account_id = art.account_id
+        WHERE a.account_id = ?
+    ');
         }
         $stmt->execute([$account_id]);
         $profile = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -211,7 +214,7 @@ if ($account_id) {
                                     <div id="artistHighlightBox">
                                         <h5 class="settings-section-title"><i class="bi bi-pencil-square"></i> Artist Description</h5>
                                         <p class="text-muted small">It's about yourself and your art</p>
-                                        <textarea class="settings-textarea-override" rows="4" name="artist_description" id="artistDescText" maxlength="250" placeholder="Description........"></textarea>
+                                        <textarea class="settings-textarea-override" rows="4" name="artist_description" id="artistDescText" maxlength="250" placeholder="Description........"><?= isset($profile['artist_description']) ? htmlspecialchars($profile['artist_description']) : '' ?></textarea>
                                         <small class="text-muted d-block mt-1 text-end" id="charCounter">0/250</small>
                                     </div>
                                 </div>
