@@ -56,7 +56,7 @@
                 </div>
             </aside>
 
-            <div class="col-lg-9">
+            <div class="col-lg-9 ps-3">
 
                 <!-- ── Pending Received Requests (horizontal scroll strip) ── -->
                 <div id="pendingSection">
