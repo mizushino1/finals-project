@@ -179,7 +179,7 @@ require_once __DIR__ . '/../config/constants.php';
     ══════════════════════════════════════ -->
     <section class="section">
         <div class="container">
-            <div class="row align-items-center g-5">
+            <div class="row align-items-center">
                 <div class="col-lg-5">
                     <p class="section__eyebrow">How it works</p>
                     <div class="gold-divider"></div>
@@ -273,7 +273,7 @@ require_once __DIR__ . '/../config/constants.php';
                 </a>
             </div>
 
-            <div class="row g-2 g-sm-3 row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-4" id="featuredArtistsGrid">
+            <div class="row g-2 g-sm-3 row-cols-2 row-cols-sm-2 row-cols-md-2 row-cols-lg-4" id="featuredArtistsGrid">
                 <?php for ($i = 0; $i < 4; $i++): ?>
                     <div class="col">
                         <div class="artist-card artist-card--skeleton h-100 border rounded-3 overflow-hidden d-flex flex-column bg-card position-relative shadow-sm" style="opacity: 0.65;">
