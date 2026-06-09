@@ -422,5 +422,4 @@ VALUES
 ALTER TABLE artist_tbl
 ADD artist_description TEXT NULL AFTER is_available;
 
-ALTER TABLE commission_tbl ADD COLUMN category_id INT;
 ALTER TABLE artist_tbl ADD COLUMN description TEXT;

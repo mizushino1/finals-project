@@ -4,80 +4,74 @@ require_once '../../config/database.php';
 
 header('Content-Type: application/json');
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'user') {
-    echo json_encode(['success' => false, 'message' => 'Unauthorized access.']);
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode(['success' => false, 'message' => 'Unauthorized access. Please log in.']);
     exit;
 }
 
 $data         = json_decode(file_get_contents('php://input'), true);
 $commissionId = isset($data['commission_id']) ? intval($data['commission_id']) : 0;
-$requestId    = isset($data['request_id']) ? intval($data['request_id']) : 0;
-$userId       = $_SESSION['user_id'];
+// Dynamically sanitizing incoming multi-line messages securely
+$message      = isset($data['message']) ? trim(htmlspecialchars($data['message'], ENT_QUOTES, 'UTF-8')) : '';
+$artistId     = $_SESSION['user_id'];
 
-if ($commissionId <= 0 || $requestId <= 0) {
-    echo json_encode(['success' => false, 'message' => 'Invalid parameters provided.']);
+if ($commissionId <= 0) {
+    echo json_encode(['success' => false, 'message' => 'Invalid commission ID.']);
+    exit;
+}
+
+if (empty($message)) {
+    echo json_encode(['success' => false, 'message' => 'An application message text is required.']);
     exit;
 }
 
 $db = getDB();
 
 try {
-    // 1. Verify this commission belongs to the logged-in user
-    $stmt = $db->prepare('SELECT commission_id FROM commission_tbl WHERE commission_id = ? AND user_id = ?');
-    $stmt->execute([$commissionId, $userId]);
-    if (!$stmt->fetch(PDO::FETCH_ASSOC)) {
-        echo json_encode(['success' => false, 'message' => 'Unauthorized: This commission does not belong to your account.']);
+    // Check if the commission is valid and open
+    $stmt = $db->prepare('SELECT status_id, user_id FROM commission_tbl WHERE commission_id = ?');
+    $stmt->execute([$commissionId]);
+    $commission = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$commission) {
+        echo json_encode(['success' => false, 'message' => 'Commission job layout not found.']);
         exit;
     }
 
-    // 2. Validate the request exists and get the artist_id
-    $stmt = $db->prepare('SELECT artist_id FROM commission_request_tbl WHERE request_id = ? AND commission_id = ?');
-    $stmt->execute([$requestId, $commissionId]);
-    $acceptedRequest = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$acceptedRequest) {
-        echo json_encode(['success' => false, 'message' => 'Artist bid could not be found.']);
+    if (intval($commission['status_id']) !== 1) {
+        echo json_encode(['success' => false, 'message' => 'This commission is no longer active.']);
         exit;
     }
 
-    $artistId = $acceptedRequest['artist_id'];
+    if (intval($commission['user_id']) === $artistId) {
+        echo json_encode(['success' => false, 'message' => 'You cannot take your own posted commission job.']);
+        exit;
+    }
 
-    $db->beginTransaction();
+    // Check for duplicate requests
+    $stmt = $db->prepare('SELECT request_id FROM commission_request_tbl WHERE commission_id = ? AND artist_id = ?');
+    $stmt->execute([$commissionId, $artistId]);
+    if ($stmt->fetch()) {
+        echo json_encode(['success' => false, 'message' => 'You have already submitted an application request for this commission job.']);
+        exit;
+    }
 
-    // Step A: Mark the accepted request — status_id 3 = Accepted
-    $stmt1 = $db->prepare('UPDATE commission_request_tbl SET status_id = 3 WHERE request_id = ?');
-    $stmt1->execute([$requestId]);
-
-    // Step B: Reject all other bids — status_id 4 = Rejected
-    $stmt2 = $db->prepare('
-        UPDATE commission_request_tbl 
-        SET status_id = 4
-        WHERE commission_id = ? AND request_id != ?
+    // Insert request with custom written message text, status_id 2 = Pending
+    $stmt = $db->prepare('
+        INSERT INTO commission_request_tbl (commission_id, artist_id, message, status_id, requested_at) 
+        VALUES (?, ?, ?, 2, NOW())
     ');
-    $stmt2->execute([$commissionId, $requestId]);
-
-    // Step C: Assign artist and set commission to In Progress — status_id 5 = In Progress
-    $stmt3 = $db->prepare('
-        UPDATE commission_tbl 
-        SET artist_id = ?, status_id = 5
-        WHERE commission_id = ?
-    ');
-    $stmt3->execute([$artistId, $commissionId]);
-
-    $db->commit();
+    $stmt->execute([$commissionId, $artistId, $message]);
 
     echo json_encode([
         'success' => true,
-        'message' => 'Artist assigned successfully. Your project is now in progress!'
+        'message' => 'Your request and application pitch have been submitted successfully!'
     ]);
 
 } catch (PDOException $e) {
-    if ($db->inTransaction()) {
-        $db->rollBack();
-    }
     echo json_encode([
         'success' => false,
-        'message' => 'Failed to process assignment: ' . $e->getMessage()
+        'message' => 'Database error encountered: ' . $e->getMessage()
     ]);
 }
 ?>

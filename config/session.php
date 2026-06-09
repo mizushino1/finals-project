@@ -25,7 +25,7 @@ if (session_status() === PHP_SESSION_NONE) {
         'domain'   => '',              // Defaults to current host domain
         'secure'   => $isSecure,       // Enforced if SSL connection is detected
         'httponly' => true,            // Mitigates XSS cookie theft risks
-        'samesite' => 'Strict',        // Defends against Cross-Site Request Forgery (CSRF)
+        'samesite' => 'Lax',           // FIXED: Changed from 'Strict' to 'Lax' to fix asynchronous fetches
     ]);
 
     // 4. Start the engine safely
