@@ -43,7 +43,7 @@
                     </a>
 
                     <!-- Always-visible nav links (hidden on small screens) -->
-                    <div class="navbar-nav d-none d-sm-flex flex-row gap-4 flex-grow-1 justify-content-center">
+                    <div class="navbar-nav d-none d-lg-flex flex-row gap-4 flex-grow-1 justify-content-center">
                         <a class="nav-link active text-light fw-bold fs-fluid-sm" aria-current="page"
                             href="<?php echo BASE_URL; ?>#">HOME</a>
                         <a class="nav-link text-light fw-bold fs-fluid-sm"
@@ -57,13 +57,32 @@
 
                     <!-- Right side — always stays here, never collapses -->
                     <?php if (isset($_SESSION['user_id'])): ?>
-                        <div class="d-flex align-items-center gap-2 ms-3">
+                        <div class="d-flex align-items-center gap-2 ms-auto">
                             <a href="<?php echo BASE_URL; ?>profile" class="nav-user-avatar text-decoration-none d-flex align-items-center gap-2 flex-shrink-0" title="View Profile">
-                                <i class=" bi bi-person-circle text-light" style="font-size:1.75rem; line-height:1;"></i>
-
+                                <i class="bi bi-person-circle text-light" style="font-size:1.75rem; line-height:1;"></i>
                             </a>
-                            <span class="fw-bold fs-fluid-xs text-light text-nowrap"><?php echo htmlspecialchars($_SESSION['username']); ?></span>
-                            <button class="navbar-toggler border-secondary ms-1" type="button"
+
+                            <!-- Inline actions: only visible on large screens -->
+                            <div class="d-none d-lg-flex align-items-center gap-1">
+                                <a class="btn btn-sm text-light fw-bold border-0 bg-transparent"
+                                    href="<?php echo BASE_URL; ?>settings">
+                                    <i class="bi bi-gear me-1"></i>Settings
+                                </a>
+                                <button class="btn btn-sm text-light fw-bold border-0 bg-transparent theme-toggle-btn d-none"
+                                    data-set-theme="light">
+                                    <i class="bi bi-sun-fill me-1"></i>Light
+                                </button>
+                                <button class="btn btn-sm text-light fw-bold border-0 bg-transparent theme-toggle-btn d-none"
+                                    data-set-theme="dark">
+                                    <i class="bi bi-moon-stars-fill me-1"></i>Dark
+                                </button>
+                                <a class="btn btn-sm text-danger fw-bold border-0 bg-transparent"
+                                    href="<?php echo BASE_URL; ?>logout">
+                                    <i class="bi bi-box-arrow-right me-1"></i>Logout
+                                </a>
+                            </div>
+
+                            <button class="navbar-toggler d-lg-none border-secondary ms-1" type="button"
                                 data-bs-toggle="collapse"
                                 data-bs-target="#accountActionsNav"
                                 aria-controls="accountActionsNav"
@@ -73,12 +92,20 @@
                             </button>
                         </div>
                     <?php else: ?>
-                        <div class="d-flex align-items-center gap-2 ms-3">
+                        <div class="d-flex align-items-center gap-2 ms-auto">
                             <button class="btn text-light p-1 border-0 dynamic-theme-solo" title="Toggle Theme">
                                 <i class="bi bi-sun-fill fs-5"></i>
                             </button>
                             <a class="btn text-light fw-bold glass-card fs-fluid-xs"
                                 href="<?php echo BASE_URL; ?>login">LOG IN</a>
+                            <button class="navbar-toggler border-secondary ms-1" type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#accountActionsNav"
+                                aria-controls="accountActionsNav"
+                                aria-expanded="false"
+                                aria-label="Toggle navigation menu">
+                                <span class="navbar-toggler-icon"></span>
+                            </button>
                         </div>
                     <?php endif; ?>
 
@@ -90,30 +117,42 @@
                         <div class="navbar-nav d-flex flex-column gap-2 ps-3 pt-2 pb-3 border-top border-secondary mt-2">
 
                             <!-- Nav links only visible here on small screens -->
-                            <div class="d-sm-none d-flex flex-column gap-2">
+                            <div class="d-lg-none d-flex flex-column gap-2">
                                 <a class="nav-link text-light fw-bold fs-fluid-sm" href="<?php echo BASE_URL; ?>#">HOME</a>
                                 <a class="nav-link text-light fw-bold fs-fluid-sm" href="<?php echo BASE_URL; ?>commissions">COMMISSIONS</a>
                                 <a class="nav-link text-light fw-bold fs-fluid-sm" href="<?php echo BASE_URL; ?>artists">ARTISTS</a>
                                 <hr class="border-secondary my-1">
                             </div>
 
-                            <!-- Account actions always visible when expanded -->
-                            <a class="nav-link text-light fw-bold fs-fluid-sm"
-                                href="<?php echo BASE_URL; ?>settings">
-                                <i class="bi bi-gear me-2"></i>Settings
-                            </a>
-                            <button class="nav-link text-light fw-bold fs-fluid-sm border-0 bg-transparent text-start theme-toggle-btn d-none"
-                                data-set-theme="light">
-                                <i class="bi bi-sun-fill me-2"></i>Light Mode
-                            </button>
-                            <button class="nav-link text-light fw-bold fs-fluid-sm border-0 bg-transparent text-start theme-toggle-btn d-none"
-                                data-set-theme="dark">
-                                <i class="bi bi-moon-stars-fill me-2"></i>Dark Mode
-                            </button>
-                            <a class="nav-link text-danger fw-bold fs-fluid-sm"
-                                href="<?php echo BASE_URL; ?>logout">
-                                <i class="bi bi-box-arrow-right me-2"></i>Logout
-                            </a>
+                            <!-- Account actions: only shown in collapse on small screens -->
+                            <div class="d-lg-none d-flex flex-column gap-2">
+                                <a class="nav-link text-light fw-bold fs-fluid-sm"
+                                    href="<?php echo BASE_URL; ?>settings">
+                                    <i class="bi bi-gear me-2"></i>Settings
+                                </a>
+                                <button class="nav-link text-light fw-bold fs-fluid-sm border-0 bg-transparent text-start theme-toggle-btn d-none"
+                                    data-set-theme="light">
+                                    <i class="bi bi-sun-fill me-2"></i>Light Mode
+                                </button>
+                                <button class="nav-link text-light fw-bold fs-fluid-sm border-0 bg-transparent text-start theme-toggle-btn d-none"
+                                    data-set-theme="dark">
+                                    <i class="bi bi-moon-stars-fill me-2"></i>Dark Mode
+                                </button>
+                                <a class="nav-link text-danger fw-bold fs-fluid-sm"
+                                    href="<?php echo BASE_URL; ?>logout">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <div class="collapse w-100" id="accountActionsNav">
+                        <div class="navbar-nav d-flex flex-column gap-2 ps-3 pt-2 pb-3 border-top border-secondary mt-2">
+                            <div class="d-sm-none d-flex flex-column gap-2">
+                                <a class="nav-link text-light fw-bold fs-fluid-sm" href="<?php echo BASE_URL; ?>#">HOME</a>
+                                <a class="nav-link text-light fw-bold fs-fluid-sm" href="<?php echo BASE_URL; ?>commissions">COMMISSIONS</a>
+                                <a class="nav-link text-light fw-bold fs-fluid-sm" href="<?php echo BASE_URL; ?>artists">ARTISTS</a>
+                            </div>
                         </div>
                     </div>
                 <?php endif; ?>
@@ -141,7 +180,7 @@
                 });
 
                 document.querySelectorAll('.dynamic-theme-solo i').forEach(icon => {
-                    icon.className = currentTheme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
+                    icon.className = currentTheme === 'dark' ? 'bi bi-sun-fill fs-5' : 'bi bi-moon-stars-fill fs-5';
                 });
             };
 
