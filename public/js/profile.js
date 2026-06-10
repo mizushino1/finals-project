@@ -28,7 +28,7 @@ function handleFollowToggle(event) {
     button.disabled = true;
 
     // Target endpoint context based on directory structures
-    const endpoint = '../../api/favorite_action.php'; 
+    const endpoint = './api/profile/favorite_action.php'; 
 
     // Prepare payload data
     const payload = {
