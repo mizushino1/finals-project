@@ -1,9 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Global Elements
     const followBtn = document.getElementById('btn-follow-action');
     const profileTabs = document.querySelectorAll('#profileTabs button');
 
-    // 1. Initialize Profile Interactive Features
     if (followBtn) {
         followBtn.addEventListener('click', handleFollowToggle);
     }
@@ -12,31 +10,27 @@ document.addEventListener('DOMContentLoaded', function () {
         initTabListeners();
     }
 
-    // Load dynamic backend profile data asynchronously on load
     checkForExtendedProfileData();
 });
 
 /**
- * Handles the AJAX Toggle for the "Favorite Artist" Action
+ * Handles the AJAX Toggle for the Follow/Unfollow Action
  */
 function handleFollowToggle(event) {
     const button = event.currentTarget;
-    const artistId = button.getAttribute('data-artist-id');
+    const artistId = parseInt(button.getAttribute('data-artist-id'), 10) || null;
+    const userId   = parseInt(button.getAttribute('data-user-id'), 10)   || null;
     const isFollowing = button.getAttribute('data-following') === '1';
 
-    // Prevent spam clicking during processing
     button.disabled = true;
 
-    // Target endpoint context based on directory structures
-    const endpoint = './api/profile/favorite_action.php'; 
-
-    // Prepare payload data
     const payload = {
-        artist_id: parseInt(artistId, 10),
-        action: isFollowing ? 'unfavorite' : 'favorite'
+        artist_id: artistId,
+        user_id:   userId,
+        action:    isFollowing ? 'unfollow' : 'follow'
     };
 
-    fetch(endpoint, {
+    fetch('./api/profile/follow_action.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -52,18 +46,16 @@ function handleFollowToggle(event) {
     })
     .then(result => {
         if (result.success) {
-            // Toggle visual attributes instantly based on response state
             if (isFollowing) {
                 button.setAttribute('data-following', '0');
                 button.className = 'btn btn-follow';
-                button.innerHTML = '<i class="fas fa-plus me-1"></i> Favorite Artist';
+                button.innerHTML = '<i class="fas fa-plus me-1"></i> Follow';
             } else {
                 button.setAttribute('data-following', '1');
-                button.className = 'btn btn-success'; 
-                button.innerHTML = '<i class="fas fa-check me-1"></i> Favorited';
+                button.className = 'btn btn-success';
+                button.innerHTML = '<i class="fas fa-check me-1"></i> Following';
             }
 
-            // Selector to adjust UI follower counts on-the-fly
             const followerCountElement = document.querySelector('.profile-stat:first-child .profile-stat-value');
             if (followerCountElement) {
                 let currentCount = parseInt(followerCountElement.innerText.replace(/,/g, ''), 10) || 0;
@@ -76,7 +68,7 @@ function handleFollowToggle(event) {
     })
     .catch(error => {
         console.error('Operation Failed:', error);
-        alert('Could not update profile configurations. Please check connection records.');
+        alert('Could not update follow status. Please check your connection.');
     })
     .finally(() => {
         button.disabled = false;
@@ -84,14 +76,13 @@ function handleFollowToggle(event) {
 }
 
 /**
- * Initializes Lazy-loading or Tab interaction events 
+ * Initializes Tab interaction events
  */
 function initTabListeners() {
     const triggerTabList = [].slice.call(document.querySelectorAll('#profileTabs button'));
     triggerTabList.forEach(function (tabEl) {
         tabEl.addEventListener('shown.bs.tab', function (event) {
             const targetPaneId = event.target.getAttribute('data-bs-target');
-            
             if (targetPaneId === '#pane-artworks') {
                 console.log('Artworks pane active. Ready to append components.');
             }
@@ -100,14 +91,14 @@ function initTabListeners() {
 }
 
 /**
- * Fetch context from profile/fetch.php to sync image placeholders if updated asynchronously
+ * Fetch profile data to sync avatar placeholder if updated asynchronously
  */
 function checkForExtendedProfileData() {
     const isEditPage = window.location.pathname.includes('edit.php');
     const isOwnProfileWithoutFollowBtn = !document.getElementById('btn-follow-action');
 
     if (isEditPage || isOwnProfileWithoutFollowBtn) {
-        fetch('./api/profile/fetch.php')   // <-- fixed path
+        fetch('./api/profile/fetch.php')
             .then(res => res.json())
             .then(resData => {
                 if (resData.success && resData.data) {

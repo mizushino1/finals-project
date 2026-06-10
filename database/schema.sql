@@ -202,17 +202,16 @@ CREATE TABLE payment_tbl (
 
 CREATE TABLE favorite_tbl (
     favorite_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    artist_id INT NOT NULL,
-    date_added DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    account_id  INT NOT NULL,
+    user_id     INT NULL,
+    artist_id   INT NULL,
+    date_added  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (user_id)
-        REFERENCES user_tbl(user_id),
+    FOREIGN KEY (account_id) REFERENCES account_tbl(account_id),
+    FOREIGN KEY (user_id)    REFERENCES user_tbl(user_id),
+    FOREIGN KEY (artist_id)  REFERENCES artist_tbl(artist_id),
 
-    FOREIGN KEY (artist_id)
-        REFERENCES artist_tbl(artist_id),
-
-    UNIQUE(user_id, artist_id)
+    UNIQUE(account_id, user_id, artist_id)
 );
 
 -- =====================================

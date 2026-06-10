@@ -58,6 +58,22 @@ try {
     // Determine the avatar resource path context if it exists
     $has_custom_avatar = !empty($profile['avatar']);
     $avatar_source = $has_custom_avatar ? BASE_URL . htmlspecialchars($profile['avatar']) : '';
+
+    $is_following = false;
+    if (isset($_SESSION['account_id']) && $_SESSION['account_id'] != $profile_account_id) {
+        $fav_stmt = $db->prepare("
+        SELECT 1 FROM favorite_tbl
+        WHERE account_id = ?
+          AND (artist_id = ? OR user_id = ?)
+        LIMIT 1
+    ");
+        $fav_stmt->execute([
+            $_SESSION['account_id'],
+            $profile['artist_id'] ?? null,
+            $profile['user_id']   ?? null
+        ]);
+        $is_following = (bool) $fav_stmt->fetchColumn();
+    }
 } catch (PDOException $e) {
     die("Database error: " . $e->getMessage());
 }
@@ -89,13 +105,13 @@ try {
                     </p>
                 <?php endif; ?>
 
-                
+
 
                 <?php if (!empty($profile['artist_id'])): ?>
                     <span class="badge bg-success">Artist</span>
                     <small class="text-muted ms-2">Starting Rate: ₱<?php echo number_format($profile['starting_rate'], 2); ?></small>
                 <?php endif; ?>
-            </div>  
+            </div>
 
             <div class="profile-search-wrapper ms-auto mt-1">
                 <i class="fas fa-search search-icon"></i>
@@ -139,15 +155,17 @@ try {
                 ?>
                     <?php if ($session_active_id != $profile['account_id']): ?>
                         <button
-                            class="btn btn-follow"
+                            class="btn <?php echo $is_following ? 'btn-success' : 'btn-follow'; ?>"
                             type="button"
                             id="btn-follow-action"
-                            data-following="0"
-                            data-artist-id="<?php echo $profile['artist_id'] ?? 0; ?>">
-                            <i class="fas fa-plus me-1"></i> Favorite Artist
-                        </button>
-                        <button class="btn btn-notify" type="button" aria-label="Notifications">
-                            <i class="fas fa-bell"></i>
+                            data-following="<?php echo $is_following ? '1' : '0'; ?>"
+                            data-artist-id="<?php echo $profile['artist_id'] ?? 0; ?>"
+                            data-user-id="<?php echo $profile['user_id'] ?? 0; ?>">
+                            <?php if ($is_following): ?>
+                                <i class="fas fa-check me-1"></i> Following
+                            <?php else: ?>
+                                <i class="fas fa-plus me-1"></i> Follow
+                            <?php endif; ?>
                         </button>
                     <?php else: ?>
                         <a href="<?php echo BASE_URL; ?>views/profile/edit.php" class="btn btn-outline-secondary">Edit Account Settings</a>
