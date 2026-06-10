@@ -44,18 +44,18 @@
                     <div class="sidebar__content-wrapper d-flex flex-wrap flex-lg-column gap-3 gap-lg-0">
                         <div class="filter-group pb-lg-3 mb-lg-3 border-bottom-lg flex-shrink-0">
                             <h3 class="filter-group__title text-uppercase fw-bold text-muted mb-2 fs-fluid-xxs">Price Range</h3>
-                            <ul class="filter-group__list list-unstyled m-0 p-0 d-flex flex-row flex-lg-column gap-1">
-                                <li><label class="rounded p-2 d-flex align-items-center gap-2 fs-fluid-xs"><input type="radio" name="price" value="0-999999" checked> <span class="text-nowrap">All Prices</span></label></li>
-                                <li><label class="rounded p-2 d-flex align-items-center gap-2 fs-fluid-xs"><input type="radio" name="price" value="0-300"> <span class="text-nowrap">₱50 – ₱300</span></label></li>
-                                <li><label class="rounded p-2 d-flex align-items-center gap-2 fs-fluid-xs"><input type="radio" name="price" value="300-700"> <span class="text-nowrap">₱300 – ₱700</span></label></li>
-                                <li><label class="rounded p-2 d-flex align-items-center gap-2 fs-fluid-xs"><input type="radio" name="price" value="700-1500"> <span class="text-nowrap">₱700 – ₱1,500</span></label></li>
-                                <li><label class="rounded p-2 d-flex align-items-center gap-2 fs-fluid-xs"><input type="radio" name="price" value="1500-999999"> <span class="text-nowrap">₱1,500+</span></label></li>
+                            <ul class="filter-group__list list-unstyled m-0 p-0 d-flex flex-column flex-md-row flex-lg-column gap-1">
+                                <li><label class="rounded p-2 d-flex align-items-center gap-1 fs-fluid-xs"><input type="radio" name="price" value="0-999999" checked> <span class="text-nowrap">All Prices</span></label></li>
+                                <li><label class="rounded p-2 d-flex align-items-center gap-1 fs-fluid-xs"><input type="radio" name="price" value="0-300"> <span class="text-nowrap">₱50 – ₱300</span></label></li>
+                                <li><label class="rounded p-2 d-flex align-items-center gap-1 fs-fluid-xs"><input type="radio" name="price" value="300-700"> <span class="text-nowrap">₱300 – ₱700</span></label></li>
+                                <li><label class="rounded p-2 d-flex align-items-center gap-1 fs-fluid-xs"><input type="radio" name="price" value="700-1500"> <span class="text-nowrap">₱700 – ₱1,500</span></label></li>
+                                <li><label class="rounded p-2 d-flex align-items-center gap-1 fs-fluid-xs"><input type="radio" name="price" value="1500-999999"> <span class="text-nowrap">₱1,500+</span></label></li>
                             </ul>
                         </div>
 
                         <div class="filter-group flex-shrink-0">
                             <h3 class="filter-group__title text-uppercase fw-bold text-muted mb-2 fs-fluid-xxs">Availability</h3>
-                            <ul class="filter-group__list list-unstyled m-0 p-0 d-flex flex-row flex-lg-column gap-1">
+                            <ul class="filter-group__list list-unstyled m-0 p-0 d-flex flex-column flex-md-row flex-lg-column gap-1">
                                 <li><label class="rounded p-2 d-flex align-items-center gap-2 fs-fluid-xs"><input type="radio" name="availability" value="all" checked> <span class="text-nowrap">All Artists</span></label></li>
                                 <li><label class="rounded p-2 d-flex align-items-center gap-2 fs-fluid-xs"><input type="radio" name="availability" value="open"> <span class="text-nowrap">Open Only</span></label></li>
                             </ul>

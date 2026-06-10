@@ -222,9 +222,11 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
     }
 
-    // ── Pending Strip ─────────────────────────────────────────
+    // ── Pending Requests Strip ────────────────────────────────
+    // Fetches from commission_request_tbl via fetch_pending_requests.php.
+    // Only shown to users/clients (commission owners) and admins.
 
-    function renderPendingStrip(data) {
+    async function loadPendingRequests() {
         const showPending = CURRENT_ROLE === 'user' || CURRENT_ROLE === 'client' || CURRENT_ROLE === 'admin';
 
         if (!showPending) {
@@ -232,23 +234,112 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        hide(pendingStripLoading);
+        try {
+            const res  = await fetch(`${APP_BASE_URL}api/commissions/fetch_pending_requests.php`);
+            const data = await res.json();
 
-        const pending = data.filter(c =>
-            parseInt(c.status_id) === 1 &&
-            (c.artist_id === null || c.artist_id === 'null' || c.artist_id === '')
-        );
+            hide(pendingStripLoading);
 
-        if (pending.length === 0) {
+            if (!data || !data.success || !Array.isArray(data.data) || data.data.length === 0) {
+                hide(pendingSection);
+                return;
+            }
+
+            if (pendingStrip) {
+                pendingStrip.innerHTML = data.data.map((r, i) => buildRequestCard(r, i)).join('');
+                show(pendingStrip);
+            }
+            show(pendingSection);
+
+        } catch (err) {
+            console.error('Pending requests load error:', err);
+            hide(pendingStripLoading);
             hide(pendingSection);
-            return;
         }
+    }
 
-        if (pendingStrip) {
-            pendingStrip.innerHTML = pending.map((c, i) => buildCard(c, i, true)).join('');
-            show(pendingStrip);
-        }
-        show(pendingSection);
+    // Builds a compact card for an inbound artist request
+    function buildRequestCard(r, index) {
+        const artistName  = r.artist_username ?? 'Unknown Artist';
+        const letter      = artistName.trim() ? artistName.trim()[0].toUpperCase() : '?';
+        const [bg, fg]    = PALETTE[index % PALETTE.length];
+        const category    = r.category_name ?? null;
+        const pitch       = r.pitch_message  ? r.pitch_message.trim() : null;
+        const budget      = parseFloat(r.price ?? 0);
+        const { title }   = parseDescription(r.commission_description ?? '');
+
+        const budgetDisplay = budget > 0
+            ? `₱${budget.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`
+            : 'Open';
+
+        const dateStr = r.requested_at
+            ? new Date(r.requested_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+            : 'Recently';
+
+        const avatarHtml = `
+            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                 style="width:38px; height:38px; background:${bg}; border:1px solid ${fg}33;">
+                <span class="fs-fluid-sm fw-bold" style="font-family:var(--font-ui); color:${fg};">${letter}</span>
+            </div>`;
+
+        const categoryBadge = category
+            ? `<span class="badge rounded-pill fs-fluid-xxs fw-semibold text-uppercase mb-2"
+                    style="background:${bg}; color:${fg}; border:1px solid ${fg}33; letter-spacing:0.04em;">
+                    ${category}
+               </span>`
+            : '';
+
+        const pitchBlock = pitch
+            ? `<div class="bg-light rounded border p-2 mb-2" style="font-size:0.8rem; font-style:italic; color: var(--color-text-muted, #6c757d);">
+                   "${pitch}"
+               </div>`
+            : `<p class="text-muted mb-2" style="font-size:0.78rem; font-style:italic;">No pitch message attached.</p>`;
+
+        return `
+            <div style="width:300px; flex-shrink:0;">
+                <div class="artist-card h-100 border rounded-3 d-flex flex-column shadow-sm bg-card p-3">
+
+                    <!-- Artist identity row -->
+                    <div class="d-flex align-items-center gap-2 mb-2 overflow-hidden">
+                        ${avatarHtml}
+                        <div class="text-truncate">
+                            <p class="m-0 fw-bold fs-fluid-sm text-truncate lh-1">${artistName}</p>
+                            <small class="text-muted fs-fluid-xxs">Applied ${dateStr}</small>
+                        </div>
+                    </div>
+
+                    <!-- Commission context -->
+                    <div class="flex-grow-1 mb-2">
+                        ${categoryBadge}
+                        ${title ? `<p class="m-0 fw-semibold fs-fluid-xs mb-1 text-truncate" title="${title}">${title}</p>` : ''}
+                        ${pitchBlock}
+                    </div>
+
+                    <!-- Budget + actions -->
+                    <div class="pt-2 border-top mt-auto">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div>
+                                <p class="m-0 text-muted fs-fluid-xxs text-uppercase" style="letter-spacing:0.05em;">Budget</p>
+                                <p class="m-0 fw-bold fs-fluid-sm">${budgetDisplay}</p>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger decline-artist-btn flex-grow-1 py-1 fs-fluid-xs rounded-2"
+                                    data-request-id="${r.request_id}">
+                                Decline
+                            </button>
+                            <button type="button"
+                                    class="btn btn-sm btn-success assign-artist-btn flex-grow-1 py-1 fs-fluid-xs rounded-2"
+                                    data-commission-id="${r.commission_id}"
+                                    data-request-id="${r.request_id}">
+                                Accept
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>`;
     }
 
     // ── Filtering & Sorting ───────────────────────────────────
@@ -323,7 +414,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             allCommissions = Array.isArray(data.data) ? data.data : [];
-            renderPendingStrip(allCommissions);
+            loadPendingRequests();
             applyFilters();
 
         } catch (err) {
@@ -382,38 +473,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function handleAssignArtist(button) {
         const commissionId = parseInt(button.getAttribute('data-commission-id'));
-        const requestId = parseInt(button.getAttribute('data-request-id'));
+        const requestId    = parseInt(button.getAttribute('data-request-id'));
 
         if (!commissionId || !requestId) return;
 
-        if (!confirm('Are you sure you want to assign this artist? All other bids for this commission will be declined.')) {
+        if (!confirm('Accept this artist? All other pending requests for this commission will be automatically declined.')) {
             return;
         }
 
         const originalText = button.textContent;
-        button.disabled = true;
-        button.textContent = 'Assigning...';
+        button.disabled    = true;
+        button.textContent = 'Accepting...';
 
         try {
-            const res = await fetch(`${APP_BASE_URL}api/commissions/assign.php`, {
-                method: 'POST',
+            const res = await fetch(`${APP_BASE_URL}api/commissions/update_status.php`, {
+                method:  'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ commission_id: commissionId, request_id: requestId })
+                body:    JSON.stringify({
+                    commission_id: commissionId,
+                    request_id:   requestId,
+                    status:       'accepted'
+                })
             });
             const data = await res.json();
 
             if (data && data.success) {
-                showSuccessModal('Assignment Complete!', data.message || 'Artist assigned successfully!');
+                showSuccessModal('Artist Accepted!', data.message || 'The commission is now in progress.');
                 loadCommissions();
+                loadPendingRequests();
             } else {
-                alert(data?.message || 'Failed to assign artist.');
-                button.disabled = false;
+                alert(data?.message || 'Failed to accept artist.');
+                button.disabled    = false;
                 button.textContent = originalText;
             }
         } catch (err) {
-            console.error('Assignment error:', err);
+            console.error('Accept handler error:', err);
             alert('A network error occurred. Please try again.');
-            button.disabled = false;
+            button.disabled    = false;
             button.textContent = originalText;
         }
     }
@@ -443,7 +539,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (data && data.success) {
                 showSuccessModal('Request Declined', data.message || 'The request has been updated.');
-                loadCommissions(); // Live refresh
+                loadCommissions();
+                loadPendingRequests();
             } else {
                 alert(data?.message || 'Failed to decline request.');
                 button.disabled = false;

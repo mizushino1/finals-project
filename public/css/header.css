@@ -2,7 +2,20 @@
    HEADER.CSS  — Navbar / site header
    Depends on variables defined in main.css
 ══════════════════════════════════════════════════════════════ */
+body {
+    overflow-x: hidden;
+}
 
+.nav-user-dropdown .dropdown-menu {
+    min-width: 160px;
+    backdrop-filter: blur(12px);
+    background: var(--clr-bg-card);
+    border: 1px solid var(--clr-border);
+    z-index: 9999 !important;
+    position: fixed !important;
+    right: 0.75rem !important;
+    left: auto !important;
+}
 /* ── Sticky wrapper ────────────────────────────────────────── */
 header.sticky-top {
     z-index: 1030;

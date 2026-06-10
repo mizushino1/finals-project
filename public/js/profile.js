@@ -107,65 +107,19 @@ function checkForExtendedProfileData() {
     const isOwnProfileWithoutFollowBtn = !document.getElementById('btn-follow-action');
 
     if (isEditPage || isOwnProfileWithoutFollowBtn) {
-        fetch('fetch.php')
+        fetch('./api/profile/fetch.php')   // <-- fixed path
             .then(res => res.json())
             .then(resData => {
                 if (resData.success && resData.data) {
-                    console.log("Verified User Profile Session Mapping:", resData.data);
-                    
-                    const avatarImageElement = document.querySelector('.profile-avatar');
-                    
-                    if (avatarImageElement) {
-                        // Get the parent container wrapper so we can substitute HTML elements if needed
-                        const parentWrapper = avatarImageElement.parentElement;
-
-                        if (resData.data.avatar_url && resData.data.avatar_url.trim() !== "") {
-                            // If an image URL exists, ensure it is an <img> tag and set its source
-                            if (avatarImageElement.tagName.toLowerCase() === 'img') {
-                                avatarImageElement.src = resData.data.avatar_url;
-                            } else {
-                                // Fallback just in case an SVG placeholder was already sitting there
-                                parentWrapper.innerHTML = `<img src="${resData.data.avatar_url}" alt="User avatar" class="profile-avatar" style="width:100%; height:100%; object-fit:cover;">`;
-                            }
-                        } else {
-                            // REFERENCE MATCH: Render identical SVG placeholder markup from browse.js if no image is uploaded
-                            parentWrapper.innerHTML = `
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="profile-avatar" style="width:100%; height:100%; background:#e9ecef; padding:2rem; box-sizing:border-box;">
-                                    <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
-                                </svg>`;
-                        }
-                    }
-                }
-            })
-            .catch(err => console.warn("Background configuration lookup skipped: ", err));
-    }
-}/**
- * Fetch context from profile/fetch.php to sync image placeholders if updated asynchronously
- */
-function checkForExtendedProfileData() {
-    const isEditPage = window.location.pathname.includes('edit.php');
-    const isOwnProfileWithoutFollowBtn = !document.getElementById('btn-follow-action');
-
-    if (isEditPage || isOwnProfileWithoutFollowBtn) {
-        fetch('fetch.php')
-            .then(res => res.json())
-            .then(resData => {
-                if (resData.success && resData.data) {
-                    console.log("Verified User Profile Session Mapping:", resData.data);
-                    
-                    // Target the parent container element instead to manipulate layout structures seamlessly
                     const avatarContainer = document.querySelector('.profile-avatar-container');
-                    
                     if (avatarContainer) {
                         if (resData.data.avatar_url && !resData.data.avatar_url.includes('default-')) {
-                            // If they have a real custom uploaded picture path
                             avatarContainer.innerHTML = `
-                                <img src="${resData.data.avatar_url}" 
-                                     alt="User avatar" 
-                                     class="profile-avatar" 
+                                <img src="${resData.data.avatar_url}"
+                                     alt="User avatar"
+                                     class="profile-avatar"
                                      style="width:100%; height:100%; object-fit:cover;">`;
                         } else {
-                            // Render identical placeholder layout directly from browse grid components
                             avatarContainer.innerHTML = `
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="profile-avatar" style="width:100%; height:100%; background:#e9ecef; padding:2rem; box-sizing:border-box;">
                                     <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
@@ -174,6 +128,6 @@ function checkForExtendedProfileData() {
                     }
                 }
             })
-            .catch(err => console.warn("Background configuration lookup skipped: ", err));
+            .catch(err => console.warn("Background configuration lookup skipped:", err));
     }
 }

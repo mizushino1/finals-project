@@ -11,8 +11,6 @@ if (isset($_GET['id'])) {
     $profile_account_id = intval($_GET['id']);
 } elseif (isset($_SESSION['account_id'])) {
     $profile_account_id = $_SESSION['account_id'];
-} elseif (isset($_SESSION['user_id'])) {
-    $profile_account_id = $_SESSION['user_id'];
 } else {
     die("Profile context not found. Please log in.");
 }
@@ -222,4 +220,4 @@ try {
     </div>
 </main>
 
-<script src="<?php echo BASE_URL; ?>public/assets/js/profile.js"></script>
+<script src="<?php echo BASE_URL; ?>public/js/profile.js"></script>
