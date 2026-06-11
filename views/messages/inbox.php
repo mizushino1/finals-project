@@ -1,6 +1,7 @@
+<?php require_once __DIR__ . '/../../src/middleware/auth_middleware.php'; ?>
 <main class="py-0">
     <div class="container-fluid p-0">
-        <div id="chatMainContainer" class="d-flex position-relative overflow-hidden chat-responsive-wrapper" style="height: 100vh; background: var(--clr-bg-card);">
+        <div id="chatMainContainer" class="d-flex position-relative overflow-hidden chat-responsive-wrapper" style="height: 90vh; background: var(--clr-bg-card);">
 
             <div id="inboxSidebarPanel" class="d-flex flex-column h-100 chat-sidebar-panel chat-panel-view active-mobile-view" style="width: 350px; border-right: 2px solid var(--clr-border);">
                 <div class="p-3 chat-sidebar-header" style="border-bottom: 2px solid var(--clr-border);">
