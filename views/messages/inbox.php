@@ -1,6 +1,6 @@
 <main class="py-0">
     <div class="container-fluid px-0">
-        <div class="d-flex" style="height: 100vh; background: var(--clr-bg-card); overflow: hidden;">
+        <div class="d-flex" style="height: 100vh; background: var(--clr-bg-card);">
 
             <!-- ── Sidebar: Conversation List ──────────────────────────────── -->
             <div class="d-flex flex-column" style="width: 350px; border-right: 2px solid var(--clr-gold);">
