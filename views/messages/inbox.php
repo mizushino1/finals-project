@@ -1,15 +1,16 @@
-<main class="py-md-4">
-    <div class="container-fluid px-md-4">
-        <div class="theme-border d-flex position-relative overflow-hidden chat-responsive-wrapper">
+<main class="py-0">
+    <div class="container-fluid p-0">
+        <!-- Removed 'theme-border' and adjusted layout for full-screen -->
+        <div class="d-flex position-relative overflow-hidden" style="height: 100vh; background: var(--clr-bg-card);">
 
-            <div id="inboxSidebarPanel" class="d-flex flex-column h-100 chat-sidebar-panel chat-panel-view active-mobile-view">
-                <div class="p-3 chat-sidebar-header">
+            <div id="inboxSidebarPanel" class="d-flex flex-column h-100 chat-sidebar-panel chat-panel-view active-mobile-view" style="width: 350px; border-right: 2px solid var(--clr-border);">
+                <div class="p-3 chat-sidebar-header" style="border-bottom: 2px solid var(--clr-border);">
                     <h3 class="mb-3 joan">Inbox</h3>
                     <div class="input-group mb-2">
-                        <span class="input-group-text bg-white theme-border chat-search-prepend">
+                        <span class="input-group-text bg-white theme-border chat-search-prepend" style="border-right: none !important;">
                             <i class="bi bi-search" style="color: var(--clr-text-muted);"></i>
                         </span>
-                        <input id="inboxSearch" type="text" class="form-control theme-border chat-search-input" placeholder="Search messages…" autocomplete="off">
+                        <input id="inboxSearch" type="text" class="form-control theme-border chat-search-input" placeholder="Search messages…" autocomplete="off" style="border-left: none !important;">
                     </div>
                 </div>
 
@@ -20,13 +21,12 @@
                 </div>
             </div>
 
-            <div id="conversationContainer" class="flex-grow-1 d-flex flex-column h-100 chat-conversation-container chat-panel-view">
+            <div id="conversationContainer" class="flex-grow-1 d-flex flex-column h-100 chat-conversation-container chat-panel-view" style="background: linear-gradient(to bottom, var(--clr-bg), var(--clr-surface));">
                 
-                <div class="p-3 d-flex align-items-center gap-3 chat-conversation-header">
+                <div class="p-3 d-flex align-items-center gap-3 chat-conversation-header" style="border-bottom: 2px solid var(--clr-border);">
                     <button id="mobileChatBackButton" class="btn btn-link text-decoration-none p-0 d-lg-none" type="button" aria-label="Return to list">
                         <i class="bi bi-arrow-left fs-4" style="color: var(--clr-gold);"></i>
                     </button>
-                    
                     <h5 id="chatHeader" class="mb-0 text-truncate font-heading fw-bold" style="color: var(--clr-text-primary);">Select a Chat</h5>
                 </div>
 
@@ -36,7 +36,7 @@
                     </div>
                 </div>
 
-                <div class="p-3 chat-conversation-footer">
+                <div class="p-3 chat-conversation-footer" style="border-top: 2px solid var(--clr-border);">
                     <div class="input-group">
                         <input id="msgInput" type="text" class="form-control theme-border chat-footer-input" placeholder="Type a message…" autocomplete="off" disabled>
                         <button id="sendBtn" class="btn btn-artovia-primary" disabled>
@@ -45,9 +45,7 @@
                     </div>
                     <div id="sendError" class="text-danger fs-fluid-xs mt-1" style="display:none;"></div>
                 </div>
-
             </div>
-
         </div>
     </div>
 </main>
