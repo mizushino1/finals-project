@@ -66,6 +66,90 @@
 
             <div class="col-lg-9 ps-3">
 
+                <!-- ── Artist: My Pending Requests (awaiting client decision) ── -->
+                <?php if ($_SESSION['role'] === 'artist'): ?>
+                <div id="artistPendingSection">
+                    <div class="browse-results-bar d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+                        <p class="browse-results-bar__count m-0 text-muted fw-semibold fs-fluid-xs">
+                            My Pending Requests
+                            <span class="badge bg-warning text-dark ms-2 fs-fluid-xxs" id="artistPendingBadge" style="display:none;"></span>
+                        </p>
+                        <span class="text-muted fs-fluid-xxs">Waiting for client response</span>
+                    </div>
+                    <div class="overflow-x-auto pb-3 mb-4">
+                        <!-- Skeleton -->
+                        <div id="artistPendingLoading" class="d-flex flex-nowrap gap-3" style="width: max-content;">
+                            <?php for ($i = 0; $i < 3; $i++): ?>
+                                <div style="width: 280px; flex-shrink: 0;">
+                                    <div class="artist-card h-100 border rounded-3 p-3 bg-card d-flex flex-column shadow-sm">
+                                        <div class="d-flex gap-2 align-items-center mb-3">
+                                            <div class="skeleton rounded-circle" style="width:36px; height:36px;"></div>
+                                            <div class="d-flex flex-column gap-1">
+                                                <div class="skeleton rounded" style="width:80px; height:12px;"></div>
+                                                <div class="skeleton rounded" style="width:50px; height:8px;"></div>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1 mb-3 d-flex flex-column gap-2">
+                                            <div class="skeleton rounded w-100" style="height:10px;"></div>
+                                            <div class="skeleton rounded w-75" style="height:10px;"></div>
+                                        </div>
+                                        <div class="skeleton rounded-pill" style="width:70px; height:22px;"></div>
+                                    </div>
+                                </div>
+                            <?php endfor; ?>
+                        </div>
+                        <!-- Populated by JS -->
+                        <div id="artistPendingGrid" class="d-flex flex-nowrap gap-3 d-none" style="width: max-content;"></div>
+                        <!-- Empty state -->
+                        <div id="artistPendingEmpty" class="d-none text-center py-4 px-3 border rounded-3 bg-card shadow-sm">
+                            <p class="text-muted fs-fluid-xs m-0">You have no pending requests right now.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Artist: Accepted Commissions ── -->
+                <div id="artistAcceptedSection">
+                    <div class="browse-results-bar d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
+                        <p class="browse-results-bar__count m-0 text-muted fw-semibold fs-fluid-xs">
+                            Accepted Commissions
+                            <span class="badge bg-info text-dark ms-2 fs-fluid-xxs" id="artistAcceptedBadge" style="display:none;"></span>
+                        </p>
+                        <span class="text-muted fs-fluid-xxs">Commissions assigned to you</span>
+                    </div>
+                    <div class="overflow-x-auto pb-3 mb-5">
+                        <!-- Skeleton -->
+                        <div id="artistAcceptedLoading" class="d-flex flex-nowrap gap-3" style="width: max-content;">
+                            <?php for ($i = 0; $i < 3; $i++): ?>
+                                <div style="width: 280px; flex-shrink: 0;">
+                                    <div class="artist-card h-100 border rounded-3 p-3 bg-card d-flex flex-column shadow-sm">
+                                        <div class="d-flex gap-2 align-items-center mb-3">
+                                            <div class="skeleton rounded-circle" style="width:36px; height:36px;"></div>
+                                            <div class="d-flex flex-column gap-1">
+                                                <div class="skeleton rounded" style="width:80px; height:12px;"></div>
+                                                <div class="skeleton rounded" style="width:50px; height:8px;"></div>
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow-1 mb-3 d-flex flex-column gap-2">
+                                            <div class="skeleton rounded w-100" style="height:10px;"></div>
+                                            <div class="skeleton rounded w-75" style="height:10px;"></div>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <div class="skeleton rounded-2" style="width:100px; height:32px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endfor; ?>
+                        </div>
+                        <!-- Populated by JS -->
+                        <div id="artistAcceptedGrid" class="d-flex flex-nowrap gap-3 d-none" style="width: max-content;"></div>
+                        <!-- Empty state -->
+                        <div id="artistAcceptedEmpty" class="d-none text-center py-4 px-3 border rounded-3 bg-card shadow-sm">
+                            <p class="text-muted fs-fluid-xs m-0">No accepted commissions yet.</p>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
+
                 <!-- ── Pending Received Requests (horizontal scroll strip) ── -->
                 <div id="pendingSection">
                     <div class="browse-results-bar d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">

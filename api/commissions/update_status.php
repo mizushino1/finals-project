@@ -19,7 +19,11 @@ if (empty($newStatus)) {
     exit;
 }
 
-// 'rejected' only needs a request_id; 'accepted' needs both; all others need a commission_id
+// 'rejected' and artist 'cancelled' only need a request_id; 'accepted' needs both; all others need a commission_id
+if (in_array($newStatus, ['rejected', 'cancelled']) && $requestId <= 0 && $commissionId <= 0) {
+    echo json_encode(['success' => false, 'message' => 'Invalid parameters: request_id or commission_id required.']);
+    exit;
+}
 if ($newStatus === 'rejected' && $requestId <= 0) {
     echo json_encode(['success' => false, 'message' => 'Invalid parameters: request_id required for rejection.']);
     exit;
@@ -28,7 +32,7 @@ if ($newStatus === 'accepted' && ($requestId <= 0 || $commissionId <= 0)) {
     echo json_encode(['success' => false, 'message' => 'Invalid parameters: commission_id and request_id required for acceptance.']);
     exit;
 }
-if (!in_array($newStatus, ['rejected', 'accepted']) && $commissionId <= 0) {
+if (!in_array($newStatus, ['rejected', 'accepted', 'cancelled']) && $commissionId <= 0) {
     echo json_encode(['success' => false, 'message' => 'Invalid parameters: commission_id required.']);
     exit;
 }
@@ -49,7 +53,7 @@ $statusMap = [
 $allowedTransitions = [
     'user'   => ['cancelled', 'rejected', 'accepted'],
     'client' => ['cancelled', 'rejected', 'accepted'],
-    'artist' => ['completed'],
+    'artist' => ['in_progress', 'completed', 'cancelled'],
     'admin'  => ['active', 'in_progress', 'completed', 'cancelled'],
 ];
 
@@ -179,20 +183,48 @@ try {
         }
         $artistId = $artistRow['artist_id'];
 
-        $stmtCheck = $db->prepare('SELECT commission_id FROM commission_tbl WHERE commission_id = ? AND artist_id = ?');
-        $stmtCheck->execute([$commissionId, $artistId]);
-        if (!$stmtCheck->fetch()) {
-            echo json_encode(['success' => false, 'message' => 'Unauthorized: You are not assigned to this commission.']);
-            exit;
+        if ($newStatus === 'cancelled') {
+            // ── Withdraw a pending request: targets commission_request_tbl ──
+            if ($requestId <= 0) {
+                echo json_encode(['success' => false, 'message' => 'Invalid parameters: request_id required to withdraw.']);
+                exit;
+            }
+
+            // Verify the request belongs to this artist and is still pending
+            $stmtCheck = $db->prepare('
+                SELECT request_id FROM commission_request_tbl
+                WHERE request_id = ? AND artist_id = ? AND status_id = 2
+            ');
+            $stmtCheck->execute([$requestId, $artistId]);
+            if (!$stmtCheck->fetch()) {
+                echo json_encode(['success' => false, 'message' => 'Request not found or already resolved.']);
+                exit;
+            }
+
+            $stmtUpdate = $db->prepare('UPDATE commission_request_tbl SET status_id = 7 WHERE request_id = ?');
+            $stmtUpdate->execute([$requestId]);
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Your request has been withdrawn.'
+            ]);
+        } else {
+            // ── in_progress / completed: targets commission_tbl ──
+            $stmtCheck = $db->prepare('SELECT commission_id FROM commission_tbl WHERE commission_id = ? AND artist_id = ?');
+            $stmtCheck->execute([$commissionId, $artistId]);
+            if (!$stmtCheck->fetch()) {
+                echo json_encode(['success' => false, 'message' => 'Unauthorized: You are not assigned to this commission.']);
+                exit;
+            }
+
+            $stmtUpdate = $db->prepare('UPDATE commission_tbl SET status_id = ? WHERE commission_id = ?');
+            $stmtUpdate->execute([$newStatusId, $commissionId]);
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Commission marked as: ' . $newStatus
+            ]);
         }
-
-        $stmtUpdate = $db->prepare('UPDATE commission_tbl SET status_id = ? WHERE commission_id = ?');
-        $stmtUpdate->execute([$newStatusId, $commissionId]);
-
-        echo json_encode([
-            'success' => true,
-            'message' => 'Commission marked as: ' . $newStatus
-        ]);
     } elseif ($role === 'admin') {
         $stmtUpdate = $db->prepare('UPDATE commission_tbl SET status_id = ? WHERE commission_id = ?');
         $stmtUpdate->execute([$newStatusId, $commissionId]);

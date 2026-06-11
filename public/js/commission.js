@@ -16,10 +16,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const gridError = document.getElementById('commissionGridError');
     const gridEmpty = document.getElementById('commissionGridEmpty');
 
-    // Pending strip elements
+    // Pending strip elements (user/client — received bids)
     const pendingStrip = document.getElementById('pendingGrid');
     const pendingStripLoading = document.getElementById('pendingGridLoading');
     const pendingSection = document.getElementById('pendingSection');
+
+    // Artist strip elements
+    const artistPendingSection = document.getElementById('artistPendingSection');
+    const artistPendingGrid = document.getElementById('artistPendingGrid');
+    const artistPendingLoading = document.getElementById('artistPendingLoading');
+    const artistPendingEmpty = document.getElementById('artistPendingEmpty');
+    const artistPendingBadge = document.getElementById('artistPendingBadge');
+    const artistAcceptedSection = document.getElementById('artistAcceptedSection');
+    const artistAcceptedGrid = document.getElementById('artistAcceptedGrid');
+    const artistAcceptedLoading = document.getElementById('artistAcceptedLoading');
+    const artistAcceptedEmpty = document.getElementById('artistAcceptedEmpty');
+    const artistAcceptedBadge = document.getElementById('artistAcceptedBadge');
 
     // Controls
     const searchInput = document.getElementById('searchInput');
@@ -55,11 +67,11 @@ document.addEventListener('DOMContentLoaded', () => {
         switch (parseInt(statusId)) {
             case 1: return { text: 'Active', class: 'artist-card__badge--open' };
             case 2: return { text: 'Pending', class: 'bg-warning text-dark border border-warning' };
-            case 3: return { text: 'Accepted', class: 'bg-info text-dark border border-info' };
+            case 3: return { text: 'Accepted', class: 'theme-fill text-dark border border-info' };
             case 4: return { text: 'Rejected', class: 'artist-card__badge--closed' };
-            case 5: return { text: 'In Progress', class: 'bg-primary text-white border border-primary' };
-            case 6: return { text: 'Completed', class: 'bg-success text-white border border-success' };
-            case 7: return { text: 'Cancelled', class: 'bg-secondary text-white border border-secondary' };
+            case 5: return { text: 'In Progress', class: 'theme-fill text-dark border border-primary' };
+            case 6: return { text: 'Completed', class: 'theme-fill text-dark border border-success' };
+            case 7: return { text: 'Cancelled', class: 'bg-danger text-white border border-secondary' };
             default: return { text: 'Unknown', class: 'bg-dark text-white' };
         }
     }
@@ -235,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const res  = await fetch(`${APP_BASE_URL}api/commissions/fetch_pending_requests.php`);
+            const res = await fetch(`${APP_BASE_URL}api/commissions/fetch_pending_requests.php`);
             const data = await res.json();
 
             hide(pendingStripLoading);
@@ -260,13 +272,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Builds a compact card for an inbound artist request
     function buildRequestCard(r, index) {
-        const artistName  = r.artist_username ?? 'Unknown Artist';
-        const letter      = artistName.trim() ? artistName.trim()[0].toUpperCase() : '?';
-        const [bg, fg]    = PALETTE[index % PALETTE.length];
-        const category    = r.category_name ?? null;
-        const pitch       = r.pitch_message  ? r.pitch_message.trim() : null;
-        const budget      = parseFloat(r.price ?? 0);
-        const { title }   = parseDescription(r.commission_description ?? '');
+        const artistName = r.artist_username ?? 'Unknown Artist';
+        const letter = artistName.trim() ? artistName.trim()[0].toUpperCase() : '?';
+        const [bg, fg] = PALETTE[index % PALETTE.length];
+        const category = r.category_name ?? null;
+        const pitch = r.pitch_message ? r.pitch_message.trim() : null;
+        const budget = parseFloat(r.price ?? 0);
+        const { title } = parseDescription(r.commission_description ?? '');
 
         const budgetDisplay = budget > 0
             ? `₱${budget.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`
@@ -342,6 +354,312 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
     }
 
+    // ── Artist: Pending Request Card ─────────────────────────
+    // Shows a commission the artist applied for while status is still pending (status_id 2)
+
+    function buildArtistPendingCard(r, index) {
+        const ownerName = r.owner_username ?? 'Client';
+        const letter = ownerName.trim() ? ownerName.trim()[0].toUpperCase() : '?';
+        const [bg, fg] = PALETTE[index % PALETTE.length];
+        const budget = parseFloat(r.price ?? 0);
+        const { title } = parseDescription(r.commission_description ?? '');
+        const category = r.category_name ?? null;
+        const pitch = r.pitch_message ? r.pitch_message.trim() : null;
+
+        const budgetDisplay = budget > 0
+            ? `₱${budget.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`
+            : 'Open';
+
+        const dateStr = r.requested_at
+            ? new Date(r.requested_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+            : 'Recently';
+
+        const avatarHtml = `
+            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                 style="width:38px; height:38px; background:${bg}; border:1px solid ${fg}33;">
+                <span class="fs-fluid-sm fw-bold" style="font-family:var(--font-ui); color:${fg};">${letter}</span>
+            </div>`;
+
+        const categoryBadge = category
+            ? `<span class="badge rounded-pill fs-fluid-xxs fw-semibold text-uppercase mb-2"
+                    style="background:${bg}; color:${fg}; border:1px solid ${fg}33; letter-spacing:0.04em;">
+                    ${category}
+               </span>`
+            : '';
+
+        const pitchSnippet = pitch
+            ? `<div class="bg-light rounded border p-2 mb-2" style="font-size:0.78rem; font-style:italic; color:var(--color-text-muted,#6c757d);">
+                   "${pitch.length > 80 ? pitch.slice(0, 80) + '…' : pitch}"
+               </div>`
+            : '';
+
+        return `
+            <div style="width:300px; flex-shrink:0;">
+                <div class="artist-card h-100 border rounded-3 d-flex flex-column shadow-sm bg-card p-3">
+
+                    <div class="d-flex align-items-center justify-content-between mb-2 gap-2">
+                        <div class="d-flex align-items-center gap-2 overflow-hidden">
+                            ${avatarHtml}
+                            <div class="text-truncate">
+                                <p class="m-0 fw-bold fs-fluid-sm text-truncate lh-1">${ownerName}</p>
+                                <small class="text-muted fs-fluid-xxs">Applied ${dateStr}</small>
+                            </div>
+                        </div>
+                        <span class="artist-card__badge d-inline-flex flex-shrink-0 align-items-center fw-bold text-uppercase bg-warning text-dark border border-warning">
+                            Pending
+                        </span>
+                    </div>
+
+                    <div class="flex-grow-1 mb-2">
+                        ${categoryBadge}
+                        ${title ? `<p class="m-0 fw-semibold fs-fluid-xs mb-1 text-truncate" title="${title}">${title}</p>` : ''}
+                        ${pitchSnippet}
+                    </div>
+
+                    <div class="pt-2 border-top mt-auto d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="m-0 text-muted fs-fluid-xxs text-uppercase" style="letter-spacing:0.05em;">Budget</p>
+                            <p class="m-0 fw-bold fs-fluid-sm">${budgetDisplay}</p>
+                        </div>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger artist-cancel-request-btn py-1 px-3 fs-fluid-xs rounded-2"
+                                data-request-id="${r.request_id}">
+                            Withdraw
+                        </button>
+                    </div>
+
+                </div>
+            </div>`;
+    }
+
+    // ── Artist: Accepted Commission Card ─────────────────────
+    // Shows a commission assigned to this artist with action buttons (In Progress / Complete)
+
+    function buildArtistAcceptedCard(c, index) {
+        const ownerName = c.owner_username ?? 'Client';
+        const letter = ownerName.trim() ? ownerName.trim()[0].toUpperCase() : '?';
+        const [bg, fg] = PALETTE[index % PALETTE.length];
+        const budget = parseFloat(c.price ?? 0);
+        const { title } = parseDescription(c.commission_description ?? '');
+        const category = c.category_name ?? null;
+        const statusId = parseInt(c.commission_status_id);
+        const status = getStatusConfig(statusId);
+
+        const budgetDisplay = budget > 0
+            ? `₱${budget.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`
+            : 'Open';
+
+        const dateStr = c.commission_date
+            ? new Date(c.commission_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+            : 'Recent';
+
+        const avatarHtml = `
+            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                 style="width:38px; height:38px; background:${bg}; border:1px solid ${fg}33;">
+                <span class="fs-fluid-sm fw-bold" style="font-family:var(--font-ui); color:${fg};">${letter}</span>
+            </div>`;
+
+        const categoryBadge = category
+            ? `<span class="badge rounded-pill fs-fluid-xxs fw-semibold text-uppercase mb-2"
+                    style="background:${bg}; color:${fg}; border:1px solid ${fg}33; letter-spacing:0.04em;">
+                    ${category}
+               </span>`
+            : '';
+
+        // Determine which action button to show based on current status
+        let actionBtn = '';
+        if (statusId === 3) {
+            // Accepted but not started — artist can mark as In Progress
+            actionBtn = `<button type="button"
+                            class="btn btn-sm btn-primary artist-progress-btn py-1 px-3 fs-fluid-xs rounded-2"
+                            data-commission-id="${c.commission_id}">
+                            Start Work
+                         </button>`;
+        } else if (statusId === 5) {
+            // In Progress — artist can mark as Completed
+            actionBtn = `<button type="button"
+                            class="btn btn-sm btn-success artist-complete-btn py-1 px-3 fs-fluid-xs rounded-2"
+                            data-commission-id="${c.commission_id}">
+                            Mark Complete
+                         </button>`;
+        } else if (statusId === 6) {
+            // Already completed — read-only
+            actionBtn = `<span class="text-success fw-semibold fs-fluid-xxs">✓ Completed</span>`;
+        }
+
+        return `
+            <div style="width:300px; flex-shrink:0;">
+                <div class="artist-card h-100 border rounded-3 d-flex flex-column shadow-sm bg-card p-3">
+
+                    <div class="d-flex align-items-center justify-content-between mb-2 gap-2">
+                        <div class="d-flex align-items-center gap-2 overflow-hidden">
+                            ${avatarHtml}
+                            <div class="text-truncate">
+                                <p class="m-0 fw-bold fs-fluid-sm text-truncate lh-1">${ownerName}</p>
+                                <small class="text-muted fs-fluid-xxs">${dateStr}</small>
+                            </div>
+                        </div>
+                        <span class="artist-card__badge d-inline-flex flex-shrink-0 align-items-center fw-bold text-uppercase ${status.class}">
+                            ${status.text}
+                        </span>
+                    </div>
+
+                    <div class="flex-grow-1 mb-2">
+                        ${categoryBadge}
+                        ${title ? `<p class="m-0 fw-semibold fs-fluid-xs mb-1 text-truncate" title="${title}">${title}</p>` : ''}
+                    </div>
+
+                    <div class="pt-2 border-top mt-auto d-flex align-items-center justify-content-between">
+                        <div>
+                            <p class="m-0 text-muted fs-fluid-xxs text-uppercase" style="letter-spacing:0.05em;">Budget</p>
+                            <p class="m-0 fw-bold fs-fluid-sm">${budgetDisplay}</p>
+                        </div>
+                        ${actionBtn}
+                    </div>
+
+                </div>
+            </div>`;
+    }
+
+    // ── Load Artist Commission Strips ─────────────────────────
+
+    async function loadArtistCommissions() {
+        if (CURRENT_ROLE !== 'artist') {
+            hide(artistPendingSection);
+            hide(artistAcceptedSection);
+            return;
+        }
+
+        try {
+            const res = await fetch(`${APP_BASE_URL}api/commissions/fetch_artist_commissions.php`);
+            const data = await res.json();
+
+            // ── Pending strip ──
+            hide(artistPendingLoading);
+
+            if (data.success && Array.isArray(data.pending) && data.pending.length > 0) {
+                if (artistPendingGrid) {
+                    artistPendingGrid.innerHTML = data.pending.map((r, i) => buildArtistPendingCard(r, i)).join('');
+                    show(artistPendingGrid);
+                }
+                hide(artistPendingEmpty);
+                if (artistPendingBadge) {
+                    artistPendingBadge.textContent = data.pending.length;
+                    artistPendingBadge.style.display = '';
+                }
+            } else {
+                hide(artistPendingGrid);
+                show(artistPendingEmpty);
+                if (artistPendingBadge) artistPendingBadge.style.display = 'none';
+            }
+
+            // ── Accepted strip ──
+            hide(artistAcceptedLoading);
+
+            if (data.success && Array.isArray(data.accepted) && data.accepted.length > 0) {
+                if (artistAcceptedGrid) {
+                    artistAcceptedGrid.innerHTML = data.accepted.map((c, i) => buildArtistAcceptedCard(c, i)).join('');
+                    show(artistAcceptedGrid);
+                }
+                hide(artistAcceptedEmpty);
+                if (artistAcceptedBadge) {
+                    artistAcceptedBadge.textContent = data.accepted.length;
+                    artistAcceptedBadge.style.display = '';
+                }
+            } else {
+                hide(artistAcceptedGrid);
+                show(artistAcceptedEmpty);
+                if (artistAcceptedBadge) artistAcceptedBadge.style.display = 'none';
+            }
+
+        } catch (err) {
+            console.error('Artist commissions load error:', err);
+            hide(artistPendingLoading);
+            hide(artistAcceptedLoading);
+            show(artistPendingEmpty);
+            show(artistAcceptedEmpty);
+        }
+    }
+
+    async function handleCancelRequest(button) {
+        const requestId = parseInt(button.getAttribute('data-request-id'));
+        if (!requestId) return;
+
+        if (!confirm('Withdraw this request? The client will no longer see your application.')) return;
+
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = 'Withdrawing…';
+
+        try {
+            const res = await fetch(`${APP_BASE_URL}api/commissions/update_status.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ request_id: requestId, status: 'cancelled' })
+            });
+            const data = await res.json();
+
+            if (data && data.success) {
+                showSuccessModal('Request Withdrawn', data.message || 'Your application has been cancelled.');
+                loadArtistCommissions();
+            } else {
+                alert(data?.message || 'Failed to withdraw request.');
+                button.disabled = false;
+                button.textContent = originalText;
+            }
+        } catch (err) {
+            console.error('Cancel request error:', err);
+            alert('A network error occurred. Please try again.');
+            button.disabled = false;
+            button.textContent = originalText;
+        }
+    }
+
+    // ── Artist Status Update Handlers ────────────────────────
+
+    async function handleArtistStatusUpdate(button, newStatus) {
+        const commissionId = parseInt(button.getAttribute('data-commission-id'));
+        if (!commissionId) return;
+
+        const labelMap = { in_progress: 'In Progress', completed: 'Completed' };
+        const confirmMsg = newStatus === 'in_progress'
+            ? 'Mark this commission as In Progress?'
+            : 'Mark this commission as Completed? This cannot be undone.';
+
+        if (!confirm(confirmMsg)) return;
+
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = 'Updating…';
+
+        try {
+            const res = await fetch(`${APP_BASE_URL}api/commissions/update_status.php`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ commission_id: commissionId, status: newStatus })
+            });
+            const data = await res.json();
+
+            if (data && data.success) {
+                showSuccessModal(
+                    `Marked as ${labelMap[newStatus]}!`,
+                    data.message || `Commission updated to ${labelMap[newStatus]}.`
+                );
+                loadArtistCommissions();
+                loadCommissions(); // Refresh main grid so user's view also updates
+            } else {
+                alert(data?.message || 'Failed to update status.');
+                button.disabled = false;
+                button.textContent = originalText;
+            }
+        } catch (err) {
+            console.error('Artist status update error:', err);
+            alert('A network error occurred. Please try again.');
+            button.disabled = false;
+            button.textContent = originalText;
+        }
+    }
+
     // ── Filtering & Sorting ───────────────────────────────────
 
     function sortData(data, sortVal) {
@@ -415,6 +733,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             allCommissions = Array.isArray(data.data) ? data.data : [];
             loadPendingRequests();
+            loadArtistCommissions();
             applyFilters();
 
         } catch (err) {
@@ -473,7 +792,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function handleAssignArtist(button) {
         const commissionId = parseInt(button.getAttribute('data-commission-id'));
-        const requestId    = parseInt(button.getAttribute('data-request-id'));
+        const requestId = parseInt(button.getAttribute('data-request-id'));
 
         if (!commissionId || !requestId) return;
 
@@ -482,17 +801,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const originalText = button.textContent;
-        button.disabled    = true;
+        button.disabled = true;
         button.textContent = 'Accepting...';
 
         try {
             const res = await fetch(`${APP_BASE_URL}api/commissions/update_status.php`, {
-                method:  'POST',
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body:    JSON.stringify({
+                body: JSON.stringify({
                     commission_id: commissionId,
-                    request_id:   requestId,
-                    status:       'accepted'
+                    request_id: requestId,
+                    status: 'accepted'
                 })
             });
             const data = await res.json();
@@ -503,13 +822,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadPendingRequests();
             } else {
                 alert(data?.message || 'Failed to accept artist.');
-                button.disabled    = false;
+                button.disabled = false;
                 button.textContent = originalText;
             }
         } catch (err) {
             console.error('Accept handler error:', err);
             alert('A network error occurred. Please try again.');
-            button.disabled    = false;
+            button.disabled = false;
             button.textContent = originalText;
         }
     }
@@ -530,9 +849,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch(`${APP_BASE_URL}api/commissions/update_status.php`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     request_id: requestId,
-                    status: 'rejected' 
+                    status: 'rejected'
                 })
             });
             const data = await res.json();
@@ -626,7 +945,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Bind the form execution processing event 
         clonedBtn.addEventListener('click', async () => {
             const messageText = textarea.value.trim();
-            
+
             // CRITICAL FETCH: Pull the precise ID fresh from the DOM attribute
             const activeCommissionId = parseInt(modalEl.getAttribute('data-active-commission-id'));
 
@@ -679,7 +998,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 clonedBtn.textContent = 'Send Request';
             }
         });
-    }   
+    }
 
     // ── Modal Form Handling ───────────────────────────────────
 
@@ -769,10 +1088,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 handleAssignArtist(e.target);
             }
             if (e.target.classList.contains('decline-artist-btn')) {
-                handleDeclineArtist(e.target); // Connects your decline handler
+                handleDeclineArtist(e.target);
             }
             if (e.target.classList.contains('take-commission-btn')) {
                 handleTakeCommission(e.target);
+            }
+            if (e.target.classList.contains('artist-progress-btn')) {
+                handleArtistStatusUpdate(e.target, 'in_progress');
+            }
+            if (e.target.classList.contains('artist-complete-btn')) {
+                handleArtistStatusUpdate(e.target, 'completed');
+            }
+            if (e.target.classList.contains('artist-cancel-request-btn')) {
+                handleCancelRequest(e.target);
             }
         }
     });
