@@ -103,8 +103,8 @@
 .form-side {
     width: 50%;
     transition:
-        transform 1s ease-in-out,
-        border-radius 1s ease-in-out;
+        transform 0.5s ease-in-out,
+        border-radius 0.5s ease-in-out;
     will-change: transform;
 }
 
