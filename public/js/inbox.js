@@ -21,7 +21,7 @@
     // ── Render thread items ───────────────────────────────────────────────────
     function renderThreads(list) {
         if (!list.length) {
-            threadList.innerHTML = '<div class=\"text-center p-4 text-muted fs-fluid-xs\">No conversations yet.</div>';
+            threadList.innerHTML = '<div class="text-center p-4 text-muted fs-fluid-xs">No conversations yet.</div>';
             return;
         }
 
@@ -103,8 +103,39 @@
         }
     }
 
-    // Initialize layout logic routines
-    loadConversations();
+    // ── Initialization Logic & Query String Router ───────────────────────
+    loadConversations().then(() => {
+        // AUTOMATIC QUERY STRING CAPTURE DETECTOR:
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetId = parseInt(urlParams.get('target_id'), 10);
+        const targetName = urlParams.get('name');
+
+        if (targetId && targetName) {
+            // Track state alignment 
+            selectedContactId = targetId;
+
+            // Re-render sidebar immediately to apply selection highlighting styling
+            renderThreads(allConversations);
+
+            // Open view pane layouts cleanly if they are operating on mobile window view boundaries
+            if (window.innerWidth < 992) {
+                if (inboxSidebarPanel) inboxSidebarPanel.classList.remove('active-mobile-view');
+                if (conversationContainer) conversationContainer.classList.add('active-mobile-view');
+            }
+
+            // Broadcast downstream message retrieval events to initialize the thread viewport container wrapper
+            const threadChangeEvent = new CustomEvent('artovia:threadChanged', {
+                detail: { id: targetId, name: targetName }
+            });
+            document.dispatchEvent(threadChangeEvent);
+
+            // Clean up parameters out of the address bar to prevent recursive reload cycling behavior
+            const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+            window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+        }
+    });
+
+    // Initialize regular polling routines
     setInterval(loadConversations, 6000);
 
     // Listen for updates from the conversation panel to refresh the sidebar values
