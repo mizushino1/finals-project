@@ -50,6 +50,8 @@
                             href="<?php echo BASE_URL; ?>commissions">COMMISSIONS</a>
                         <a class="nav-link text-light fw-bold fs-fluid-sm"
                             href="<?php echo BASE_URL; ?>artists">ARTISTS</a>
+                        <a class="nav-link text-light fw-bold fs-fluid-sm"
+                            href="<?php echo BASE_URL; ?>messages">INBOX</a>
                     </div>
 
                     <!-- Spacer on small screens to push right side to the end -->
