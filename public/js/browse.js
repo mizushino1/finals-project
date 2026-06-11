@@ -7,28 +7,28 @@ document.addEventListener('DOMContentLoaded', () => {
     let allArtists = [];
     let activeStyle = 'all';
 
-    const artistGrid        = document.getElementById('artistGrid');
+    const artistGrid = document.getElementById('artistGrid');
     const artistGridLoading = document.getElementById('artistGridLoading');
-    const artistGridError   = document.getElementById('artistGridError');
-    const artistGridEmpty   = document.getElementById('artistGridEmpty');
-    const topArtistsGrid    = document.getElementById('topArtistsGrid');
+    const artistGridError = document.getElementById('artistGridError');
+    const artistGridEmpty = document.getElementById('artistGridEmpty');
+    const topArtistsGrid = document.getElementById('topArtistsGrid');
     const topArtistsLoading = document.getElementById('topArtistsLoading');
-    const searchInput       = document.getElementById('searchInput');
-    const searchBtn         = document.getElementById('searchBtn');
-    const sortSelect        = document.getElementById('sortSelect');
-    const resultsNumber     = document.getElementById('resultsNumber');
-    const clearFiltersBtn   = document.getElementById('clearFilters');
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const sortSelect = document.getElementById('sortSelect');
+    const resultsNumber = document.getElementById('resultsNumber');
+    const clearFiltersBtn = document.getElementById('clearFilters');
 
     const AVATAR_PALETTE = [
-        ['#e8d5b0','#a8834a'],
-        ['#d4e8d0','#3a7a4a'],
-        ['#d0dce8','#3a5a7a'],
-        ['#e8d0e0','#7a3a5a'],
-        ['#e0e8d0','#5a7a3a'],
+        ['#e8d5b0', '#a8834a'],
+        ['#d4e8d0', '#3a7a4a'],
+        ['#d0dce8', '#3a5a7a'],
+        ['#e8d0e0', '#7a3a5a'],
+        ['#e0e8d0', '#5a7a3a'],
     ];
 
     function initialsAvatar(name, index) {
-        const parts  = name.trim().split(/[\s_]+/);
+        const parts = name.trim().split(/[\s_]+/);
         const letter = (parts[0]?.[0] ?? '?').toUpperCase();
         const [bg, fg] = AVATAR_PALETTE[index % AVATAR_PALETTE.length];
         return `
@@ -49,9 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function buildCard(artist, index, opts = {}) {
         const { isTopArtist = false, rank = null } = opts;
 
-        const isOpen  = artist.is_available == 1;
-        const name    = artist.username ?? 'Unknown';
-        const price   = artist.starting_rate ?? '0';
+        const isOpen = artist.is_available == 1;
+        const name = artist.username ?? 'Unknown';
+        const price = artist.starting_rate ?? '0';
         const priceNum = parseFloat(price);
 
         const avatarHtml = artist.avatar_url
@@ -65,11 +65,14 @@ document.addEventListener('DOMContentLoaded', () => {
             : '';
 
         const badgeClass = isOpen ? 'artist-card__badge--open' : 'artist-card__badge--closed';
-        const badgeText  = isOpen ? 'Open' : 'Closed';
+        const badgeText = isOpen ? 'Open' : 'Closed';
 
         const priceDisplay = priceNum > 0
             ? `₱${priceNum.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
             : 'Free';
+
+        // Direct Routing URL Query Configuration Parameter String targeting the Inbox module
+        const chatInboxUrl = `${BASE_URL}messages?target_id=${artist.account_id}&name=${encodeURIComponent(name)}`;
 
         return `
 <div class="col" data-id="${artist.artist_id}" data-price="${price}" data-open="${isOpen ? 1 : 0}">
@@ -87,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         <div class="artist-card__body p-2 p-sm-3 d-flex flex-column gap-1 flex-grow-1">
             <div class="artist-card__header d-flex align-items-start justify-content-between gap-1">
-                <span class="artist-card__name text-truncate fw-bold">${name}</span>
+                <span class="artist-card__name text-truncate fw-bold text-capitalize">${name}</span>
                 <span class="artist-card__rating d-inline-flex align-items-center gap-1 fw-bold text-nowrap">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
                     4.8
@@ -101,9 +104,12 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         </div>
 
-        <div class="artist-card__actions d-flex p-2 p-sm-3 pt-0 gap-2 mt-auto">
+        <div class="artist-card__actions d-flex p-2 p-sm-3 pt-0 gap-2 mt-auto align-items-center">
             <a href="${BASE_URL}profile?id=${artist.account_id}&role=artist" class="btn-artovia-outline text-center flex-grow-1 p-2 py-1.5 rounded-2">Profile</a>
-            <a href="${BASE_URL}commissions/create?artist=${artist.artist_id}" class="btn-artovia-primary text-center flex-grow-1 p-2 py-1.5 rounded-2">Hire</a>
+            
+            <a href="${chatInboxUrl}" class="btn-artovia-primary d-inline-flex align-items-center justify-content-center p-2 rounded-2" style="width: 40px; height: 38px;" title="Message ${name}">
+                <i class="bi bi-chat-dots-fill"></i>
+            </a>
         </div>
 
     </div>
@@ -125,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', e => {
                 e.preventDefault();
                 e.stopPropagation();
-                const svg    = btn.querySelector('svg');
+                const svg = btn.querySelector('svg');
                 const active = btn.dataset.active === '1';
                 if (active) {
                     svg.setAttribute('fill', 'none');
@@ -159,15 +165,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function applyFilters() {
-        const priceVal       = document.querySelector('input[name="price"]:checked')?.value ?? '0-999999';
+        const priceVal = document.querySelector('input[name="price"]:checked')?.value ?? '0-999999';
         const availabilityVal = document.querySelector('input[name="availability"]:checked')?.value ?? 'all';
-        const searchVal      = searchInput?.value.trim().toLowerCase() ?? '';
-        const sortVal        = sortSelect?.value ?? 'relevance';
+        const searchVal = searchInput?.value.trim().toLowerCase() ?? '';
+        const sortVal = sortSelect?.value ?? 'relevance';
 
         const [minPrice, maxPrice] = priceVal.split('-').map(Number);
 
         let filtered = allArtists.filter(a => {
-            const price        = parseFloat(a.starting_rate ?? 0);
+            const price = parseFloat(a.starting_rate ?? 0);
             const matchesPrice = price >= minPrice && price <= maxPrice;
             const matchesAvail = availabilityVal === 'all' ||
                 (availabilityVal === 'open' && a.is_available == 1);
@@ -192,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadArtists() {
         try {
-            const res  = await fetch(`${BASE_URL}api/artists/fetch_all.php`);
+            const res = await fetch(`${BASE_URL}api/artists/fetch_all.php`);
             const data = await res.json();
 
             if (artistGridLoading) artistGridLoading.classList.add('d-none');
@@ -229,9 +235,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('input[name="price"], input[name="availability"]')
         .forEach(input => input.addEventListener('change', applyFilters));
 
-    if (sortSelect)     sortSelect.addEventListener('change', applyFilters);
-    if (searchBtn)      searchBtn.addEventListener('click', applyFilters);
-    if (searchInput)    searchInput.addEventListener('keydown', e => {
+    if (sortSelect) sortSelect.addEventListener('change', applyFilters);
+    if (searchBtn) searchBtn.addEventListener('click', applyFilters);
+    if (searchInput) searchInput.addEventListener('keydown', e => {
         if (e.key === 'Enter') applyFilters();
     });
 
