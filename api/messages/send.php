@@ -55,28 +55,34 @@ try {
         if ($artRow) { $receiverId = $artRow['artist_id']; }
     }
     */
+    $senderId = $_SESSION['user_id'];
+    if ($role === 'artist') {
+        $stmtAcc = $db->prepare("SELECT account_id FROM artist_tbl WHERE artist_id = ?");
+    } else {
+        $stmtAcc = $db->prepare("SELECT account_id FROM user_tbl WHERE user_id = ?");
+    }
+    $stmtAcc->execute([$senderId]);
+    $senderId = $stmtAcc->fetchColumn() ?: $senderId;
 
     // 2. Insert message with exact payload binding mappings
     $stmt = $db->prepare('
-        INSERT INTO message_box (sender_id, receiver_id, message_content, sent_at, status)
-        VALUES (?, ?, ?, NOW(), "unread")
-    ');
-    
+    INSERT INTO message_tbl (sender_account_id, receiver_account_id, message_content, sent_at, status_id, conversation_id)
+    VALUES (?, ?, ?, NOW(), (SELECT status_id FROM status_tbl WHERE LOWER(status_name) = "unread"), NULL)
+');
+
     $stmt->execute([
-        $senderId, 
-        $receiverId, 
+        $senderId,
+        $receiverId,
         $content
     ]);
 
     echo json_encode([
-        'success' => true, 
+        'success' => true,
         'message' => 'Message dispatched successfully.'
     ]);
-
 } catch (PDOException $e) {
     echo json_encode([
-        'success' => false, 
+        'success' => false,
         'message' => 'Database failure during transit: ' . $e->getMessage()
     ]);
 }
-?>
