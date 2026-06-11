@@ -1,48 +1,37 @@
 /* ==========================================================================
-   Artovia Messaging System Layout Stylesheet
+   Artovia Messaging System Layout Stylesheet (Updated Viewport Frame)
    ========================================================================== */
 
-/* Main layout responsive wrapper frame block constraints */
 .chat-responsive-wrapper {
-    height: 600px; 
+    height: 100vh; /* Changed from 600px to full fluid layout height */
     background: var(--clr-bg-card);
 }
 
-/* Base structural sidebar panel mapping settings */
 .chat-sidebar-panel {
     width: 350px; 
-    border-right: 2px solid var(--clr-gold); 
+    border-right: 2px solid var(--clr-border); 
     flex-shrink: 0;
 }
 
-/* Sidebar context layout headers */
 .chat-sidebar-header {
-    border-bottom: 2px solid var(--clr-gold); 
+    border-bottom: 2px solid var(--clr-border); 
     background: var(--clr-bg-card);
 }
 
-/* Search engine alignment tweaks */
-.chat-search-prepend {
-    border-right: none !important;
-}
-.chat-search-input {
-    border-left: none !important;
-}
+.chat-search-prepend { border-right: none !important; }
+.chat-search-input { border-left: none !important; }
 
-/* Dynamic Active Conversation Main Window Space */
 .chat-conversation-container {
     background: linear-gradient(to bottom, var(--clr-bg), var(--clr-surface));
 }
 
-/* Chat display top application identity space */
 .chat-conversation-header {
-    border-bottom: 2px solid var(--clr-gold); 
+    border-bottom: 2px solid var(--clr-border); 
     background: var(--clr-bg-card); 
     height: 75px; 
     flex-shrink: 0;
 }
 
-/* Dialogue timeline content display wrapper space */
 .chat-message-pane {
     overflow-y: auto;
 }
@@ -50,7 +39,6 @@
     max-width: 100%;
 }
 
-/* Dynamic Text bubble custom formatting values */
 .chat-bubble-mine {
     border-radius: var(--radius-md); 
     background: var(--clr-gold); 
@@ -65,32 +53,24 @@
     word-break: break-word;
 }
 
-/* Text area messaging utility control panel bar footer fields */
 .chat-conversation-footer {
-    border-top: 2px solid var(--clr-gold); 
+    border-top: 2px solid var(--clr-border); 
     background: var(--clr-bg-card); 
     flex-shrink: 0;
 }
-.chat-footer-input {
-    border-width: 1px !important;
-}
+.chat-footer-input { border-width: 1px !important; }
 
-/* Custom platform layout thread lists scrolling rule modifications */
-.hide-scrollbar::-webkit-scrollbar {
-    display: none;
-}
+.hide-scrollbar::-webkit-scrollbar { display: none; }
 .hide-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
 
-/* ==========================================================================
-   Mobile-First Screen Breakpoints State Transitions Engine (md / lg bounds)
-   ========================================================================== */
+/* ── Mobile View Overrides ─────────────────────────────────────────────── */
 @media (max-width: 991.98px) {
     .chat-responsive-wrapper {
         display: block !important;
-        height: 80vh !important; /* Maximizes vertical viewport layout usage on smartphone displays */
+        height: 100vh !important; /* Forces layout tracking viewport to stay 100% full screen */
     }
     
     .chat-panel-view {
@@ -107,7 +87,6 @@
         border-right: none !important;
     }
     
-    /* Reveal targeted view window while sliding the opposing window out dynamically */
     .chat-panel-view.active-mobile-view {
         transform: translateX(0);
         opacity: 1;

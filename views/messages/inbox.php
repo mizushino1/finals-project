@@ -1,7 +1,6 @@
 <main class="py-0">
     <div class="container-fluid p-0">
-        <!-- Removed 'theme-border' and adjusted layout for full-screen -->
-        <div class="d-flex position-relative overflow-hidden" style="height: 100vh; background: var(--clr-bg-card);">
+        <div id="chatMainContainer" class="d-flex position-relative overflow-hidden chat-responsive-wrapper" style="height: 100vh; background: var(--clr-bg-card);">
 
             <div id="inboxSidebarPanel" class="d-flex flex-column h-100 chat-sidebar-panel chat-panel-view active-mobile-view" style="width: 350px; border-right: 2px solid var(--clr-border);">
                 <div class="p-3 chat-sidebar-header" style="border-bottom: 2px solid var(--clr-border);">
@@ -23,7 +22,7 @@
 
             <div id="conversationContainer" class="flex-grow-1 d-flex flex-column h-100 chat-conversation-container chat-panel-view" style="background: linear-gradient(to bottom, var(--clr-bg), var(--clr-surface));">
                 
-                <div class="p-3 d-flex align-items-center gap-3 chat-conversation-header" style="border-bottom: 2px solid var(--clr-border);">
+                <div class="p-3 d-flex align-items-center gap-3 chat-conversation-header" style="border-bottom: 2px solid var(--clr-border); height: 75px; flex-shrink: 0;">
                     <button id="mobileChatBackButton" class="btn btn-link text-decoration-none p-0 d-lg-none" type="button" aria-label="Return to list">
                         <i class="bi bi-arrow-left fs-4" style="color: var(--clr-gold);"></i>
                     </button>
@@ -46,12 +45,12 @@
                     <div id="sendError" class="text-danger fs-fluid-xs mt-1" style="display:none;"></div>
                 </div>
             </div>
+
         </div>
     </div>
 </main>
 
 <script>
-    // Global scope authorization and mapping identity keys logic references
     window.CURRENT_ACCOUNT_ID = <?= json_encode($_SESSION['account_id'] ?? ($_SESSION['user_id'] ?? 0)); ?>;
 </script>
 <script src="<?php echo BASE_URL; ?>public/js/inbox.js"></script>
