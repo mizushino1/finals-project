@@ -109,7 +109,7 @@ body {
     font-family: var(--font-body);
 }
 
-main { min-height: 100vh; }
+main { min-height: 90vh; }
 
 /* ── 3. Typography ─────────────────────────────────────────── */
 h1, h2, h3, h4, h5, h6 {

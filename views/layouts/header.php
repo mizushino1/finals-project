@@ -33,7 +33,7 @@
 
 <body data-bs-theme="dark">
     <header class="sticky-top">
-        <nav class="navbar glass-card-dark">
+        <nav class="navbar glass-card-dark p-3">
             <div class="container-fluid flex-wrap">
 
                 <div class="d-flex align-items-center w-100">
@@ -51,8 +51,11 @@
                             href="<?php echo BASE_URL; ?>commissions">COMMISSIONS</a>
                         <a class="nav-link text-light fw-bold fs-fluid-sm"
                             href="<?php echo BASE_URL; ?>artists">ARTISTS</a>
+                        <?php if (isset($_SESSION['user_id'])): ?>
                         <a class="nav-link text-light fw-bold fs-fluid-sm"
                             href="<?php echo BASE_URL; ?>messages">INBOX</a>
+                        <?php else: ?>
+                        <?php endif; ?>
                     </div>
 
                     <!-- Spacer on small screens to push right side to the end -->
@@ -69,19 +72,19 @@
                             <div class="d-none d-lg-flex align-items-center gap-1">
                                 <a class="btn btn-sm text-light fw-bold border-0 bg-transparent"
                                     href="<?php echo BASE_URL; ?>settings">
-                                    <i class="bi bi-gear me-1"></i>Settings
+                                    <i class="bi bi-gear me-1 fs-5"></i>
                                 </a>
                                 <button class="btn btn-sm text-light fw-bold border-0 bg-transparent theme-toggle-btn d-none"
                                     data-set-theme="light">
-                                    <i class="bi bi-sun-fill me-1"></i>Light
+                                    <i class="bi bi-sun-fill me-1 fs-5"></i>
                                 </button>
                                 <button class="btn btn-sm text-light fw-bold border-0 bg-transparent theme-toggle-btn d-none"
                                     data-set-theme="dark">
-                                    <i class="bi bi-moon-stars-fill me-1"></i>Dark
+                                    <i class="bi bi-moon-stars-fill me-1 fs-5"></i>
                                 </button>
                                 <a class="btn btn-sm text-danger fw-bold border-0 bg-transparent"
                                     href="<?php echo BASE_URL; ?>logout">
-                                    <i class="bi bi-box-arrow-right me-1"></i>Logout
+                                    <i class="bi bi-box-arrow-right me-1 fs-5"></i>
                                 </a>
                             </div>
 
@@ -101,7 +104,7 @@
                             </button>
                             <a class="btn text-light fw-bold glass-card fs-fluid-xs"
                                 href="<?php echo BASE_URL; ?>login">LOG IN</a>
-                            <button class="navbar-toggler border-secondary ms-1" type="button"
+                            <button class="navbar-toggler d-lg-none border-secondary ms-1" type="button"
                                 data-bs-toggle="collapse"
                                 data-bs-target="#accountActionsNav"
                                 aria-controls="accountActionsNav"
@@ -124,6 +127,8 @@
                                 <a class="nav-link text-light fw-bold fs-fluid-sm" href="<?php echo BASE_URL; ?>#">HOME</a>
                                 <a class="nav-link text-light fw-bold fs-fluid-sm" href="<?php echo BASE_URL; ?>commissions">COMMISSIONS</a>
                                 <a class="nav-link text-light fw-bold fs-fluid-sm" href="<?php echo BASE_URL; ?>artists">ARTISTS</a>
+                                <a class="nav-link text-light fw-bold fs-fluid-sm"
+                                href="<?php echo BASE_URL; ?>messages">INBOX</a>
                                 <hr class="border-secondary my-1">
                             </div>
 
