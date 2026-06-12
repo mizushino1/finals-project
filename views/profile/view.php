@@ -37,6 +37,7 @@ try {
          ORDER BY img.uploaded_at DESC
          LIMIT 1) AS avatar,
         (SELECT COUNT(*) FROM favorite_tbl f WHERE f.artist_id = art.artist_id) AS followers_count,
+        (SELECT COUNT(*) FROM favorite_tbl f WHERE f.account_id = a.account_id) AS following_count,
         (SELECT ROUND(AVG(r.rating), 1) FROM review_tbl r WHERE r.artist_id = art.artist_id) AS avg_rating,
         (SELECT COUNT(*)               FROM review_tbl r WHERE r.artist_id = art.artist_id) AS review_count
     FROM account_tbl a
@@ -63,19 +64,28 @@ try {
     $live_review_count = (int)($profile['review_count'] ?? 0);
 
     $is_following = false;
-    if (isset($_SESSION['account_id']) && $_SESSION['account_id'] != $profile_account_id) {
-        $fav_stmt = $db->prepare("
-            SELECT 1 FROM favorite_tbl
-            WHERE account_id = ?
-              AND (artist_id = ? OR user_id = ?)
-            LIMIT 1
-        ");
-        $fav_stmt->execute([
-            $_SESSION['account_id'],
-            $profile['artist_id'] ?? null,
-            $profile['user_id']   ?? null,
-        ]);
-        $is_following = (bool) $fav_stmt->fetchColumn();
+    $viewer_following_count = 0;
+    if (isset($_SESSION['account_id'])) {
+        // Is the viewer following this profile?
+        if ($_SESSION['account_id'] != $profile_account_id) {
+            $fav_stmt = $db->prepare("
+                SELECT 1 FROM favorite_tbl
+                WHERE account_id = ?
+                  AND (artist_id = ? OR user_id = ?)
+                LIMIT 1
+            ");
+            $fav_stmt->execute([
+                $_SESSION['account_id'],
+                $profile['artist_id'] ?? null,
+                $profile['user_id']   ?? null,
+            ]);
+            $is_following = (bool) $fav_stmt->fetchColumn();
+        }
+
+        // How many accounts does the viewer follow?
+        $fol_stmt = $db->prepare("SELECT COUNT(*) FROM favorite_tbl WHERE account_id = ?");
+        $fol_stmt->execute([$_SESSION['account_id']]);
+        $viewer_following_count = (int) $fol_stmt->fetchColumn();
     }
 } catch (PDOException $e) {
     die("Database error: " . $e->getMessage());
@@ -150,7 +160,7 @@ try {
             </div>
 
             <div class="profile-stat">
-                <span class="profile-stat-value">0</span>
+                <span class="profile-stat-value" id="stat-following"><?php echo number_format($viewer_following_count); ?></span>
                 <span class="profile-stat-label">Following</span>
             </div>
 

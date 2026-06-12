@@ -422,3 +422,35 @@ ALTER TABLE artist_tbl
 ADD artist_description TEXT NULL AFTER is_available;
 
 ALTER TABLE artist_tbl ADD COLUMN description TEXT;
+
+-- =====================================
+-- REVIEWS TABLE
+-- =====================================
+
+CREATE TABLE review_tbl (
+    review_id           INT AUTO_INCREMENT PRIMARY KEY,
+    artist_id           INT NOT NULL,
+    reviewer_account_id INT NOT NULL,
+    commission_id       INT NULL,           -- optional: tie review to a specific commission
+    rating              TINYINT NOT NULL    -- 1–5
+                        CHECK (rating BETWEEN 1 AND 5),
+    comment             TEXT,
+    created_at          DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at          DATETIME DEFAULT CURRENT_TIMESTAMP
+                        ON UPDATE CURRENT_TIMESTAMP,
+
+    -- One review per reviewer per artist (or per commission if you prefer)
+    UNIQUE KEY uq_review_artist_reviewer (artist_id, reviewer_account_id),
+
+    FOREIGN KEY (artist_id)
+        REFERENCES artist_tbl(artist_id)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (reviewer_account_id)
+        REFERENCES account_tbl(account_id)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (commission_id)
+        REFERENCES commission_tbl(commission_id)
+        ON DELETE SET NULL
+);

@@ -1,0 +1,437 @@
+/* ══════════════════════════════════════════════════════════════
+   ARTWORK-CARD.CSS  — Artwork grid, upload modal, review cards
+   Depends on variables defined in main.css
+══════════════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════════════════════
+   1. ARTWORK GRID
+══════════════════════════════════════════════════════════════ */
+
+#artworks-grid {
+    row-gap: 16px;
+    column-gap: 16px;
+}
+
+/* ── Artwork card ──────────────────────────────────────────── */
+.artwork-card {
+    background: var(--clr-bg-card);
+    border: 1px solid var(--clr-border) !important;
+    border-radius: var(--radius-md) !important;
+    overflow: hidden;
+    transition:
+        transform  var(--transition-spring),
+        box-shadow var(--transition-spring),
+        border-color var(--transition-base);
+    cursor: pointer;
+}
+
+.artwork-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--clr-border-strong) !important;
+}
+
+[data-bs-theme="dark"] .artwork-card {
+    background: #18140f;
+    border-color: var(--clr-border) !important;
+}
+
+[data-bs-theme="dark"] .artwork-card:hover {
+    box-shadow: 0 12px 40px rgba(0,0,0,0.50);
+    border-color: var(--clr-border-strong) !important;
+}
+
+/* ── Image wrapper (strict 1:1 ratio) ─────────────────────── */
+.artwork-card-img-wrap {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%; /* 1:1 */
+    overflow: hidden;
+    background: var(--clr-surface);
+}
+
+.artwork-card-img-wrap img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-slow);
+}
+
+.artwork-card:hover .artwork-card-img-wrap img {
+    transform: scale(1.06);
+}
+
+/* Gold overlay shimmer on hover */
+.artwork-card-img-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        160deg,
+        rgba(201, 168, 108, 0.18) 0%,
+        transparent 60%
+    );
+    opacity: 0;
+    transition: opacity var(--transition-base);
+    pointer-events: none;
+}
+
+.artwork-card:hover .artwork-card-img-wrap::after {
+    opacity: 1;
+}
+
+/* ── Card footer (date) ────────────────────────────────────── */
+.artwork-card .card-footer {
+    padding: 8px 12px !important;
+    background: transparent !important;
+    border-top: 1px solid var(--clr-border) !important;
+}
+
+.artwork-card .card-footer small {
+    font-family: var(--font-ui);
+    font-size: 0.65rem;
+    color: var(--clr-text-muted);
+    letter-spacing: 0.04em;
+}
+
+/* ── Empty state ───────────────────────────────────────────── */
+.artworks-empty {
+    padding: 60px 20px;
+}
+
+.artworks-empty p {
+    font-family: var(--font-ui);
+    font-size: 0.88rem;
+    color: var(--clr-text-muted);
+    letter-spacing: 0.04em;
+    margin: 0;
+}
+
+.artworks-empty p::before {
+    content: '✦';
+    display: block;
+    font-size: 1.5rem;
+    color: var(--clr-border-strong);
+    margin-bottom: 12px;
+}
+
+/* ── Pagination ────────────────────────────────────────────── */
+#artworks-pagination .pagination,
+#reviews-pagination .pagination {
+    gap: 4px;
+}
+
+#artworks-pagination .page-link,
+#reviews-pagination .page-link {
+    font-family: var(--font-ui);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--clr-text-muted);
+    background: var(--clr-bg-card);
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-sm) !important;
+    padding: 6px 12px;
+    transition:
+        background  var(--transition-fast),
+        color       var(--transition-fast),
+        border-color var(--transition-fast);
+}
+
+#artworks-pagination .page-link:hover,
+#reviews-pagination .page-link:hover {
+    background: rgba(201, 168, 108, 0.10);
+    border-color: var(--clr-gold);
+    color: var(--clr-gold);
+}
+
+#artworks-pagination .page-item.active .page-link,
+#reviews-pagination .page-item.active .page-link {
+    background: var(--clr-gold);
+    border-color: var(--clr-gold);
+    color: var(--clr-text-primary);
+}
+
+#artworks-pagination .page-item.disabled .page-link,
+#reviews-pagination .page-item.disabled .page-link {
+    background: transparent;
+    border-color: var(--clr-border);
+    color: var(--clr-border-strong);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   2. UPLOAD ARTWORK MODAL
+══════════════════════════════════════════════════════════════ */
+
+#uploadArtworkModal .modal-content {
+    background: var(--clr-bg-card);
+    border: 1px solid var(--clr-border-strong);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+}
+
+[data-bs-theme="dark"] #uploadArtworkModal .modal-content {
+    background: #1a1612;
+    border-color: var(--clr-border-strong);
+}
+
+#uploadArtworkModal .modal-header {
+    border-bottom: 1px solid var(--clr-border);
+    padding: 20px 24px 16px;
+}
+
+#uploadArtworkModal .modal-title {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--clr-gold);
+    letter-spacing: 0.02em;
+}
+
+#uploadArtworkModal .modal-header .btn-close {
+    filter: var(--bs-btn-close-white-filter, none);
+    opacity: 0.5;
+    transition: opacity var(--transition-fast);
+}
+#uploadArtworkModal .modal-header .btn-close:hover { opacity: 1; }
+
+[data-bs-theme="dark"] #uploadArtworkModal .modal-header .btn-close {
+    filter: invert(1) grayscale(1);
+}
+
+#uploadArtworkModal .modal-body {
+    padding: 20px 24px;
+}
+
+#uploadArtworkModal .modal-footer {
+    border-top: 1px solid var(--clr-border);
+    padding: 14px 24px;
+}
+
+/* Labels */
+#uploadArtworkModal .form-label {
+    font-family: var(--font-ui);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--clr-text-secondary);
+    margin-bottom: 6px;
+}
+
+/* Inputs */
+#uploadArtworkModal .form-control {
+    background: var(--clr-bg-alt);
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-sm);
+    color: var(--clr-text-primary);
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    padding: 9px 12px;
+    transition:
+        border-color var(--transition-fast),
+        box-shadow   var(--transition-fast);
+}
+
+#uploadArtworkModal .form-control::placeholder {
+    color: var(--clr-text-muted);
+}
+
+#uploadArtworkModal .form-control:focus {
+    background: var(--clr-bg-card);
+    border-color: var(--clr-gold);
+    box-shadow: 0 0 0 3px rgba(201, 168, 108, 0.14);
+    color: var(--clr-text-primary);
+    outline: none;
+}
+
+[data-bs-theme="dark"] #uploadArtworkModal .form-control {
+    background: #0f0d0a;
+    border-color: var(--clr-border);
+    color: var(--clr-text-primary);
+}
+
+[data-bs-theme="dark"] #uploadArtworkModal .form-control:focus {
+    background: #1a1612;
+}
+
+#uploadArtworkModal .form-text {
+    font-size: 0.72rem;
+    color: var(--clr-text-muted);
+    margin-top: 4px;
+}
+
+/* Image preview */
+#artwork-preview-wrap {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--clr-border);
+    background: var(--clr-surface);
+    max-height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#artwork-preview-img {
+    max-height: 220px;
+    width: 100%;
+    object-fit: contain;
+}
+
+/* Alert */
+#upload-artwork-alert {
+    font-family: var(--font-ui);
+    font-size: 0.82rem;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    border: none;
+}
+
+#upload-artwork-alert.alert-danger  { background: rgba(220, 38, 38, 0.12);  color: #f87171; }
+#upload-artwork-alert.alert-success { background: rgba(74, 222, 128, 0.12); color: #4ade80; }
+
+/* Confirm / cancel buttons */
+#uploadArtworkModal .btn-secondary {
+    font-family: var(--font-ui);
+    font-size: 0.80rem;
+    font-weight: 600;
+    padding: 8px 20px;
+    background: transparent;
+    border: 1px solid var(--clr-border-strong);
+    color: var(--clr-text-muted);
+    border-radius: var(--radius-sm);
+    transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+#uploadArtworkModal .btn-secondary:hover {
+    border-color: var(--clr-gold);
+    color: var(--clr-gold);
+    background: transparent;
+}
+
+#btn-confirm-upload {
+    font-family: var(--font-ui);
+    font-size: 0.80rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 8px 24px;
+    background: var(--clr-gold);
+    color: var(--clr-text-primary);
+    border: none;
+    border-radius: var(--radius-sm);
+    transition:
+        background  var(--transition-base),
+        transform   var(--transition-base),
+        box-shadow  var(--transition-base);
+}
+#btn-confirm-upload:hover:not(:disabled) {
+    background: var(--clr-gold-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(201, 168, 108, 0.25);
+    color: var(--clr-text-primary);
+}
+#btn-confirm-upload:disabled {
+    background: var(--clr-border-strong);
+    color: var(--clr-text-muted);
+    cursor: not-allowed;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   3. REVIEW CARDS
+══════════════════════════════════════════════════════════════ */
+
+#reviews-list .card {
+    background: var(--clr-bg-card);
+    border: 1px solid var(--clr-border) !important;
+    border-radius: var(--radius-md) !important;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+#reviews-list .card:hover {
+    border-color: var(--clr-border-strong) !important;
+    box-shadow: var(--shadow-sm);
+}
+
+[data-bs-theme="dark"] #reviews-list .card {
+    background: #18140f;
+}
+
+#reviews-list .card-body {
+    padding: 16px 20px;
+}
+
+#reviews-list .card-body strong {
+    font-family: var(--font-ui);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--clr-text-primary);
+}
+
+#reviews-list .card-body p {
+    font-size: 0.85rem;
+    color: var(--clr-text-secondary);
+    line-height: 1.55;
+    margin-bottom: 0;
+}
+
+#reviews-list .card-body small {
+    font-size: 0.72rem;
+    color: var(--clr-text-muted);
+    font-family: var(--font-ui);
+}
+
+/* Review summary card */
+#pane-reviews > .d-flex.p-3 {
+    background: var(--clr-bg-alt) !important;
+    border: 1px solid var(--clr-border);
+    border-radius: var(--radius-md);
+}
+
+[data-bs-theme="dark"] #pane-reviews > .d-flex.p-3 {
+    background: #0e0c09 !important;
+}
+
+#review-summary-avg {
+    font-family: var(--font-display);
+    font-size: 2.8rem;
+    font-weight: 400;
+    color: var(--clr-gold);
+    line-height: 1;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   4. ARTWORK LOADING SPINNER
+══════════════════════════════════════════════════════════════ */
+
+#artworks-loading {
+    color: var(--clr-text-muted);
+    font-family: var(--font-ui);
+    font-size: 0.82rem;
+}
+
+#artworks-loading .spinner-border {
+    color: var(--clr-gold);
+    width: 1.1rem;
+    height: 1.1rem;
+    border-width: 2px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   5. RESPONSIVE
+══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 575.98px) {
+    #artworks-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    .profile-stat {
+        padding: 6px 10px;
+        min-width: 56px;
+    }
+
+    .profile-stat-value {
+        font-size: 0.95rem;
+    }
+}

@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/settings.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/home.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/inbox.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/artwork-card.css">
 
     <script>
         window.USER_ROLE = "<?php echo isset($_SESSION['role']) ? $_SESSION['role'] : 'guest'; ?>";

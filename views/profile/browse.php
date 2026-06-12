@@ -37,7 +37,7 @@
             <aside class="col-lg-3">
                 <div class="browse__sidebar sticky-top shadow-sm border rounded-3 p-3 bg-card" style="top: 90px; z-index: 100;">
                     <div class="sidebar__header d-flex align-items-center justify-content-between pb-2 mb-3 border-bottom">
-                        <span class="sidebar__header-title text-uppercase fw-bold text-primary fs-fluid-xxs">Filters</span>
+                        <span class="sidebar__header-title text-uppercase fw-bold fs-fluid-xxs">Filters</span>
                         <button class="sidebar__clear-btn border-0 bg-transparent p-0 fw-semibold fs-fluid-xs" id="clearFilters">Clear all</button>
                     </div>
 
@@ -68,7 +68,7 @@
                 
                 <div class="browse-results-bar d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
                     <p class="browse-results-bar__count m-0 text-muted fs-fluid-xs">
-                        Showing <strong id="resultsNumber" class="text-primary fw-semibold">—</strong> artists
+                        Showing <strong id="resultsNumber" class="fw-semibold">—</strong> artists
                     </p>
                     <div class="browse-sort d-flex align-items-center gap-2">
                         <span class="text-muted text-nowrap fs-fluid-xs">Sort by</span>

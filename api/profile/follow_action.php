@@ -39,7 +39,12 @@ try {
         $stmt->execute([$account_id, $target_user_id, $target_user_id, $artist_id, $artist_id]);
     }
 
-    echo json_encode(['success' => true]);
+    // Return the viewer's updated following count so the JS can sync the stat live
+    $countStmt = $db->prepare('SELECT COUNT(*) FROM favorite_tbl WHERE account_id = ?');
+    $countStmt->execute([$account_id]);
+    $following_count = (int) $countStmt->fetchColumn();
+
+    echo json_encode(['success' => true, 'following_count' => $following_count]);
 } catch (PDOException $e) {
     echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
 }
