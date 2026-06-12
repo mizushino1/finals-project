@@ -42,9 +42,6 @@ if ($account_id) {
 }
 ?>
 
-<link rel="stylesheet" href="<?= BASE_URL ?>public/css/profile.css">
-<link rel="stylesheet" href="<?= BASE_URL ?>public/css/settings.css">
-
 <main class="py-5 settings-main">
     <div class="container-fluid settings-container">
         <div class="row justify-content-center">
@@ -188,23 +185,23 @@ if ($account_id) {
                                             <img src="<?= $avatarSrc ?>"
                                                 id="avatarPreview"
                                                 class="profile-avatar <?= $hasAvatar ? '' : 'd-none' ?>"
-                                                alt="User avatar">
+                                                alt="User avatar"  style="width: 90px; height: 90px;">
 
-                                            <div id="avatarPreviewPlaceholder" class="profile-avatar-placeholder <?= $hasAvatar ? 'd-none' : 'd-inline-flex' ?> align-items-center justify-content-center bg-light border text-secondary rounded-circle">
+                                            <div id="avatarPreviewPlaceholder" class="profile-avatar-placeholder <?= $hasAvatar ? 'd-none' : 'd-inline-flex' ?> align-items-center justify-content-center bg-light border text-secondary rounded-circle" >
                                                 <i class="bi bi-person-fill fs-2"></i>
                                             </div>
                                         </div>
-                                        <button type="button" class="btn btn-sm btn-outline-danger mt-3 px-3 profile-sub-weight" id="removeAvatarBtn">Remove</button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger mt-3 px-3 profile-sub-weight fs-fluid-xs" id="removeAvatarBtn">Remove</button>
                                     </div>
 
                                     <div class="flex-grow-1">
                                         <div class="border p-3 text-center">
-                                            <p class="mb-2 fw-bold">Choose New Avatar</p>
-                                            <small class="text-muted d-block mb-3">Drag & drop an image here or click browse here</small>
-                                            <button type="button" class="btn btn-sm btn-follow w-100 px-3 profile-sub-weight" id="uploadImageBtn">Upload New Image</button>
+                                            <p class="mb-2 fw-bold fs-fluid-sm">Choose New Avatar</p>
+                                            <small class="text-muted d-block mb-3 fs-fluid-xs">Drag & drop an image here or click browse here</small>
+                                            <button type="button" class="btn btn-sm btn-follow px-3 profile-sub-weight fs-fluid-xs" id="uploadImageBtn">Upload New Image</button>
                                             <input type="file" id="avatarFileInput" name="avatar" class="d-none" accept="image/png, image/jpeg, image/jpg">
                                         </div>
-                                        <small class="text-muted mt-2 d-block text-center">Recommended PNG</small>
+                                        <small class="text-muted mt-2 d-block text-center fs-fluid-xs">Recommended PNG</small>
                                     </div>
                                 </div>
                             </div>
@@ -228,11 +225,11 @@ if ($account_id) {
 
                     <div class="row mt-4 align-items-center settings-footer-actions">
                         <div class="col-6 d-flex gap-2">
-                            <button type="submit" id="settingsSubmit" class="btn-follow">Save Changes</button>
-                            <button type="button" id="clearForm" class="btn btn-outline-secondary btn-sm px-3 btn-cancel-custom">Cancel</button>
+                            <button type="submit" id="settingsSubmit" class="btn-follow fs-fluid-xs">Save Changes</button>
+                            <button type="button" id="clearForm" class="btn btn-outline-secondary btn-sm px-3 btn-cancel-custom fs-fluid-xs">Cancel</button>
                         </div>
                         <div class="col-6 text-end">
-                            <button type="button" id="deleteAccountBtn" class="btn btn-outline-danger btn-sm btn-delete-custom">
+                            <button type="button" id="deleteAccountBtn" class="btn btn-outline-danger btn-sm btn-delete-custom fs-fluid-sm">
                                 <i class="bi bi-trash"></i> Delete Account
                             </button>
                         </div>

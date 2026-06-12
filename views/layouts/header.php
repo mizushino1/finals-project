@@ -22,6 +22,10 @@
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/home.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/inbox.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/artwork-card.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/home.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/profile.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/settings.css">
+
 
     <script>
         window.USER_ROLE = "<?php echo isset($_SESSION['role']) ? $_SESSION['role'] : 'guest'; ?>";
@@ -53,8 +57,8 @@
                         <a class="nav-link text-light fw-bold fs-fluid-sm"
                             href="<?php echo BASE_URL; ?>artists">ARTISTS</a>
                         <?php if (isset($_SESSION['user_id'])): ?>
-                        <a class="nav-link text-light fw-bold fs-fluid-sm"
-                            href="<?php echo BASE_URL; ?>messages">INBOX</a>
+                            <a class="nav-link text-light fw-bold fs-fluid-sm"
+                                href="<?php echo BASE_URL; ?>messages">INBOX</a>
                         <?php else: ?>
                         <?php endif; ?>
                     </div>
@@ -129,7 +133,7 @@
                                 <a class="nav-link text-light fw-bold fs-fluid-sm" href="<?php echo BASE_URL; ?>commissions">COMMISSIONS</a>
                                 <a class="nav-link text-light fw-bold fs-fluid-sm" href="<?php echo BASE_URL; ?>artists">ARTISTS</a>
                                 <a class="nav-link text-light fw-bold fs-fluid-sm"
-                                href="<?php echo BASE_URL; ?>messages">INBOX</a>
+                                    href="<?php echo BASE_URL; ?>messages">INBOX</a>
                                 <hr class="border-secondary my-1">
                             </div>
 

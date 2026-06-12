@@ -1,10 +1,3 @@
-<?php
-require_once __DIR__ . '/../config/session.php';
-require_once __DIR__ . '/../config/constants.php';
-?>
-
-<link rel="stylesheet" href="<?= BASE_URL ?>public/css/home.css">
-
 <main>
 
     <!-- ══════════════════════════════════════
@@ -358,14 +351,14 @@ require_once __DIR__ . '/../config/constants.php';
                     <a href="<?= BASE_URL ?>login" class="btn-artovia-light">
                         Create an Account
                     </a>
-                    <a href="<?= BASE_URL ?>commissions" class="btn-artovia-ghost">
+                    <a href="<?= BASE_URL ?>artists" class="btn-artovia-ghost">
                         Browse Artists
                     </a>
                 <?php else: ?>
-                    <a href="<?= BASE_URL ?>commissions/create" class="btn-artovia-light">
+                    <a href="<?= BASE_URL ?>commissions" class="btn-artovia-light">
                         Post a Commission
                     </a>
-                    <a href="<?= BASE_URL ?>commissions" class="btn-artovia-ghost">
+                    <a href="<?= BASE_URL ?>artists" class="btn-artovia-ghost">
                         Browse Artists
                     </a>
                 <?php endif; ?>

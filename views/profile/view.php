@@ -202,7 +202,7 @@ try {
                             <?php endif; ?>
                         </button>
                     <?php else: ?>
-                        <a href="<?php echo BASE_URL; ?>views/profile/edit.php"
+                        <a href="<?php echo BASE_URL; ?>settings"
                            class="btn btn-outline-secondary">Edit Account Settings</a>
                     <?php endif; ?>
                 <?php else: ?>

@@ -1,5 +1,6 @@
-<?php require_once __DIR__ . '/../../src/middleware/auth_middleware.php'; ?>
-
+<?php
+require_once __DIR__ . '/../../src/middleware/auth_middleware.php';
+?>
 <main class="container-xl px-3 px-sm-4 py-4">
 
     <section class="text-center py-5 my-2 position-relative">
