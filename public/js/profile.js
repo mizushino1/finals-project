@@ -40,18 +40,16 @@ let artworkCurrentPage = 1;
  * @param {number} page
  */
 function loadArtworks(accountId, page) {
-    const grid       = document.getElementById('artworks-grid');
+    const grid         = document.getElementById('artworks-grid');
     const paginationEl = document.getElementById('artworks-pagination');
-    const loading    = document.getElementById('artworks-loading');
+    const loading      = document.getElementById('artworks-loading');
 
     if (!grid) return;
 
     artworkCurrentPage = page;
 
-    // Show spinner
     if (loading) loading.style.display = 'block';
 
-    // Clear previous cards and any empty-state message
     grid.querySelectorAll('.artwork-card-col, .artworks-empty').forEach(el => el.remove());
 
     const perPage = 12;
@@ -80,10 +78,15 @@ function loadArtworks(accountId, page) {
                 const col = document.createElement('div');
                 col.className = 'col artwork-card-col';
                 col.innerHTML = buildArtworkCard(artwork);
+
+                col.querySelector('.artwork-card').addEventListener('click', function () {
+                    const data = JSON.parse(this.getAttribute('data-artwork'));
+                    openArtworkModal(data);
+                });
+
                 grid.appendChild(col);
             });
 
-            // Pagination
             if (paginationEl) {
                 renderArtworkPagination(paginationEl, result.pages, page, accountId);
             }
@@ -100,24 +103,27 @@ function loadArtworks(accountId, page) {
  */
 function buildArtworkCard(artwork) {
     const imgSrc = window.BASE_URL + escapeHtml(artwork.image_url);
-    const date   = artwork.uploaded_at
+    const date = artwork.uploaded_at
         ? new Date(artwork.uploaded_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
         : '';
+    const title = escapeHtml(artwork.title || 'Untitled');
 
     return `
-        <div class="card h-100 artwork-card border-0 shadow-sm">
+        <div class="card h-100 artwork-card border-0 shadow-sm"
+             style="cursor:pointer;"
+             data-artwork='${JSON.stringify(artwork).replace(/'/g, "&#39;")}'>
             <div class="artwork-card-img-wrap"
                  style="aspect-ratio:1/1;overflow:hidden;background:#f0f0f0;">
                 <img src="${imgSrc}"
-                     alt="Artwork"
+                     alt="${title}"
                      loading="lazy"
                      class="card-img-top"
                      style="width:100%;height:100%;object-fit:cover;"
                      onerror="this.src='${window.BASE_URL}public/img/placeholder-artwork.png'">
             </div>
-            ${date ? `<div class="card-footer py-1 px-2 bg-transparent border-0">
-                <small class="text-muted">${date}</small>
-            </div>` : ''}
+            <div class="card-body p-2">
+                <p class="mb-0 small fw-semibold text-truncate" title="${title}">${title}</p>
+            </div>
         </div>`;
 }
 
@@ -173,7 +179,7 @@ function renderArtworkPagination(container, totalPages, currentPage, accountId) 
     // Show at most 5 page links centered around current
     const delta = 2;
     let start = Math.max(1, currentPage - delta);
-    let end   = Math.min(totalPages, currentPage + delta);
+    let end = Math.min(totalPages, currentPage + delta);
 
     if (start > 1) {
         addPage('1', 1, false, false);
@@ -209,8 +215,8 @@ function initUploadArtworkModal() {
     const editBtn = document.querySelector('a[href*="edit.php"]');
     if (editBtn && !document.getElementById('btn-upload-artwork')) {
         const uploadBtn = document.createElement('button');
-        uploadBtn.id        = 'btn-upload-artwork';
-        uploadBtn.type      = 'button';
+        uploadBtn.id = 'btn-upload-artwork';
+        uploadBtn.type = 'button';
         uploadBtn.className = 'btn btn-primary ms-2';
         uploadBtn.innerHTML = '<i class="fas fa-upload me-1"></i> Upload Artwork';
         uploadBtn.addEventListener('click', () => openUploadModal());
@@ -233,6 +239,57 @@ function initUploadArtworkModal() {
     if (fileInput) {
         fileInput.addEventListener('change', handleArtworkPreview);
     }
+}
+
+function openArtworkModal(artwork) {
+    // Inject modal if not already present
+    if (!document.getElementById('artworkViewModal')) {
+        document.body.insertAdjacentHTML('beforeend', `
+            <div class="modal fade" id="artworkViewModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header border-0 pb-0">
+                            <h5 class="modal-title fw-bold" id="artworkViewTitle"></h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <img id="artworkViewImg" src="" alt=""
+                                 class="img-fluid rounded mb-3 d-block mx-auto"
+                                 style="max-height:480px;object-fit:contain;width:100%;">
+                            <p id="artworkViewDesc" class="text-muted mb-2"></p>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-user me-1"></i>
+                                    <span id="artworkViewArtist"></span>
+                                </small>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    <span id="artworkViewDate"></span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>`);
+    }
+
+    // Populate fields
+    const title    = artwork.title       || 'Untitled';
+    const desc     = artwork.description || 'No description provided.';
+    const artist   = artwork.username    || 'Unknown Artist';
+    const date     = artwork.uploaded_at
+        ? new Date(artwork.uploaded_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+        : 'Unknown date';
+    const imgSrc   = window.BASE_URL + artwork.image_url;
+
+    document.getElementById('artworkViewTitle').textContent  = title;
+    document.getElementById('artworkViewImg').src            = imgSrc;
+    document.getElementById('artworkViewImg').alt            = title;
+    document.getElementById('artworkViewDesc').textContent   = desc;
+    document.getElementById('artworkViewArtist').textContent = artist;
+    document.getElementById('artworkViewDate').textContent   = date;
+
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('artworkViewModal')).show();
 }
 
 function buildUploadModalHTML() {
@@ -333,7 +390,7 @@ function handleArtworkPreview(event) {
     if (!file) return;
 
     const wrap = document.getElementById('artwork-preview-wrap');
-    const img  = document.getElementById('artwork-preview-img');
+    const img = document.getElementById('artwork-preview-img');
 
     const reader = new FileReader();
     reader.onload = e => {
@@ -358,53 +415,53 @@ function handleArtworkUpload(event) {
         return;
     }
 
-    const spinner   = document.getElementById('upload-spinner');
+    const spinner = document.getElementById('upload-spinner');
     const confirmBtn = document.getElementById('btn-confirm-upload');
-    if (spinner)    spinner.classList.remove('d-none');
+    if (spinner) spinner.classList.remove('d-none');
     if (confirmBtn) confirmBtn.disabled = true;
 
     setUploadAlert('', '');
 
     const formData = new FormData();
-    formData.append('artwork',      fileInput.files[0]);
-    formData.append('title',        titleInput.value.trim());
-    formData.append('description',  document.getElementById('artwork-description')?.value.trim() || '');
+    formData.append('artwork', fileInput.files[0]);
+    formData.append('title', titleInput.value.trim());
+    formData.append('description', document.getElementById('artwork-description')?.value.trim() || '');
 
     fetch(`${window.BASE_URL}api/profile/upload_artwork.php`, {
         method: 'POST',
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
         body: formData
     })
-    .then(res => {
-        if (!res.ok) throw new Error('Server returned an error response');
-        return res.json();
-    })
-    .then(result => {
-        if (result.success) {
-            setUploadAlert('Artwork uploaded successfully!', 'success');
+        .then(res => {
+            if (!res.ok) throw new Error('Server returned an error response');
+            return res.json();
+        })
+        .then(result => {
+            if (result.success) {
+                setUploadAlert('Artwork uploaded successfully!', 'success');
 
-            // Refresh the artworks grid
-            const grid = document.getElementById('artworks-grid');
-            const accountId = parseInt(grid?.getAttribute('data-account-id'), 10) || 0;
-            if (accountId) {
-                setTimeout(() => {
-                    loadArtworks(accountId, 1);
-                    const modalEl = document.getElementById('uploadArtworkModal');
-                    bootstrap.Modal.getInstance(modalEl)?.hide();
-                }, 800);
+                // Refresh the artworks grid
+                const grid = document.getElementById('artworks-grid');
+                const accountId = parseInt(grid?.getAttribute('data-account-id'), 10) || 0;
+                if (accountId) {
+                    setTimeout(() => {
+                        loadArtworks(accountId, 1);
+                        const modalEl = document.getElementById('uploadArtworkModal');
+                        bootstrap.Modal.getInstance(modalEl)?.hide();
+                    }, 800);
+                }
+            } else {
+                setUploadAlert(result.message || 'Upload failed. Please try again.', 'danger');
             }
-        } else {
-            setUploadAlert(result.message || 'Upload failed. Please try again.', 'danger');
-        }
-    })
-    .catch(err => {
-        console.error('Upload error:', err);
-        setUploadAlert('An unexpected error occurred. Please try again.', 'danger');
-    })
-    .finally(() => {
-        if (spinner)    spinner.classList.add('d-none');
-        if (confirmBtn) confirmBtn.disabled = false;
-    });
+        })
+        .catch(err => {
+            console.error('Upload error:', err);
+            setUploadAlert('An unexpected error occurred. Please try again.', 'danger');
+        })
+        .finally(() => {
+            if (spinner) spinner.classList.add('d-none');
+            if (confirmBtn) confirmBtn.disabled = false;
+        });
 }
 
 function setUploadAlert(message, type) {
@@ -424,9 +481,9 @@ function setUploadAlert(message, type) {
 ═══════════════════════════════════════════════════════════════ */
 
 function handleFollowToggle(event) {
-    const button      = event.currentTarget;
-    const artistId    = parseInt(button.getAttribute('data-artist-id'), 10) || null;
-    const userId      = parseInt(button.getAttribute('data-user-id'), 10)   || null;
+    const button = event.currentTarget;
+    const artistId = parseInt(button.getAttribute('data-artist-id'), 10) || null;
+    const userId = parseInt(button.getAttribute('data-user-id'), 10) || null;
     const isFollowing = button.getAttribute('data-following') === '1';
 
     button.disabled = true;
@@ -439,52 +496,53 @@ function handleFollowToggle(event) {
         },
         body: JSON.stringify({
             artist_id: artistId,
-            user_id:   userId,
-            action:    isFollowing ? 'unfollow' : 'follow'
+            user_id: userId,
+            action: isFollowing ? 'unfollow' : 'follow'
         })
     })
-    .then(res => {
-        if (!res.ok) throw new Error('Network error');
-        return res.json();
-    })
-    .then(result => {
-        if (result.success) {
-            if (isFollowing) {
-                button.setAttribute('data-following', '0');
-                button.className = 'btn btn-follow';
-                button.innerHTML = '<i class="fas fa-plus me-1"></i> Follow';
-            } else {
-                button.setAttribute('data-following', '1');
-                button.className = 'btn btn-success';
-                button.innerHTML = '<i class="fas fa-check me-1"></i> Following';
-            }
-
-            // Update the viewed profile's Followers count
-            const followersEl = document.getElementById('stat-followers');
-            if (followersEl) {
-                let count = parseInt(followersEl.innerText.replace(/,/g, ''), 10) || 0;
-                count = isFollowing ? Math.max(0, count - 1) : count + 1;
-                followersEl.innerText = count.toLocaleString();
-            }
-
-            // Update the viewer's own Following count (returned live from the server)
-            if (result.following_count !== undefined) {
-                const followingEl = document.getElementById('stat-following');
-                if (followingEl) {
-                    followingEl.innerText = result.following_count.toLocaleString();
+        .then(res => {
+            if (!res.ok) throw new Error('Network error');
+            return res.json();
+        })
+        .then(result => {
+            if (result.success) {
+                if (isFollowing) {
+                    button.setAttribute('data-following', '0');
+                    button.className = 'btn btn-follow';
+                    button.innerHTML = '<i class="fas fa-plus me-1"></i> Follow';
+                } else {
+                    button.setAttribute('data-following', '1');
+                    button.className = 'btn btn-success';
+                    button.innerHTML = '<i class="fas fa-check me-1"></i> Following';
                 }
+
+                // Update the viewed profile's Followers count
+                const followersEl = document.getElementById('stat-followers');
+                if (followersEl) {
+                    let count = parseInt(followersEl.innerText.replace(/,/g, ''), 10) || 0;
+                    count = isFollowing ? Math.max(0, count - 1) : count + 1;
+                    followersEl.innerText = count.toLocaleString();
+                }
+
+                // Only update Following stat if we're on our own profile page
+                if (result.following_count !== undefined &&
+                    window.VIEWER_ACCOUNT_ID === window.PROFILE_ACCOUNT_ID) {
+                    const followingEl = document.getElementById('stat-following');
+                    if (followingEl) {
+                        followingEl.innerText = result.following_count.toLocaleString();
+                    }
+                }
+            } else {
+                alert(result.message || 'An error occurred.');
             }
-        } else {
-            alert(result.message || 'An error occurred.');
-        }
-    })
-    .catch(err => {
-        console.error('Follow toggle failed:', err);
-        alert('Could not update follow status. Please check your connection.');
-    })
-    .finally(() => {
-        button.disabled = false;
-    });
+        })
+        .catch(err => {
+            console.error('Follow toggle failed:', err);
+            alert('Could not update follow status. Please check your connection.');
+        })
+        .finally(() => {
+            button.disabled = false;
+        });
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -497,7 +555,7 @@ function initTabListeners() {
             const target = event.target.getAttribute('data-bs-target');
 
             if (target === '#pane-artworks') {
-                const grid      = document.getElementById('artworks-grid');
+                const grid = document.getElementById('artworks-grid');
                 const accountId = parseInt(grid?.getAttribute('data-account-id'), 10) || 0;
                 if (accountId) loadArtworks(accountId, artworkCurrentPage);
             }
@@ -517,8 +575,8 @@ function initTabListeners() {
 ═══════════════════════════════════════════════════════════════ */
 
 function loadReviews(accountId, page) {
-    const pane       = document.getElementById('pane-reviews');
-    const list       = document.getElementById('reviews-list');
+    const pane = document.getElementById('pane-reviews');
+    const list = document.getElementById('reviews-list');
     const pagination = document.getElementById('reviews-pagination');
     if (!list || !accountId) return;
 
@@ -597,7 +655,7 @@ function buildReviewCard(r) {
 ═══════════════════════════════════════════════════════════════ */
 
 function checkForExtendedProfileData() {
-    const isEditPage             = window.location.pathname.includes('edit.php');
+    const isEditPage = window.location.pathname.includes('edit.php');
     const isOwnProfileNoFollowBtn = !document.getElementById('btn-follow-action');
 
     if (!isEditPage && !isOwnProfileNoFollowBtn) return;

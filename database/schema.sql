@@ -454,3 +454,16 @@ CREATE TABLE review_tbl (
         REFERENCES commission_tbl(commission_id)
         ON DELETE SET NULL
 );
+
+CREATE TABLE artwork_tbl (
+    artwork_id   INT AUTO_INCREMENT PRIMARY KEY,
+    image_id     INT NOT NULL UNIQUE,
+    title        VARCHAR(255) NOT NULL DEFAULT 'Untitled',
+    description  TEXT NULL,
+    created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (image_id)
+        REFERENCES image_tbl(image_id)
+        ON DELETE CASCADE
+);

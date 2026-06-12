@@ -160,7 +160,7 @@ try {
             </div>
 
             <div class="profile-stat">
-                <span class="profile-stat-value" id="stat-following"><?php echo number_format($viewer_following_count); ?></span>
+                <span class="profile-stat-value" id="stat-following"> <?php echo number_format($profile['following_count'] ?? 0); ?></span>
                 <span class="profile-stat-label">Following</span>
             </div>
 

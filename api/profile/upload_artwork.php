@@ -128,6 +128,12 @@ try {
         VALUES (?, ?)
     ');
     $stmt->execute([$portfolio_id, $relUrl]);
+    // After inserting into image_tbl and getting $image_id:
+    $stmt = $db->prepare('
+    INSERT INTO artworks_tbl (image_id, title, description)
+    VALUES (?, ?, ?)
+');
+    $stmt->execute([$image_id, $title, $description]);
 
     $db->commit();
 
@@ -137,7 +143,6 @@ try {
         'image_url' => $relUrl,
         'image_id'  => (int) $image_id,
     ]);
-
 } catch (Exception $e) {
     if (isset($db) && $db->inTransaction()) {
         $db->rollBack();

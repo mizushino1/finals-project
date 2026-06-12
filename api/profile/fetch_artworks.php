@@ -67,27 +67,30 @@ try {
 
     // Paginated artworks
     $fetchParams   = array_merge($params, [$per_page, $offset]);
-    $artworkStmt   = $db->prepare("
-        SELECT
-            img.image_id,
-            img.image_url,
-            img.uploaded_at,
-            a.username,
-            a.account_id
-        FROM image_tbl img
-        JOIN account_tbl a ON (
-            (img.artist_id IS NOT NULL AND img.artist_id = (
-                SELECT art2.artist_id FROM artist_tbl art2 WHERE art2.account_id = a.account_id LIMIT 1
-            ))
-            OR
-            (img.user_id IS NOT NULL AND img.user_id = (
-                SELECT u2.user_id FROM user_tbl u2 WHERE u2.account_id = a.account_id LIMIT 1
-            ))
-        )
-        WHERE {$where}
-        ORDER BY img.uploaded_at DESC
-        LIMIT ? OFFSET ?
-    ");
+    $artworkStmt = $db->prepare("
+    SELECT
+        img.image_id,
+        img.image_url,
+        img.uploaded_at,
+        a.username,
+        a.account_id,
+        COALESCE(art.title, 'Untitled')  AS title,
+        art.description
+    FROM image_tbl img
+    JOIN account_tbl a ON (
+        (img.artist_id IS NOT NULL AND img.artist_id = (
+            SELECT art2.artist_id FROM artist_tbl art2 WHERE art2.account_id = a.account_id LIMIT 1
+        ))
+        OR
+        (img.user_id IS NOT NULL AND img.user_id = (
+            SELECT u2.user_id FROM user_tbl u2 WHERE u2.account_id = a.account_id LIMIT 1
+        ))
+    )
+    LEFT JOIN artworks_tbl art ON art.image_id = img.image_id
+    WHERE {$where}
+    ORDER BY img.uploaded_at DESC
+    LIMIT ? OFFSET ?
+");
     $artworkStmt->execute($fetchParams);
     $artworks = $artworkStmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -99,7 +102,6 @@ try {
         'per_page' => $per_page,
         'pages'    => (int) ceil($total / $per_page),
     ]);
-
 } catch (PDOException $e) {
     echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
 }
