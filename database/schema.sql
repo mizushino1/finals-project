@@ -455,7 +455,7 @@ CREATE TABLE review_tbl (
         ON DELETE SET NULL
 );
 
-CREATE TABLE artwork_tbl (
+CREATE TABLE artworks_tbl (
     artwork_id   INT AUTO_INCREMENT PRIMARY KEY,
     image_id     INT NOT NULL UNIQUE,
     title        VARCHAR(255) NOT NULL DEFAULT 'Untitled',
