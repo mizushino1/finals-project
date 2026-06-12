@@ -40,9 +40,9 @@ let artworkCurrentPage = 1;
  * @param {number} page
  */
 function loadArtworks(accountId, page) {
-    const grid         = document.getElementById('artworks-grid');
+    const grid = document.getElementById('artworks-grid');
     const paginationEl = document.getElementById('artworks-pagination');
-    const loading      = document.getElementById('artworks-loading');
+    const loading = document.getElementById('artworks-loading');
 
     if (!grid) return;
 
@@ -53,7 +53,7 @@ function loadArtworks(accountId, page) {
     grid.querySelectorAll('.artwork-card-col, .artworks-empty').forEach(el => el.remove());
 
     const perPage = 12;
-    const url     = `${window.BASE_URL}api/profile/fetch_artworks.php?account_id=${accountId}&page=${page}&per_page=${perPage}`;
+    const url = `${window.BASE_URL}api/profile/fetch_artworks.php?account_id=${accountId}&page=${page}&per_page=${perPage}`;
 
     fetch(url)
         .then(res => {
@@ -107,22 +107,32 @@ function buildArtworkCard(artwork) {
         ? new Date(artwork.uploaded_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
         : '';
     const title = escapeHtml(artwork.title || 'Untitled');
+    const artist = escapeHtml(artwork.artist_name || 'Unknown');
 
     return `
-        <div class="card h-100 artwork-card border-0 shadow-sm"
-             style="cursor:pointer;"
+        <div class="card artwork-card border-0 theme-border"
+             style="cursor:pointer; background: var(--clr-bg-card); transition: all 0.3s ease; border-radius: var(--radius-md);"
+             onmouseover="this.style.borderColor='var(--clr-gold)'; this.style.transform='translateY(-5px)';"
+             onmouseout="this.style.borderColor='transparent'; this.style.transform='translateY(0)';"
              data-artwork='${JSON.stringify(artwork).replace(/'/g, "&#39;")}'>
-            <div class="artwork-card-img-wrap"
-                 style="aspect-ratio:1/1;overflow:hidden;background:#f0f0f0;">
+             
+            <!-- Image Area -->
+            <div class="artwork-card-img-wrap" style="aspect-ratio: 1/1; overflow: hidden; border-bottom: 2px solid var(--clr-gold);">
                 <img src="${imgSrc}"
                      alt="${title}"
                      loading="lazy"
                      class="card-img-top"
-                     style="width:100%;height:100%;object-fit:cover;"
+                     style="width:100%; height:100%; object-fit:cover;"
                      onerror="this.src='${window.BASE_URL}public/img/placeholder-artwork.png'">
             </div>
-            <div class="card-body p-2">
-                <p class="mb-0 small fw-semibold text-truncate" title="${title}">${title}</p>
+            
+            <!-- Metadata Area -->
+            <div class="card-body p-3">
+                <h6 class="mb-1 text-white fw-bold text-truncate" style="font-family: 'Joan', serif;">${title}</h6>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <span class="text-secondary" style="font-size: 0.8rem;">${artist}</span>
+                    <span class="text-secondary" style="font-size: 0.75rem;">${date}</span>
+                </div>
             </div>
         </div>`;
 }
@@ -245,49 +255,77 @@ function openArtworkModal(artwork) {
     // Inject modal if not already present
     if (!document.getElementById('artworkViewModal')) {
         document.body.insertAdjacentHTML('beforeend', `
-            <div class="modal fade" id="artworkViewModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-lg modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header border-0 pb-0">
-                            <h5 class="modal-title fw-bold" id="artworkViewTitle"></h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal fade" id="artworkViewModal" tabindex="-1" aria-hidden="true">
+            <!-- Increased max-width significantly for a wider landscape layout -->
+            <div class="modal-dialog modal-xl modal-dialog-centered" style="min-width: 750px;">
+                <div class="modal-content" style="background: var(--clr-bg-card); border: 2px solid var(--clr-gold); border-radius: var(--radius-lg); overflow: hidden;">
+                    
+                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" 
+                            data-bs-dismiss="modal" aria-label="Close" style="z-index: 10;"></button>
+                    
+                    <div class="row g-0">
+                        <!-- Image Column -->
+                        <div class="col-lg-7 d-flex align-items-center justify-content-center" style="background: var(--clr-bg-alt);">
+                            <img id="artworkViewImg" src="" alt="" 
+                                 class="img-fluid" 
+                                 style="max-width: 100%; max-height: 550px; object-fit: contain; padding: 40px;">
                         </div>
-                        <div class="modal-body">
-                            <img id="artworkViewImg" src="" alt=""
-                                 class="img-fluid rounded mb-3 d-block mx-auto"
-                                 style="max-height:480px;object-fit:contain;width:100%;">
-                            <p id="artworkViewDesc" class="text-muted mb-2"></p>
-                            <div class="d-flex justify-content-between align-items-center mt-2">
-                                <small class="text-muted">
-                                    <i class="fas fa-user me-1"></i>
-                                    <span id="artworkViewArtist"></span>
-                                </small>
-                                <small class="text-muted">
-                                    <i class="fas fa-calendar me-1"></i>
-                                    <span id="artworkViewDate"></span>
-                                </small>
+                        
+                        <!-- Content Column -->
+                        <div class="col-lg-5 d-flex flex-column">
+                            <div class="p-4 p-md-5 flex-grow-1 d-flex flex-column justify-content-center">
+                                
+                                <div class="mb-4">
+                                    <h2 id="artworkViewTitle" class="joan mb-1" style="color: var(--clr-text-primary); font-size: 2.2rem;"></h2>
+                                    <div style="width: 60px; height: 3px; background: var(--clr-gold);"></div>
+                                </div>
+
+                                <div class="mb-5">
+                                    <p id="artworkViewDesc" class="text-secondary" style="line-height: 1.8; font-size: 1.05rem;"></p>
+                                </div>
+                                
+                                <!-- Metadata Grid: Forced to stay side-by-side -->
+                                <div class="mt-auto border-top pt-4" style="border-color: var(--clr-border) !important;">
+                                    <div class="d-flex flex-row justify-content-start gap-5">
+                                        <div>
+                                            <p class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.65rem; letter-spacing: 0.15em;">Artist</p>
+                                            <div class="d-flex align-items-center text-nowrap">
+                                                <i class="bi bi-person-fill" style="color: var(--clr-gold); font-size: 1.1rem;"></i>
+                                                <span id="artworkViewArtist" class="ms-2 text-white fw-medium"></span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <p class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.65rem; letter-spacing: 0.15em;">Uploaded</p>
+                                            <div class="d-flex align-items-center text-nowrap">
+                                                <i class="bi bi-calendar-event" style="color: var(--clr-gold); font-size: 1rem;"></i>
+                                                <span id="artworkViewDate" class="ms-2 text-white fw-medium"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>`);
+            </div>
+        </div>`);
     }
 
     // Populate fields
-    const title    = artwork.title       || 'Untitled';
-    const desc     = artwork.description || 'No description provided.';
-    const artist   = artwork.username    || 'Unknown Artist';
-    const date     = artwork.uploaded_at
+    const title = artwork.title || 'Untitled';
+    const desc = artwork.description || 'No description provided.';
+    const artist = artwork.username || 'Unknown Artist';
+    const date = artwork.uploaded_at
         ? new Date(artwork.uploaded_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
         : 'Unknown date';
-    const imgSrc   = window.BASE_URL + artwork.image_url;
+    const imgSrc = window.BASE_URL + artwork.image_url;
 
-    document.getElementById('artworkViewTitle').textContent  = title;
-    document.getElementById('artworkViewImg').src            = imgSrc;
-    document.getElementById('artworkViewImg').alt            = title;
-    document.getElementById('artworkViewDesc').textContent   = desc;
+    document.getElementById('artworkViewTitle').textContent = title;
+    document.getElementById('artworkViewImg').src = imgSrc;
+    document.getElementById('artworkViewImg').alt = title;
+    document.getElementById('artworkViewDesc').textContent = desc;
     document.getElementById('artworkViewArtist').textContent = artist;
-    document.getElementById('artworkViewDate').textContent   = date;
+    document.getElementById('artworkViewDate').textContent = date;
 
     bootstrap.Modal.getOrCreateInstance(document.getElementById('artworkViewModal')).show();
 }
