@@ -251,7 +251,7 @@ try {
             <!-- ── Artworks pane ───────────────────────────────── -->
             <div class="tab-pane fade show active" id="pane-artworks" role="tabpanel">
                 <div id="artworks-grid"
-                     class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-3"
+                     class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-3 justify-content-center"
                      data-account-id="<?php echo $profile_account_id; ?>">
                     <!-- Populated by profile.js -->
                     <div class="col-12 text-center py-5 text-muted" id="artworks-loading">
