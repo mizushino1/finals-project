@@ -213,21 +213,10 @@
     font-size: 0.80rem;
     letter-spacing: 0.06em;
     padding: 8px 20px;
-    background: var(--clr-gold);
-    color: var(--clr-text-primary);
-    border: none;
-    border-radius: var(--radius-sm);
-    transition:
-        background var(--transition-base),
-        transform  var(--transition-base),
-        box-shadow var(--transition-base);
 }
 
 #btn-upload-artwork:hover {
-    background: var(--clr-gold-dark);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(201, 168, 108, 0.28);
-    color: var(--clr-text-primary);
 }
 
 /* ── Notify bell ───────────────────────────────────────────── */

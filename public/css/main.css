@@ -385,7 +385,8 @@ p, .roboto {
         background var(--transition-base),
         color var(--transition-base),
         transform var(--transition-slow),
-        box-shadow var(--transition-slow);
+        box-shadow var(--transition-slow),
+        border var(--transition-slow);
     cursor: pointer;
 }
 .btn-fill-static:hover {
@@ -393,6 +394,7 @@ p, .roboto {
     color: #f5ede0;
     transform: translateY(-5px);
     box-shadow: var(--shadow-lg);
+    border: 2px solid var(--clr-border-strong);
 }
 
 /* Gradient fill */

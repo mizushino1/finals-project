@@ -164,12 +164,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="d-flex gap-2 w-100">
                         <button type="button" 
-                                class="btn btn-sm btn-outline-danger decline-artist-btn flex-grow-1 py-1 fs-fluid-xs rounded-2"
+                                class="btn btn-sm btn-outline decline-artist-btn flex-grow-1 py-1 fs-fluid-xs rounded-2"
                                 data-request-id="${c.request_id}">
                                 Decline
                         </button>
                         <button type="button" 
-                                class="btn btn-sm btn-success assign-artist-btn flex-grow-1 py-1 fs-fluid-xs rounded-2"
+                                class="btn btn-sm btn-fill assign-artist-btn flex-grow-1 py-1 fs-fluid-xs rounded-2"
                                 data-commission-id="${c.commission_id}" 
                                 data-request-id="${c.request_id}">
                                 Accept
@@ -353,12 +353,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         <div class="d-flex gap-2">
                             <button type="button"
-                                    class="btn btn-sm btn-outline-danger decline-artist-btn flex-grow-1 py-1 fs-fluid-xs rounded-2"
+                                    class="btn btn-sm btn-outline decline-artist-btn flex-grow-1 py-1 fs-fluid-xs rounded-2"
                                     data-request-id="${r.request_id}">
                                 Decline
                             </button>
                             <button type="button"
-                                    class="btn btn-sm btn-success assign-artist-btn flex-grow-1 py-1 fs-fluid-xs rounded-2"
+                                    class="btn btn-sm btn-fill-static assign-artist-btn flex-grow-1 py-1 fs-fluid-xs rounded-2"
                                     data-commission-id="${r.commission_id}"
                                     data-request-id="${r.request_id}">
                                 Accept

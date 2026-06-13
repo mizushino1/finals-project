@@ -227,10 +227,12 @@ function renderArtworkPagination(container, totalPages, currentPage, accountId) 
 ═══════════════════════════════════════════════════════════════ */
 
 function initUploadArtworkModal() {
-    // Only inject the modal + button if the "Edit Account Settings" link is present
-    // (meaning this is the owner's own profile) AND there's no upload modal yet.
+    // 1. Ensure the user is viewing their own profile page context
     const isOwnProfile = !!document.getElementById('btn-edit-profile');
     if (!isOwnProfile) return;
+
+    // 2. Strict Role Verification: Exits immediately if the logged-in account isn't an artist
+    if (!window.IS_ARTIST) return;
 
     // Insert "Upload Artwork" button next to "Edit Account Settings"
     const editBtn = document.getElementById('btn-edit-profile');
@@ -238,13 +240,13 @@ function initUploadArtworkModal() {
         const uploadBtn = document.createElement('button');
         uploadBtn.id = 'btn-upload-artwork';
         uploadBtn.type = 'button';
-        uploadBtn.className = 'btn btn-primary ms-2';
+        uploadBtn.className = 'btn btn-fill-static ms-2';
         uploadBtn.innerHTML = '<i class="fas fa-upload me-1"></i> Upload Artwork';
         uploadBtn.addEventListener('click', () => openUploadModal());
         editBtn.parentNode.insertBefore(uploadBtn, editBtn.nextSibling);
     }
 
-    // Inject modal HTML once
+    // Inject modal HTML once if missing
     if (!document.getElementById('uploadArtworkModal')) {
         document.body.insertAdjacentHTML('beforeend', buildUploadModalHTML());
     }
@@ -436,7 +438,7 @@ function buildUploadModalHTML() {
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-primary" id="btn-confirm-upload">
+            <button type="button" class="btn btn-fill-static" id="btn-confirm-upload">
                 <span id="upload-spinner" class="spinner-border spinner-border-sm me-1 d-none" role="status"></span>
                 Upload
             </button>

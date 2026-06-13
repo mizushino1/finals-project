@@ -470,5 +470,6 @@ try {
     window.PROFILE_ACCOUNT_ID = <?php echo $profile_account_id; ?>;
     window.BASE_URL            = '<?php echo BASE_URL; ?>';
     window.IS_OWN_USER_PROFILE = <?php echo $is_own_user_profile ? 'true' : 'false'; ?>;
+    window.IS_ARTIST           = <?php echo (isset($_SESSION['role']) && strtolower($_SESSION['role']) === 'artist') ? 'true' : 'false'; ?>;
 </script>
 <script src="<?php echo BASE_URL; ?>public/js/profile.js"></script>
