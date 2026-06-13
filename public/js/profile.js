@@ -1,3 +1,8 @@
+// Fallback in case this page didn't define window.BASE_URL via an inline script
+if (typeof window.BASE_URL === 'undefined' || window.BASE_URL === null) {
+    window.BASE_URL = './';
+}
+
 document.addEventListener('DOMContentLoaded', function () {
 
     /* ─── Follow button ───────────────────────────────────────── */
@@ -26,6 +31,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     /* ─── Upload artwork modal (artists only) ────────────────── */
     initUploadArtworkModal();
+
+    /* ─── My Commissions tab (own user profile) ─────────────── */
+    if (window.IS_OWN_USER_PROFILE) {
+        initProfileCommissionsTab();
+        initPostCommissionModal();
+    }
 });
 
 /* ═══════════════════════════════════════════════════════════════
@@ -218,11 +229,11 @@ function renderArtworkPagination(container, totalPages, currentPage, accountId) 
 function initUploadArtworkModal() {
     // Only inject the modal + button if the "Edit Account Settings" link is present
     // (meaning this is the owner's own profile) AND there's no upload modal yet.
-    const isOwnProfile = !!document.querySelector('a[href*="edit.php"]');
+    const isOwnProfile = !!document.getElementById('btn-edit-profile');
     if (!isOwnProfile) return;
 
     // Insert "Upload Artwork" button next to "Edit Account Settings"
-    const editBtn = document.querySelector('a[href*="edit.php"]');
+    const editBtn = document.getElementById('btn-edit-profile');
     if (editBtn && !document.getElementById('btn-upload-artwork')) {
         const uploadBtn = document.createElement('button');
         uploadBtn.id = 'btn-upload-artwork';
@@ -255,52 +266,89 @@ function openArtworkModal(artwork) {
     // Inject modal if not already present
     if (!document.getElementById('artworkViewModal')) {
         document.body.insertAdjacentHTML('beforeend', `
-        <div class="modal fade" id="artworkViewModal" tabindex="-1" aria-hidden="true">
-            <!-- Increased max-width significantly for a wider landscape layout -->
-            <div class="modal-dialog modal-xl modal-dialog-centered" style="min-width: 750px;">
-                <div class="modal-content" style="background: var(--clr-bg-card); border: 2px solid var(--clr-gold); border-radius: var(--radius-lg); overflow: hidden;">
-                    
-                    <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" 
-                            data-bs-dismiss="modal" aria-label="Close" style="z-index: 10;"></button>
-                    
-                    <div class="row g-0">
-                        <!-- Image Column -->
-                        <div class="col-lg-7 d-flex align-items-center justify-content-center" style="background: var(--clr-bg-alt);">
-                            <img id="artworkViewImg" src="" alt="" 
-                                 class="img-fluid" 
-                                 style="max-width: 100%; max-height: 550px; object-fit: contain; padding: 40px;">
-                        </div>
-                        
-                        <!-- Content Column -->
-                        <div class="col-lg-5 d-flex flex-column">
-                            <div class="p-4 p-md-5 flex-grow-1 d-flex flex-column justify-content-center">
-                                
-                                <div class="mb-4">
-                                    <h2 id="artworkViewTitle" class="joan mb-1" style="color: var(--clr-text-primary); font-size: 2.2rem;"></h2>
-                                    <div style="width: 60px; height: 3px; background: var(--clr-gold);"></div>
-                                </div>
+<style>
+#artworkViewModal .modal-dialog {
+    max-width: min(1100px, 95vw) !important;
+    width: 100% !important;
+    margin: 0.5rem auto !important;
+}
+@media (min-width: 992px) {
+    #artworkViewModal .modal-dialog {
+        max-width: 800px !important;
+    }
+}
+    #artworkViewModal .artwork-img-col {
+        background: var(--clr-bg-alt);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 260px;
+    }
+    #artworkViewImg {
+        max-width: 100%;
+        max-height: 55vh;
+        object-fit: contain;
+        padding: 24px;
+    }
+    @media (min-width: 992px) {
+        #artworkViewImg {
+            max-height: 600px;
+            padding: 40px;
+        }
+    }
+    #artworkViewModal .artwork-meta-label {
+        font-size: 0.65rem;
+        letter-spacing: 0.15em;
+        white-space: nowrap;
+    }
+    #artworkViewModal .artwork-title {
+        font-size: clamp(1.4rem, 3vw, 2.2rem);
+    }
+    #artworkViewModal .artwork-meta-value {
+        white-space: nowrap;
+    }
+</style>
+<div class="modal fade" id="artworkViewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" style="background: var(--clr-bg-card); border: 2px solid var(--clr-gold); border-radius: var(--radius-lg); overflow: hidden;">
 
-                                <div class="mb-5">
-                                    <p id="artworkViewDesc" class="text-secondary" style="line-height: 1.8; font-size: 1.05rem;"></p>
+            <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3"
+                    data-bs-dismiss="modal" aria-label="Close" style="z-index: 10;"></button>
+
+            <div class="row g-0 flex-column flex-lg-row">
+                <!-- Image Column -->
+                <div class="col-12 col-lg-7 artwork-img-col">
+                    <img id="artworkViewImg" src="" alt="" class="img-fluid">
+                </div>
+
+                <!-- Content Column -->
+                <div class="col-12 col-lg-5 d-flex flex-column" style="min-width:0;">
+                    <div class="p-4 p-lg-5 flex-grow-1 d-flex flex-column justify-content-center">
+
+                        <div class="mb-3">
+                            <h2 id="artworkViewTitle" class="joan mb-1 artwork-title" style="color: var(--clr-text-primary);"></h2>
+                            <div style="width: 60px; height: 3px; background: var(--clr-gold);"></div>
+                        </div>
+
+                        <div class="mb-4">
+                            <p id="artworkViewDesc" class="text-secondary" style="line-height: 1.8; font-size: 1.05rem;"></p>
+                        </div>
+
+                        <!-- Metadata -->
+                        <div class="mt-auto border-top pt-3" style="border-color: var(--clr-border) !important;">
+                            <div class="d-flex flex-row justify-content-start gap-4">
+                                <div>
+                                    <p class="text-muted text-uppercase fw-bold mb-1 artwork-meta-label">Artist</p>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-person-fill" style="color: var(--clr-gold); font-size: 1.1rem;"></i>
+                                        <span id="artworkViewArtist" class="ms-2 text-white fw-medium artwork-meta-value"></span>
+                                    </div>
                                 </div>
-                                
-                                <!-- Metadata Grid: Forced to stay side-by-side -->
-                                <div class="mt-auto border-top pt-4" style="border-color: var(--clr-border) !important;">
-                                    <div class="d-flex flex-row justify-content-start gap-5">
-                                        <div>
-                                            <p class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.65rem; letter-spacing: 0.15em;">Artist</p>
-                                            <div class="d-flex align-items-center text-nowrap">
-                                                <i class="bi bi-person-fill" style="color: var(--clr-gold); font-size: 1.1rem;"></i>
-                                                <span id="artworkViewArtist" class="ms-2 text-white fw-medium"></span>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <p class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.65rem; letter-spacing: 0.15em;">Uploaded</p>
-                                            <div class="d-flex align-items-center text-nowrap">
-                                                <i class="bi bi-calendar-event" style="color: var(--clr-gold); font-size: 1rem;"></i>
-                                                <span id="artworkViewDate" class="ms-2 text-white fw-medium"></span>
-                                            </div>
-                                        </div>
+                                <div>
+                                    <p class="text-muted text-uppercase fw-bold mb-1 artwork-meta-label">Uploaded</p>
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-calendar-event" style="color: var(--clr-gold); font-size: 1rem;"></i>
+                                        <span id="artworkViewDate" class="ms-2 text-white fw-medium artwork-meta-value"></span>
                                     </div>
                                 </div>
                             </div>
@@ -308,7 +356,9 @@ function openArtworkModal(artwork) {
                     </div>
                 </div>
             </div>
-        </div>`);
+        </div>
+    </div>
+</div>`);
     }
 
     // Populate fields
@@ -725,6 +775,223 @@ function checkForExtendedProfileData() {
             }
         })
         .catch(err => console.warn('Avatar sync skipped:', err));
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MY COMMISSIONS TAB (own user profile)
+═══════════════════════════════════════════════════════════════ */
+
+let profileCommissionsLoaded = false;
+
+function initProfileCommissionsTab() {
+    const tabBtn = document.getElementById('tab-commissions');
+    if (!tabBtn) return;
+
+    tabBtn.addEventListener('shown.bs.tab', () => {
+        if (!profileCommissionsLoaded) {
+            loadProfileCommissions();
+        }
+    });
+
+    // If this tab is already active on page load (non-artist profiles),
+    // the 'shown.bs.tab' event never fires for it, so load now.
+    if (tabBtn.classList.contains('active')) {
+        loadProfileCommissions();
+    }
+}
+
+function loadProfileCommissions() {
+    const grid = document.getElementById('profileCommissionGrid');
+    const loading = document.getElementById('profileCommissionsLoading');
+    const errorEl = document.getElementById('profileCommissionsError');
+    const emptyEl = document.getElementById('profileCommissionsEmpty');
+    if (!grid) return;
+
+    if (errorEl) errorEl.classList.add('d-none');
+    if (emptyEl) emptyEl.classList.add('d-none');
+    if (loading) loading.style.display = 'block';
+
+    grid.querySelectorAll('.profile-commission-card-col').forEach(el => el.remove());
+
+    fetch(`${window.BASE_URL}api/commissions/fetch.php`)
+        .then(res => res.json())
+        .then(result => {
+            if (loading) loading.style.display = 'none';
+            profileCommissionsLoaded = true;
+
+            if (!result.success) {
+                if (errorEl) errorEl.classList.remove('d-none');
+                return;
+            }
+
+            const commissions = result.data || [];
+            if (commissions.length === 0) {
+                if (emptyEl) emptyEl.classList.remove('d-none');
+                return;
+            }
+
+            commissions.forEach(c => {
+                const col = document.createElement('div');
+                col.className = 'col profile-commission-card-col';
+                col.innerHTML = buildProfileCommissionCard(c);
+                grid.appendChild(col);
+            });
+        })
+        .catch(err => {
+            console.error('Profile commissions fetch error:', err);
+            if (loading) loading.style.display = 'none';
+            if (errorEl) errorEl.classList.remove('d-none');
+        });
+}
+
+function getCommissionStatusBadge(statusId) {
+    switch (parseInt(statusId)) {
+        case 1: return { text: 'Active', class: 'artist-card__badge--open' };
+        case 2: return { text: 'Pending', class: 'bg-warning text-dark border border-warning' };
+        case 3: return { text: 'Accepted', class: 'theme-fill text-dark border border-info' };
+        case 4: return { text: 'Rejected', class: 'artist-card__badge--closed' };
+        case 5: return { text: 'In Progress', class: 'theme-fill text-dark border border-primary' };
+        case 6: return { text: 'Completed', class: 'theme-fill text-dark border border-success' };
+        case 7: return { text: 'Cancelled', class: 'bg-danger text-white border border-secondary' };
+        default: return { text: 'Unknown', class: 'bg-dark text-white' };
+    }
+}
+
+function buildProfileCommissionCard(c) {
+    const status = getCommissionStatusBadge(c.status_id);
+    const budget = parseFloat(c.price ?? 0);
+    const budgetDisplay = budget > 0
+        ? `₱${budget.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`
+        : 'Open Budget';
+
+    const raw = (c.description ?? '').split('\n\n');
+    let title = '';
+    let body = raw.join('\n\n');
+    if (raw.length >= 2) {
+        title = raw[0].trim();
+        body = raw.slice(1).join('\n\n').trim();
+    }
+
+    const dateStr = c.commission_date
+        ? new Date(c.commission_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+        : 'Recent';
+
+    const category = c.category_name
+        ? `<span class="badge rounded-pill fs-fluid-xxs fw-semibold text-uppercase mb-2"
+                style="background:#e8d5b0; color:#a8834a; border:1px solid #a8834a33; letter-spacing:0.04em;">
+                ${escapeHtml(c.category_name)}
+           </span>`
+        : '';
+
+    return `
+        <div class="artist-card h-100 border rounded-3 d-flex flex-column shadow-sm bg-card p-3">
+            <div class="d-flex justify-content-between align-items-start mb-2 gap-2">
+                <small class="text-muted fs-fluid-xxs">${dateStr}</small>
+                <span class="artist-card__badge d-inline-flex flex-shrink-0 align-items-center fw-bold text-uppercase ${status.class}">
+                    ${status.text}
+                </span>
+            </div>
+            <div class="flex-grow-1 mb-3">
+                ${category}
+                ${title ? `<p class="m-0 fw-semibold fs-fluid-xs mb-1 text-truncate">${escapeHtml(title)}</p>` : ''}
+                <p class="text-muted small m-0" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;line-height:1.6;">
+                    ${escapeHtml(body)}
+                </p>
+            </div>
+            <div class="d-flex align-items-center justify-content-between pt-3 border-top mt-auto">
+                <div>
+                    <p class="m-0 text-muted fs-fluid-xxs text-uppercase" style="letter-spacing:0.05em;">Budget</p>
+                    <p class="m-0 fw-bold fs-fluid-sm">${budgetDisplay}</p>
+                </div>
+                <a href="${window.BASE_URL}commissions/manage?id=${c.commission_id}" class="btn-artovia-outline py-1 px-3 fs-fluid-xs rounded-2">Manage</a>
+            </div>
+        </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   POST COMMISSION MODAL (own user profile)
+═══════════════════════════════════════════════════════════════ */
+
+function initPostCommissionModal() {
+    const submitBtn = document.getElementById('submitCommissionBtn');
+    const titleInput = document.getElementById('commissionTitle');
+    const descInput = document.getElementById('commissionDescription');
+    const budgetInput = document.getElementById('commissionBudget');
+    const categoryInput = document.getElementById('commissionCategory');
+    const imageFile = document.getElementById('commissionImageFile');
+    const imageName = document.getElementById('commissionImageName');
+    const formAlert = document.getElementById('commissionFormAlert');
+
+    if (imageFile) {
+        imageFile.addEventListener('change', () => {
+            if (imageName) imageName.textContent = imageFile.files[0]?.name ?? '';
+        });
+    }
+
+    function showModalAlert(message, isSuccess) {
+        if (!formAlert) return;
+        formAlert.textContent = message;
+        formAlert.className = `alert fs-fluid-xs ${isSuccess ? 'alert-success' : 'alert-danger'}`;
+        formAlert.classList.remove('d-none');
+    }
+
+    function resetModal() {
+        if (titleInput) titleInput.value = '';
+        if (descInput) descInput.value = '';
+        if (budgetInput) budgetInput.value = '';
+        if (categoryInput) categoryInput.value = '';
+        if (imageFile) imageFile.value = '';
+        if (imageName) imageName.textContent = '';
+        if (formAlert) formAlert.classList.add('d-none');
+    }
+
+    if (submitBtn) {
+        submitBtn.addEventListener('click', async () => {
+            if (formAlert) formAlert.classList.add('d-none');
+
+            const title = titleInput?.value.trim() ?? '';
+            const description = descInput?.value.trim() ?? '';
+            const budget = parseFloat(budgetInput?.value ?? 0);
+            const category_id = parseInt(categoryInput?.value ?? 0);
+
+            if (!title) { showModalAlert('Please provide a commission name.', false); return; }
+            if (!description) { showModalAlert('Please provide a project description.', false); return; }
+            if (isNaN(budget) || budget <= 0) { showModalAlert('Please enter a valid budget higher than ₱0.', false); return; }
+            if (!category_id) { showModalAlert('Please select a category.', false); return; }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Posting…';
+
+            try {
+                const res = await fetch(`${window.BASE_URL}api/commissions/create.php`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, description, budget, category_id })
+                });
+                const data = await res.json();
+
+                if (data && data.success) {
+                    showModalAlert(data.message, true);
+                    setTimeout(() => {
+                        if (typeof bootstrap !== 'undefined') {
+                            bootstrap.Modal.getInstance(document.getElementById('postCommissionModal'))?.hide();
+                        }
+                        profileCommissionsLoaded = false;
+                        loadProfileCommissions();
+                    }, 1500);
+                } else {
+                    showModalAlert(data?.message || 'Something went wrong.', false);
+                }
+            } catch {
+                showModalAlert('Network error — please try again.', false);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Post Commission';
+            }
+        });
+    }
+
+    document.getElementById('postCommissionModal')?.addEventListener('hidden.bs.modal', resetModal);
 }
 
 /* ═══════════════════════════════════════════════════════════════

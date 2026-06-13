@@ -56,6 +56,32 @@ document.addEventListener('DOMContentLoaded', () => {
         ['#d0dce8', '#3a5a7a'], ['#e8d0e0', '#7a3a5a']
     ];
 
+    // ── Avatar helper ─────────────────────────────────────────
+    // Mirrors browse.js: shows a real photo when avatar_url is present,
+    // otherwise falls back to a coloured initials circle.
+    function makeAvatar(name, index, avatarUrl = null) {
+        const [bg, fg] = PALETTE[index % PALETTE.length];
+        if (avatarUrl) {
+            return `
+            <img src="${APP_BASE_URL}${avatarUrl}"
+                 class="rounded-circle flex-shrink-0 object-fit-cover"
+                 style="width:38px; height:38px; border:1px solid ${fg}33;"
+                 alt="${name}"
+                 onerror="this.replaceWith(this.nextElementSibling)"
+            >
+            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                 style="width:38px; height:38px; background:${bg}; border:1px solid ${fg}33; display:none!important;">
+                <span class="fs-fluid-sm fw-bold" style="font-family:var(--font-ui); color:${fg};">${(name.trim()[0] ?? '?').toUpperCase()}</span>
+            </div>`;
+        }
+        const letter = name.trim() ? name.trim()[0].toUpperCase() : '?';
+        return `
+            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                 style="width:38px; height:38px; background:${bg}; border:1px solid ${fg}33;">
+                <span class="fs-fluid-sm fw-bold" style="font-family:var(--font-ui); color:${fg};">${letter}</span>
+            </div>`;
+    }
+
     // ── Null-safe class helpers ───────────────────────────────
 
     function show(el) { el?.classList.remove('d-none'); }
@@ -87,7 +113,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function buildCard(c, index, compact = false) {
         const clientName = c.posted_by ?? 'Anonymous Client';
         const budget = parseFloat(c.price ?? 0);
-        const letter = clientName.trim() ? clientName.trim()[0].toUpperCase() : '?';
         const [bg, fg] = PALETTE[index % PALETTE.length];
         const status = getStatusConfig(c.status_id);
         const { title, body } = parseDescription(c.description);
@@ -101,11 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ? new Date(c.commission_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
             : 'Recent';
 
-        const avatarHtml = `
-            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
-                 style="width:38px; height:38px; background:${bg}; border:1px solid ${fg}33;">
-                <span class="fs-fluid-sm fw-bold" style="font-family:var(--font-ui); color:${fg};">${letter}</span>
-            </div>`;
+        const avatarHtml = makeAvatar(clientName, index, c.client_avatar_url ?? c.avatar_url ?? null);
 
         const categoryBadge = category
             ? `<span class="badge rounded-pill fs-fluid-xxs fw-semibold text-uppercase mb-2"
@@ -273,7 +294,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Builds a compact card for an inbound artist request
     function buildRequestCard(r, index) {
         const artistName = r.artist_username ?? 'Unknown Artist';
-        const letter = artistName.trim() ? artistName.trim()[0].toUpperCase() : '?';
         const [bg, fg] = PALETTE[index % PALETTE.length];
         const category = r.category_name ?? null;
         const pitch = r.pitch_message ? r.pitch_message.trim() : null;
@@ -288,11 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ? new Date(r.requested_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
             : 'Recently';
 
-        const avatarHtml = `
-            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
-                 style="width:38px; height:38px; background:${bg}; border:1px solid ${fg}33;">
-                <span class="fs-fluid-sm fw-bold" style="font-family:var(--font-ui); color:${fg};">${letter}</span>
-            </div>`;
+        const avatarHtml = makeAvatar(artistName, index, r.artist_avatar_url ?? r.avatar_url ?? null);
 
         const categoryBadge = category
             ? `<span class="badge rounded-pill fs-fluid-xxs fw-semibold text-uppercase mb-2"
@@ -359,7 +375,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function buildArtistPendingCard(r, index) {
         const ownerName = r.owner_username ?? 'Client';
-        const letter = ownerName.trim() ? ownerName.trim()[0].toUpperCase() : '?';
         const [bg, fg] = PALETTE[index % PALETTE.length];
         const budget = parseFloat(r.price ?? 0);
         const { title } = parseDescription(r.commission_description ?? '');
@@ -374,11 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ? new Date(r.requested_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
             : 'Recently';
 
-        const avatarHtml = `
-            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
-                 style="width:38px; height:38px; background:${bg}; border:1px solid ${fg}33;">
-                <span class="fs-fluid-sm fw-bold" style="font-family:var(--font-ui); color:${fg};">${letter}</span>
-            </div>`;
+        const avatarHtml = makeAvatar(ownerName, index, r.owner_avatar_url ?? r.avatar_url ?? null);
 
         const categoryBadge = category
             ? `<span class="badge rounded-pill fs-fluid-xxs fw-semibold text-uppercase mb-2"
@@ -437,7 +448,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function buildArtistAcceptedCard(c, index) {
         const ownerName = c.owner_username ?? 'Client';
-        const letter = ownerName.trim() ? ownerName.trim()[0].toUpperCase() : '?';
         const [bg, fg] = PALETTE[index % PALETTE.length];
         const budget = parseFloat(c.price ?? 0);
         const { title } = parseDescription(c.commission_description ?? '');
@@ -453,11 +463,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ? new Date(c.commission_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
             : 'Recent';
 
-        const avatarHtml = `
-            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
-                 style="width:38px; height:38px; background:${bg}; border:1px solid ${fg}33;">
-                <span class="fs-fluid-sm fw-bold" style="font-family:var(--font-ui); color:${fg};">${letter}</span>
-            </div>`;
+        const avatarHtml = makeAvatar(ownerName, index, c.owner_avatar_url ?? c.avatar_url ?? null);
 
         const categoryBadge = category
             ? `<span class="badge rounded-pill fs-fluid-xxs fw-semibold text-uppercase mb-2"
@@ -471,14 +477,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (statusId === 3) {
             // Accepted but not started — artist can mark as In Progress
             actionBtn = `<button type="button"
-                            class="btn btn-sm btn-primary artist-progress-btn py-1 px-3 fs-fluid-xs rounded-2"
+                            class="btn btn-sm btn-outline artist-progress-btn py-1 px-3 fs-fluid-xs rounded-2"
                             data-commission-id="${c.commission_id}">
                             Start Work
                          </button>`;
         } else if (statusId === 5) {
             // In Progress — artist can mark as Completed
             actionBtn = `<button type="button"
-                            class="btn btn-sm btn-success artist-complete-btn py-1 px-3 fs-fluid-xs rounded-2"
+                            class="btn btn-sm btn-outline artist-complete-btn py-1 px-3 fs-fluid-xs rounded-2"
                             data-commission-id="${c.commission_id}">
                             Mark Complete
                          </button>`;

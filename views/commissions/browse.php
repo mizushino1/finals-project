@@ -112,7 +112,7 @@
                     <div class="browse-results-bar d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3">
                         <p class="browse-results-bar__count m-0 text-muted fw-semibold fs-fluid-xs">
                             Accepted Commissions
-                            <span class="badge bg-info text-dark ms-2 fs-fluid-xxs" id="artistAcceptedBadge" style="display:none;"></span>
+                            <span class="badge theme-fill text-dark ms-2 fs-fluid-xxs" id="artistAcceptedBadge" style="display:none;"></span>
                         </p>
                         <span class="text-muted fs-fluid-xxs">Commissions assigned to you</span>
                     </div>

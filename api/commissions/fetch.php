@@ -13,7 +13,7 @@ if (!isset($_SESSION['user_id'])) {
 try {
     $db   = getDB();
     $role = strtolower($_SESSION['role']);
-    $id = $_SESSION['account_id']; // account_id from account_tbl
+    $id   = $_SESSION['user_id']; // user_tbl.user_id (or artist_id for artists)
 
     // 1. ARTIST: Sees all open (status_id = 1) commission posts
     if ($role === 'artist') {
@@ -23,16 +23,17 @@ try {
                 a.username  AS posted_by,
                 a.first_name,
                 a.last_name,
-                cat.category_name
+                cat.category_name,
+                img.image_url AS client_avatar_url
             FROM commission_tbl c
             JOIN user_tbl      u   ON c.user_id     = u.user_id
             JOIN account_tbl   a   ON u.account_id  = a.account_id
             LEFT JOIN category_tbl cat ON c.category_id = cat.category_id
+            LEFT JOIN image_tbl    img ON img.user_id   = u.user_id AND img.image_type_id = 1
             WHERE c.status_id = 1
             ORDER BY c.commission_date DESC
         ');
         $stmt->execute();
-        error_log('DEBUG id=' . $id . ' rows=' . $stmt->rowCount());
 
     // 2. USER/CLIENT: Sees only their own commissions (all statuses)
     } elseif ($role === 'user' || $role === 'client') {
@@ -42,12 +43,14 @@ try {
                 a.username  AS posted_by,
                 a.first_name,
                 a.last_name,
-                cat.category_name
+                cat.category_name,
+                img.image_url AS client_avatar_url
             FROM commission_tbl c
             JOIN user_tbl      u   ON c.user_id     = u.user_id
             JOIN account_tbl   a   ON u.account_id  = a.account_id
             LEFT JOIN category_tbl cat ON c.category_id = cat.category_id
-            WHERE u.account_id = ?
+            LEFT JOIN image_tbl    img ON img.user_id   = u.user_id AND img.image_type_id = 1
+            WHERE u.user_id = ?
             ORDER BY c.commission_date DESC
         ');
         $stmt->execute([$id]);
@@ -60,11 +63,13 @@ try {
                 a.username  AS posted_by,
                 a.first_name,
                 a.last_name,
-                cat.category_name
+                cat.category_name,
+                img.image_url AS client_avatar_url
             FROM commission_tbl c
             JOIN user_tbl      u   ON c.user_id     = u.user_id
             JOIN account_tbl   a   ON u.account_id  = a.account_id
             LEFT JOIN category_tbl cat ON c.category_id = cat.category_id
+            LEFT JOIN image_tbl    img ON img.user_id   = u.user_id AND img.image_type_id = 1
             ORDER BY c.commission_date DESC
         ');
         $stmt->execute();

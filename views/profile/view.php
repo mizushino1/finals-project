@@ -54,6 +54,13 @@ try {
         die("User profile data could not be found inside the system tables.");
     }
 
+    $viewer_role = strtolower($_SESSION['role'] ?? '');
+    $is_own_user_profile = isset($_SESSION['account_id'])
+        && $_SESSION['account_id'] == $profile['account_id']
+        && in_array($viewer_role, ['user', 'client']);
+
+    $is_artist_profile = !empty($profile['artist_id']);
+
     $clean_username   = htmlspecialchars($profile['username']);
     $display_name     = htmlspecialchars($profile['first_name'] . ' ' . $profile['last_name']);
     $has_custom_avatar = !empty($profile['avatar']);
@@ -129,7 +136,7 @@ try {
                     </p>
                 <?php endif; ?>
 
-                <?php if (!empty($profile['artist_id'])): ?>
+                <?php if ($is_artist_profile): ?>
                     <span class="badge bg-success">Artist</span>
                     <small class="text-muted ms-2">
                         Starting Rate: ₱<?php echo number_format($profile['starting_rate'], 2); ?>
@@ -169,7 +176,7 @@ try {
                 <span class="profile-stat-label">Likes</span>
             </div>
 
-            <?php if (!empty($profile['artist_id'])): ?>
+            <?php if ($is_artist_profile): ?>
             <div class="profile-stat">
                 <span class="profile-stat-value profile-reviews-badge" id="stat-avg-rating">
                     <i class="fas fa-star"></i> <?php echo $live_avg_rating; ?>/5
@@ -185,10 +192,21 @@ try {
             <!-- Follow / Edit -->
             <div class="ms-auto d-flex align-items-center gap-2">
                 <?php
-                $session_active_id = $_SESSION['account_id'] ?? $_SESSION['user_id'] ?? null;
+                $session_active_id = $_SESSION['account_id'] ?? null;
+                $is_viewing_own_profile = false;
+                if ($session_active_id !== null) {
+                    $is_viewing_own_profile = ($session_active_id == $profile['account_id']);
+                } elseif (isset($_SESSION['user_id'])) {
+                    if ($viewer_role === 'artist') {
+                        $is_viewing_own_profile = ($_SESSION['user_id'] == ($profile['artist_id'] ?? null));
+                    } elseif (in_array($viewer_role, ['user', 'client'])) {
+                        $is_viewing_own_profile = ($_SESSION['user_id'] == ($profile['user_id'] ?? null));
+                    }
+                    $session_active_id = $is_viewing_own_profile ? $profile['account_id'] : $_SESSION['user_id'];
+                }
                 if ($session_active_id):
                 ?>
-                    <?php if ($session_active_id != $profile['account_id']): ?>
+                    <?php if (!$is_viewing_own_profile): ?>
                         <button class="btn <?php echo $is_following ? 'btn-success' : 'btn-follow'; ?>"
                                 type="button"
                                 id="btn-follow-action"
@@ -203,6 +221,7 @@ try {
                         </button>
                     <?php else: ?>
                         <a href="<?php echo BASE_URL; ?>settings"
+                           id="btn-edit-profile"
                            class="btn btn-outline-secondary">Edit Account Settings</a>
                     <?php endif; ?>
                 <?php else: ?>
@@ -217,8 +236,9 @@ try {
 
         </div><!-- /stats-row -->
 
-        <!-- Tabs: Artworks + Reviews only -->
+        <!-- Tabs -->
         <ul class="nav profile-tabs" id="profileTabs" role="tablist">
+            <?php if ($is_artist_profile): ?>
             <li class="nav-item" role="presentation">
                 <button class="nav-link active"
                         id="tab-artworks"
@@ -228,7 +248,6 @@ try {
                         aria-controls="pane-artworks"
                         aria-selected="true">Artworks</button>
             </li>
-            <?php if (!empty($profile['artist_id'])): ?>
             <li class="nav-item" role="presentation">
                 <button class="nav-link"
                         id="tab-reviews"
@@ -237,6 +256,17 @@ try {
                         type="button" role="tab"
                         aria-controls="pane-reviews"
                         aria-selected="false">Reviews</button>
+            </li>
+            <?php endif; ?>
+            <?php if ($is_own_user_profile): ?>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link<?php echo !$is_artist_profile ? ' active' : ''; ?>"
+                        id="tab-commissions"
+                        data-bs-toggle="tab"
+                        data-bs-target="#pane-commissions"
+                        type="button" role="tab"
+                        aria-controls="pane-commissions"
+                        aria-selected="<?php echo !$is_artist_profile ? 'true' : 'false'; ?>">Commissions</button>
             </li>
             <?php endif; ?>
         </ul>
@@ -248,7 +278,8 @@ try {
     <div class="container">
         <div class="tab-content" id="profileTabContent">
 
-            <!-- ── Artworks pane ───────────────────────────────── -->
+            <!-- ── Artworks pane (artists only) ─────────────────── -->
+            <?php if ($is_artist_profile): ?>
             <div class="tab-pane fade show active" id="pane-artworks" role="tabpanel">
                 <div id="artworks-grid"
                      class="row row-cols-2 row-cols-sm-3 row-cols-md-4 g-3 justify-content-center"
@@ -265,7 +296,6 @@ try {
             </div>
 
             <!-- ── Reviews pane (artists only) ────────────────── -->
-            <?php if (!empty($profile['artist_id'])): ?>
             <div class="tab-pane fade" id="pane-reviews" role="tabpanel"
                  data-account-id="<?php echo $profile_account_id; ?>"
                  data-loaded="false">
@@ -305,13 +335,140 @@ try {
             </div>
             <?php endif; ?>
 
+            <!-- ── Commissions pane (own user profile only) ─────── -->
+            <?php if ($is_own_user_profile): ?>
+            <div class="tab-pane fade<?php echo !$is_artist_profile ? ' show active' : ''; ?>" id="pane-commissions" role="tabpanel">
+
+                <div class="d-flex justify-content-end mb-3">
+                    <button
+                        class="btn-artovia-primary px-4 py-2 fs-fluid-xs rounded-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#postCommissionModal">
+                        + Post a Commission
+                    </button>
+                </div>
+
+                <div id="profileCommissionsError" class="grid-state d-none text-center py-5 px-3 border rounded-3 bg-card shadow-sm">
+                    <p class="grid-state__title fw-bold m-0 mb-1 fs-fluid-sm">Failed to load commissions</p>
+                    <p class="grid-state__sub text-muted mx-auto mb-3 fs-fluid-xs">There was an issue communicating with the server.</p>
+                    <button class="btn btn-outline-secondary btn-sm fs-fluid-xs" onclick="location.reload()">Retry</button>
+                </div>
+
+                <div id="profileCommissionsEmpty" class="grid-state d-none text-center py-5 px-3 border rounded-3 bg-card shadow-sm">
+                    <p class="grid-state__title fw-bold m-0 mb-1 fs-fluid-sm">No commissions yet</p>
+                    <p class="grid-state__sub text-muted mx-auto m-0 fs-fluid-xs">Click "+ Post a Commission" to create your first one.</p>
+                </div>
+
+                <div class="row g-2 g-sm-3 row-cols-1 row-cols-md-2 row-cols-xl-3" id="profileCommissionGrid">
+                    <div class="col-12 text-center py-5 text-muted" id="profileCommissionsLoading">
+                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                        Loading commissions…
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ── Post Commission Modal (copied from browse.php) ── -->
+            <div class="modal fade" id="postCommissionModal" tabindex="-1" aria-labelledby="postCommissionModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content bg-card border rounded-3 shadow">
+
+                        <div class="modal-header border-bottom px-4 pt-4 pb-3">
+                            <h5 class="modal-title fw-bold fs-fluid-sm" id="postCommissionModalLabel">Create Commission</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <div class="modal-body px-4 py-4">
+                            <div id="commissionFormAlert" class="alert d-none mb-3 fs-fluid-xs" role="alert"></div>
+
+                            <!-- Commission Name -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold fs-fluid-xs">Commission Name <span class="text-danger">*</span></label>
+                                <input
+                                    type="text"
+                                    id="commissionTitle"
+                                    class="form-control theme-border fs-fluid-xs"
+                                    style="border-width:1px !important;"
+                                    placeholder="e.g. Character portrait for my OC">
+                            </div>
+
+                            <!-- Category (Genre) -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold fs-fluid-xs">Genre <span class="text-danger">*</span></label>
+                                <select
+                                    id="commissionCategory"
+                                    class="form-select theme-border fs-fluid-xs"
+                                    style="border-width:1px !important;"
+                                    aria-label="Commission category">
+                                    <option value="" disabled selected>Select a genre</option>
+                                    <option value="1">Anime</option>
+                                    <option value="2">Chibi</option>
+                                    <option value="3">Pixel Art</option>
+                                    <option value="4">Watercolor</option>
+                                    <option value="5">Fantasy</option>
+                                    <option value="6">Logo Design</option>
+                                    <option value="7">Portrait</option>
+                                    <option value="8">Character Design</option>
+                                </select>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold fs-fluid-xs">Description <span class="text-danger">*</span></label>
+                                <textarea
+                                    id="commissionDescription"
+                                    class="form-control theme-border hide-scrollbar fs-fluid-xs"
+                                    rows="5"
+                                    style="resize:none; overflow-y:auto; border-width:1px !important;"
+                                    placeholder="Describe your project — style, mood, references, deliverables…"></textarea>
+                            </div>
+
+                            <!-- Budget + Upload -->
+                            <div class="row g-3 mb-2">
+                                <div class="col-6">
+                                    <label class="form-label fw-semibold fs-fluid-xs">Budget (₱) <span class="text-danger">*</span></label>
+                                    <input
+                                        type="number"
+                                        id="commissionBudget"
+                                        class="form-control theme-border fs-fluid-xs"
+                                        style="border-width:1px !important;"
+                                        placeholder="e.g. 2500"
+                                        min="1"
+                                        step="any">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label fw-semibold fs-fluid-xs">Reference Image <span class="text-muted fw-normal">(Optional)</span></label>
+                                    <input type="file" id="commissionImageFile" accept="image/*" class="d-none">
+                                    <button
+                                        type="button"
+                                        class="btn-artovia-outline w-100 fs-fluid-xs"
+                                        onclick="document.getElementById('commissionImageFile').click()">
+                                        Select Image
+                                    </button>
+                                    <p id="commissionImageName" class="text-muted fs-fluid-xxs mt-1 mb-0 text-truncate"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer border-top px-4 pb-4 pt-3 d-flex gap-2 flex-nowrap">
+                            <button type="button" id="submitCommissionBtn" class="btn-artovia-primary w-50 fs-fluid-xs rounded-2">
+                                Post Commission
+                            </button>
+                            <button type="button" class="btn btn-outline w-50 fs-fluid-xs" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
+
         </div>
     </div>
 </main>
 
 <script>
-    // Pass PHP values into JS without inline PHP in profile.js
     window.PROFILE_ACCOUNT_ID = <?php echo $profile_account_id; ?>;
     window.BASE_URL            = '<?php echo BASE_URL; ?>';
+    window.IS_OWN_USER_PROFILE = <?php echo $is_own_user_profile ? 'true' : 'false'; ?>;
 </script>
 <script src="<?php echo BASE_URL; ?>public/js/profile.js"></script>

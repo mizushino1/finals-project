@@ -351,14 +351,14 @@
                     <a href="<?= BASE_URL ?>login" class="btn-artovia-light">
                         Create an Account
                     </a>
-                    <a href="<?= BASE_URL ?>artists" class="btn-artovia-ghost">
+                    <a href="<?= BASE_URL ?>artists" class="btn-artovia-ghost-static">
                         Browse Artists
                     </a>
                 <?php else: ?>
                     <a href="<?= BASE_URL ?>commissions" class="btn-artovia-light">
                         Post a Commission
                     </a>
-                    <a href="<?= BASE_URL ?>artists" class="btn-artovia-ghost">
+                    <a href="<?= BASE_URL ?>artists" class="btn-artovia-ghost-static">
                         Browse Artists
                     </a>
                 <?php endif; ?>

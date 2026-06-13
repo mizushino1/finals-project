@@ -176,6 +176,7 @@
 
     <script>
         const BASE_URL = '<?= BASE_URL ?>';
+        window.BASE_URL = BASE_URL;
         document.addEventListener('DOMContentLoaded', () => {
             const getTheme = () => localStorage.getItem('artovia-theme') || 'dark';
 
