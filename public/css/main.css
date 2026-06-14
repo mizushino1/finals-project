@@ -513,6 +513,14 @@ p, .roboto {
 .eye-toggle-icon        { display: none !important; cursor: pointer; }
 .eye-toggle-icon.visible { display: flex !important; }
 
+.star-rating .star-node {
+    transition: color 0.15s ease-in-out;
+}
+.star-rating .star-node.hover,
+.star-rating .star-node.selected {
+    color: #ffc107 !important; /* Bootstrap Warning Gold */
+}
+
 /* ── 10. Animations ────────────────────────────────────────── */
 @keyframes fadeUp {
     from { opacity: 0; transform: translateY(22px); }

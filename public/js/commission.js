@@ -135,6 +135,16 @@ document.addEventListener('DOMContentLoaded', () => {
                </span>`
             : '';
 
+        const referenceImageUrl = c.image_url ?? c.reference_image ?? c.reference_url ?? null;
+        const referenceImageHtml = referenceImageUrl
+            ? `<img src="${APP_BASE_URL}${referenceImageUrl}"
+                    alt="Reference"
+                    class="rounded-2 object-fit-cover flex-shrink-0"
+                    style="width:clamp(56px, 22%, 88px); aspect-ratio:1/1; border:1px solid var(--border-color, #ffffff18); background:var(--bg-subtle, #1a1a1a);"
+                    onerror="this.style.display='none'"
+               >`
+            : '';
+
         // Contextual action button router
         let actionBtn = '';
 
@@ -175,13 +185,30 @@ document.addEventListener('DOMContentLoaded', () => {
                                 Accept
                         </button>
                     </div>`;
+            } else if (parseInt(c.status_id) === 6) {
+                // NEW: If commission status is Completed (6), replace Manage with a Review trigger
+                actionBtn = `<button type="button"
+                                    class="btn btn-warning text-dark btn-review-trigger py-1 px-3 fs-fluid-xs rounded-2 fw-semibold shadow-sm"
+                                    data-commission-id="${c.commission_id}">
+                                    <i class="bi bi-star-fill me-1"></i>Review
+                                 </button>`;
             } else {
-                // Default fallback option for a user's posted management index if no bids exist yet
-                actionBtn = `<a href="${APP_BASE_URL}commissions/manage?id=${c.commission_id}" class="btn-artovia-outline py-1 px-3 fs-fluid-xs rounded-2">Manage</a>`;
+                // Default fallback option for a user's posted management index if no bids exist or it's not completed yet
+                actionBtn = `<button type="button"
+                                    class="btn-artovia-outline py-1 px-3 fs-fluid-xs rounded-2"
+                                    data-bs-toggle="modal" data-bs-target="#editCommissionModal"
+                                    data-commission-id="${c.commission_id}">
+                                    Manage
+                                 </button>`;
             }
 
         } else if (CURRENT_ROLE === 'admin') {
-            actionBtn = `<a href="${APP_BASE_URL}commissions/manage?id=${c.commission_id}" class="btn-danger text-white py-1 px-3 fs-fluid-xs rounded-2">Moderate</a>`;
+            actionBtn = `<button type="button"
+                                class="btn-danger text-white py-1 px-3 fs-fluid-xs rounded-2"
+                                data-bs-toggle="modal" data-bs-target="#editCommissionModal"
+                                data-commission-id="${c.commission_id}">
+                                Moderate
+                             </button>`;
 
         } else {
             // True Guest/Logged-out user fallback route options
@@ -206,10 +233,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                         <div class="flex-grow-1 mb-3">
                             ${categoryBadge}
-                            ${title ? `<p class="m-0 fw-semibold  fs-fluid-xs mb-1 text-truncate">${title}</p>` : ''}
-                            <p class="text-muted small m-0" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.6;">
-                                ${body}
-                            </p>
+                            <div class="d-flex align-items-start gap-2">
+                                <div class="flex-grow-1 overflow-hidden">
+                                    ${title ? `<p class="m-0 fw-semibold fs-fluid-xs mb-1 text-truncate">${title}</p>` : ''}
+                                    <p class="text-muted small m-0" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.6;">
+                                        ${body}
+                                    </p>
+                                </div>
+                                ${referenceImageHtml}
+                            </div>
                         </div>
                         <div class="d-flex align-items-center justify-content-between pt-3 border-top mt-auto">
                             <div>
@@ -239,10 +271,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="flex-grow-1 mb-4">
                         ${categoryBadge}
-                        ${title ? `<p class="m-0 fw-semibold  fs-fluid-xs mb-1 text-truncate">${title}</p>` : ''}
-                        <p class="text-muted small m-0" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;line-height:1.6;">
-                            ${body}
-                        </p>
+                        <div class="d-flex align-items-start gap-2">
+                            <div class="flex-grow-1 overflow-hidden">
+                                ${title ? `<p class="m-0 fw-semibold fs-fluid-xs mb-1 text-truncate">${title}</p>` : ''}
+                                <p class="text-muted small m-0" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;line-height:1.6;">
+                                    ${body}
+                                </p>
+                            </div>
+                            ${referenceImageHtml}
+                        </div>
                     </div>
                     <div class="d-flex align-items-center justify-content-between pt-3 border-top mt-auto">
                         <div>
@@ -1049,10 +1086,20 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.textContent = 'Posting…';
 
             try {
+                // Use FormData so the reference image file can be included
+                const formData = new FormData();
+                formData.append('title', title);
+                formData.append('description', description);
+                formData.append('budget', budget);
+                formData.append('category_id', category_id);
+                if (imageFile?.files[0]) {
+                    formData.append('image', imageFile.files[0]);
+                }
+
                 const res = await fetch(`${APP_BASE_URL}api/commissions/create.php`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title, description, budget, category_id })
+                    // No Content-Type header — browser sets it with the multipart boundary automatically
+                    body: formData
                 });
                 const data = await res.json();
 
@@ -1078,6 +1125,210 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('postCommissionModal')?.addEventListener('hidden.bs.modal', resetModal);
 
+    // ── Edit Commission Modal ──────────────────────────────────
+    // Populate fields when the modal opens, save changes on submit
+
+    const editModal = document.getElementById('editCommissionModal');
+    const editTitle = document.getElementById('editCommissionTitle');
+    const editDesc = document.getElementById('editCommissionDescription');
+    const editBudget = document.getElementById('editCommissionBudget');
+    const editCategory = document.getElementById('editCommissionCategory');
+    const editImageFile = document.getElementById('editCommissionImageFile');
+    const editImageName = document.getElementById('editCommissionImageName');
+    const editImagePreview = document.getElementById('editCommissionImagePreview');
+    const editAlert = document.getElementById('editCommissionFormAlert');
+    const editSaveBtn = document.getElementById('saveCommissionBtn');
+    const editCancelBtn = document.getElementById('cancelCommissionBtn');
+
+    let activeEditId = null;
+
+    function showEditAlert(message, isSuccess = false) {
+        if (!editAlert) return;
+        editAlert.textContent = message;
+        editAlert.className = `alert fs-fluid-xs ${isSuccess ? 'alert-success' : 'alert-danger'}`;
+        show(editAlert);
+    }
+
+    // Populate the edit modal when it opens
+    if (editModal) {
+        editModal.addEventListener('show.bs.modal', async (e) => {
+            // commission_id is set on the trigger button via data-commission-id
+            const trigger = e.relatedTarget;
+            const commissionId = parseInt(trigger?.getAttribute('data-commission-id') ?? 0);
+            if (!commissionId) return;
+
+            activeEditId = commissionId;
+            if (editAlert) hide(editAlert);
+
+            // Reset fields while loading
+            if (editTitle) editTitle.value = '';
+            if (editDesc) editDesc.value = '';
+            if (editBudget) editBudget.value = '';
+            if (editCategory) editCategory.value = '';
+            if (editImageName) editImageName.textContent = '';
+            if (editImagePreview) { editImagePreview.src = ''; hide(editImagePreview); }
+
+            try {
+                const res = await fetch(`${APP_BASE_URL}api/commissions/manage.php?commission_id=${commissionId}`);
+                const data = await res.json();
+
+                if (!data?.success) {
+                    showEditAlert(data?.message || 'Failed to load commission data.');
+                    return;
+                }
+
+                const d = data.data;
+                if (editTitle) editTitle.value = d.title ?? '';
+                if (editDesc) editDesc.value = d.description ?? '';
+                if (editBudget) editBudget.value = d.price ?? '';
+                if (editCategory) editCategory.value = d.category_id ?? '';
+
+                // Show existing reference image preview if present
+                if (editImagePreview && d.image_url) {
+                    editImagePreview.src = `${APP_BASE_URL}${d.image_url}`;
+                    show(editImagePreview);
+                }
+            } catch (err) {
+                console.error('Edit modal load error:', err);
+                showEditAlert('Network error loading commission data.');
+            }
+        });
+
+        // Clear activeEditId on close
+        editModal.addEventListener('hidden.bs.modal', () => {
+            activeEditId = null;
+            if (editAlert) hide(editAlert);
+            if (editImagePreview) { editImagePreview.src = ''; hide(editImagePreview); }
+        });
+    }
+
+    // File input label update for edit modal
+    if (editImageFile) {
+        editImageFile.addEventListener('change', () => {
+            if (editImageName) editImageName.textContent = editImageFile.files[0]?.name ?? '';
+            // Preview the newly selected image
+            if (editImagePreview && editImageFile.files[0]) {
+                editImagePreview.src = URL.createObjectURL(editImageFile.files[0]);
+                show(editImagePreview);
+            }
+        });
+    }
+
+    // Save button — POST to manage.php with FormData
+    if (editSaveBtn) {
+        editSaveBtn.addEventListener('click', async () => {
+            if (!activeEditId) return;
+            if (editAlert) hide(editAlert);
+
+            const title = editTitle?.value.trim() ?? '';
+            const description = editDesc?.value.trim() ?? '';
+            const budget = parseFloat(editBudget?.value ?? 0);
+            const category_id = parseInt(editCategory?.value ?? 0);
+
+            if (!title) { showEditAlert('Please provide a commission name.'); return; }
+            if (!description) { showEditAlert('Please provide a project description.'); return; }
+            if (isNaN(budget) || budget <= 0) { showEditAlert('Please enter a valid budget higher than ₱0.'); return; }
+            if (!category_id) { showEditAlert('Please select a category.'); return; }
+
+            editSaveBtn.disabled = true;
+            editSaveBtn.textContent = 'Saving…';
+
+            try {
+                const formData = new FormData();
+                formData.append('commission_id', activeEditId);
+                formData.append('action', 'update');
+                formData.append('title', title);
+                formData.append('description', description);
+                formData.append('budget', budget);
+                formData.append('category_id', category_id);
+                if (editImageFile?.files[0]) {
+                    formData.append('image', editImageFile.files[0]);
+                }
+
+                const res = await fetch(`${APP_BASE_URL}api/commissions/manage.php`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (data?.success) {
+                    showEditAlert(data.message || 'Commission updated successfully.', true);
+                    setTimeout(() => {
+                        bootstrap.Modal.getInstance(editModal)?.hide();
+                        loadCommissions();
+                    }, 1200);
+                } else {
+                    showEditAlert(data?.message || 'Failed to save changes.');
+                }
+            } catch (err) {
+                console.error('Save commission error:', err);
+                showEditAlert('Network error — please try again.');
+            } finally {
+                editSaveBtn.disabled = false;
+                editSaveBtn.textContent = 'Save Changes';
+            }
+        });
+    }
+
+    // Cancel commission button inside the edit modal
+    if (editCancelBtn) {
+        editCancelBtn.addEventListener('click', async () => {
+            if (!activeEditId) return;
+            if (!confirm('Are you sure you want to cancel this commission? This cannot be undone.')) return;
+
+            editCancelBtn.disabled = true;
+            editCancelBtn.textContent = 'Cancelling…';
+
+            try {
+                const res = await fetch(`${APP_BASE_URL}api/commissions/manage.php`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ commission_id: activeEditId, action: 'cancel' })
+                });
+                const data = await res.json();
+
+                if (data?.success) {
+                    bootstrap.Modal.getInstance(editModal)?.hide();
+                    showSuccessModal('Commission Cancelled', data.message || 'Your commission has been cancelled.');
+                    loadCommissions();
+                } else {
+                    showEditAlert(data?.message || 'Failed to cancel commission.');
+                }
+            } catch (err) {
+                console.error('Cancel commission error:', err);
+                showEditAlert('Network error — please try again.');
+            } finally {
+                editCancelBtn.disabled = false;
+                editCancelBtn.textContent = 'Cancel Commission';
+            }
+        });
+    }
+    function handleOpenReviewModal(commissionId) {
+        // Look for 'reviewModal' instead of 'submitReviewModal'
+        const reviewModalEl = document.getElementById('reviewModal'); 
+        
+        // Look for 'modalCommissionId' which is defined in review_modal.php
+        const hiddenInput = document.getElementById('modalCommissionId'); 
+        
+        if (!reviewModalEl) {
+            console.error('Submit review modal could not be found in the DOM.');
+            return;
+        }
+    
+        // Clear out any previous inputs/errors from a previous session
+        const form = reviewModalEl.querySelector('form');
+        if (form) form.reset();
+    
+        // Bind the clicked commission id reference to your hidden form input
+        if (hiddenInput) {
+            hiddenInput.value = commissionId;
+        }
+    
+        // Safely initialize and present the Bootstrap Modal
+        const modalInstance = bootstrap.Modal.getOrCreateInstance(reviewModalEl);
+        modalInstance.show();
+    }
+
     // ── Event Listeners ───────────────────────────────────────
 
     document.querySelectorAll('input[type="radio"]').forEach(input =>
@@ -1090,6 +1341,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Dynamic central action routing via delegated listeners
     document.addEventListener('click', e => {
         if (e.target) {
+            // Handle clicking the Review button
+            const reviewBtn = e.target.closest('.btn-review-trigger');
+            if (reviewBtn) {
+                const commissionId = reviewBtn.getAttribute('data-commission-id');
+                handleOpenReviewModal(commissionId);
+            }
             if (e.target.classList.contains('assign-artist-btn')) {
                 handleAssignArtist(e.target);
             }

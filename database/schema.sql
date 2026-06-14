@@ -467,3 +467,6 @@ CREATE TABLE artworks_tbl (
         REFERENCES image_tbl(image_id)
         ON DELETE CASCADE
 );
+
+ALTER TABLE review_tbl DROP INDEX uq_review_artist_reviewer;
+ALTER TABLE review_tbl ADD UNIQUE KEY uq_review_commission (commission_id);

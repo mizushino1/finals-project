@@ -3,6 +3,42 @@ if (typeof window.BASE_URL === 'undefined' || window.BASE_URL === null) {
     window.BASE_URL = './';
 }
 
+/* ─── Avatar palette (mirrors commission.js) ─────────────────────────── */
+const PROFILE_PALETTE = [
+    ['#e8d5b0', '#a8834a'], ['#d4e8d0', '#3a7a4a'],
+    ['#d0dce8', '#3a5a7a'], ['#e8d0e0', '#7a3a5a']
+];
+
+/**
+ * Build an avatar element: real photo when avatar_url is present,
+ * otherwise a coloured initials circle.
+ * @param {string} name
+ * @param {number} index  – used to pick a palette colour
+ * @param {string|null} avatarUrl
+ */
+function makeProfileAvatar(name, index, avatarUrl = null) {
+    const [bg, fg] = PROFILE_PALETTE[index % PROFILE_PALETTE.length];
+    if (avatarUrl) {
+        return `
+        <img src="${window.BASE_URL}${avatarUrl}"
+             class="rounded-circle flex-shrink-0 object-fit-cover"
+             style="width:38px; height:38px; border:1px solid ${fg}33;"
+             alt="${escapeHtml(name)}"
+             onerror="this.replaceWith(this.nextElementSibling)"
+        >
+        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+             style="width:38px; height:38px; background:${bg}; border:1px solid ${fg}33; display:none!important;">
+            <span class="fs-fluid-sm fw-bold" style="font-family:var(--font-ui); color:${fg};">${(name.trim()[0] ?? '?').toUpperCase()}</span>
+        </div>`;
+    }
+    const letter = name.trim() ? name.trim()[0].toUpperCase() : '?';
+    return `
+        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+             style="width:38px; height:38px; background:${bg}; border:1px solid ${fg}33;">
+            <span class="fs-fluid-sm fw-bold" style="font-family:var(--font-ui); color:${fg};">${letter}</span>
+        </div>`;
+}
+
 document.addEventListener('DOMContentLoaded', function () {
 
     /* ─── Follow button ───────────────────────────────────────── */
@@ -118,7 +154,7 @@ function buildArtworkCard(artwork) {
         ? new Date(artwork.uploaded_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
         : '';
     const title = escapeHtml(artwork.title || 'Untitled');
-    const artist = escapeHtml(artwork.artist_name || 'Unknown');
+    const artist = escapeHtml(artwork.username || 'Unknown');
 
     return `
         <div class="card artwork-card border-0 theme-border"
@@ -832,10 +868,10 @@ function loadProfileCommissions() {
                 return;
             }
 
-            commissions.forEach(c => {
+            commissions.forEach((c, i) => {
                 const col = document.createElement('div');
                 col.className = 'col profile-commission-card-col';
-                col.innerHTML = buildProfileCommissionCard(c);
+                col.innerHTML = buildProfileCommissionCard(c, i);
                 grid.appendChild(col);
             });
         })
@@ -859,46 +895,72 @@ function getCommissionStatusBadge(statusId) {
     }
 }
 
-function buildProfileCommissionCard(c) {
+function buildProfileCommissionCard(c, index = 0) {
+    const clientName = c.posted_by ?? 'Anonymous Client';
     const status = getCommissionStatusBadge(c.status_id);
     const budget = parseFloat(c.price ?? 0);
+    const [bg, fg] = PROFILE_PALETTE[index % PROFILE_PALETTE.length];
+
     const budgetDisplay = budget > 0
         ? `₱${budget.toLocaleString('en-PH', { minimumFractionDigits: 2 })}`
         : 'Open Budget';
 
-    const raw = (c.description ?? '').split('\n\n');
-    let title = '';
-    let body = raw.join('\n\n');
-    if (raw.length >= 2) {
-        title = raw[0].trim();
-        body = raw.slice(1).join('\n\n').trim();
-    }
+    // Shared description parser (mirrors commission.js parseDescription)
+    const parts = (c.description ?? '').split('\n\n');
+    const title = parts.length >= 2 ? parts[0].trim() : '';
+    const body = parts.length >= 2 ? parts.slice(1).join('\n\n').trim() : (c.description ?? '').trim();
 
     const dateStr = c.commission_date
         ? new Date(c.commission_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
         : 'Recent';
 
-    const category = c.category_name
+    // Rotating palette category badge (matches commission.js style)
+    const categoryBadge = c.category_name
         ? `<span class="badge rounded-pill fs-fluid-xxs fw-semibold text-uppercase mb-2"
-                style="background:#e8d5b0; color:#a8834a; border:1px solid #a8834a33; letter-spacing:0.04em;">
+                style="background:${bg}; color:${fg}; border:1px solid ${fg}33; letter-spacing:0.04em;">
                 ${escapeHtml(c.category_name)}
            </span>`
+        : '';
+
+    // Avatar: real photo with initials fallback
+    const avatarHtml = makeProfileAvatar(clientName, index, c.client_avatar_url ?? c.avatar_url ?? null);
+
+    // Optional reference image thumbnail
+    const referenceImageUrl = c.image_url ?? c.reference_image ?? c.reference_url ?? null;
+    const referenceImageHtml = referenceImageUrl
+        ? `<img src="${window.BASE_URL}${referenceImageUrl}"
+                alt="Reference"
+                class="rounded-2 object-fit-cover flex-shrink-0"
+                style="width:clamp(56px, 22%, 88px); aspect-ratio:1/1; border:1px solid var(--border-color, #ffffff18); background:var(--bg-subtle, #1a1a1a);"
+                onerror="this.style.display='none'"
+           >`
         : '';
 
     return `
         <div class="artist-card h-100 border rounded-3 d-flex flex-column shadow-sm bg-card p-3">
             <div class="d-flex justify-content-between align-items-start mb-2 gap-2">
-                <small class="text-muted fs-fluid-xxs">${dateStr}</small>
+                <div class="d-flex align-items-center gap-2 overflow-hidden">
+                    ${avatarHtml}
+                    <div class="text-truncate">
+                        <p class="m-0 fw-bold fs-fluid-sm text-truncate lh-1">${escapeHtml(clientName)}</p>
+                        <small class="text-muted fs-fluid-xxs">${dateStr}</small>
+                    </div>
+                </div>
                 <span class="artist-card__badge d-inline-flex flex-shrink-0 align-items-center fw-bold text-uppercase ${status.class}">
                     ${status.text}
                 </span>
             </div>
             <div class="flex-grow-1 mb-3">
-                ${category}
-                ${title ? `<p class="m-0 fw-semibold fs-fluid-xs mb-1 text-truncate">${escapeHtml(title)}</p>` : ''}
-                <p class="text-muted small m-0" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;line-height:1.6;">
-                    ${escapeHtml(body)}
-                </p>
+                ${categoryBadge}
+                <div class="d-flex align-items-start gap-2">
+                    <div class="flex-grow-1 overflow-hidden">
+                        ${title ? `<p class="m-0 fw-semibold fs-fluid-xs mb-1 text-truncate">${escapeHtml(title)}</p>` : ''}
+                        <p class="text-muted small m-0" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;line-height:1.6;">
+                            ${escapeHtml(body)}
+                        </p>
+                    </div>
+                    ${referenceImageHtml}
+                </div>
             </div>
             <div class="d-flex align-items-center justify-content-between pt-3 border-top mt-auto">
                 <div>
@@ -908,6 +970,7 @@ function buildProfileCommissionCard(c) {
                 <a href="${window.BASE_URL}commissions/manage?id=${c.commission_id}" class="btn-artovia-outline py-1 px-3 fs-fluid-xs rounded-2">Manage</a>
             </div>
         </div>`;
+
 }
 
 /* ═══════════════════════════════════════════════════════════════

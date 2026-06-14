@@ -1,3 +1,6 @@
+<?php
+require_once __DIR__ . '/../../src/middleware/auth_middleware.php';
+?>
  <main class="py-4">
      <div class="container-fluid">
          <div class="row pt-3 px-3">

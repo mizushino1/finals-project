@@ -1,8 +1,8 @@
 <?php
-ob_start(); // buffer any accidental output
+ob_start();
 require_once '../../config/session.php';
 require_once '../../config/database.php';
-ob_clean(); // discard anything that slipped out
+ob_clean();
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['user_id'])) {
@@ -13,65 +13,35 @@ if (!isset($_SESSION['user_id'])) {
 try {
     $db   = getDB();
     $role = strtolower($_SESSION['role']);
-    $id   = $_SESSION['user_id']; // user_tbl.user_id (or artist_id for artists)
+    $id   = $_SESSION['user_id'];
 
-    // 1. ARTIST: Sees all open (status_id = 1) commission posts
+    $baseSelect = '
+        SELECT
+            c.*,
+            a.username       AS posted_by,
+            a.first_name,
+            a.last_name,
+            cat.category_name,
+            avatar.image_url AS client_avatar_url,
+            ref.image_url    AS reference_image
+        FROM commission_tbl c
+        JOIN user_tbl        u      ON c.user_id      = u.user_id
+        JOIN account_tbl     a      ON u.account_id   = a.account_id
+        LEFT JOIN category_tbl  cat    ON c.category_id  = cat.category_id
+        LEFT JOIN image_tbl     avatar ON avatar.user_id  = u.user_id    AND avatar.image_type_id = 1
+        LEFT JOIN image_tbl     ref    ON ref.commission_id = c.commission_id AND ref.image_type_id = 4
+    ';
+
     if ($role === 'artist') {
-        $stmt = $db->prepare('
-            SELECT
-                c.*,
-                a.username  AS posted_by,
-                a.first_name,
-                a.last_name,
-                cat.category_name,
-                img.image_url AS client_avatar_url
-            FROM commission_tbl c
-            JOIN user_tbl      u   ON c.user_id     = u.user_id
-            JOIN account_tbl   a   ON u.account_id  = a.account_id
-            LEFT JOIN category_tbl cat ON c.category_id = cat.category_id
-            LEFT JOIN image_tbl    img ON img.user_id   = u.user_id AND img.image_type_id = 1
-            WHERE c.status_id = 1
-            ORDER BY c.commission_date DESC
-        ');
+        $stmt = $db->prepare($baseSelect . 'WHERE c.status_id = 1 ORDER BY c.commission_date DESC');
         $stmt->execute();
 
-    // 2. USER/CLIENT: Sees only their own commissions (all statuses)
     } elseif ($role === 'user' || $role === 'client') {
-        $stmt = $db->prepare('
-            SELECT
-                c.*,
-                a.username  AS posted_by,
-                a.first_name,
-                a.last_name,
-                cat.category_name,
-                img.image_url AS client_avatar_url
-            FROM commission_tbl c
-            JOIN user_tbl      u   ON c.user_id     = u.user_id
-            JOIN account_tbl   a   ON u.account_id  = a.account_id
-            LEFT JOIN category_tbl cat ON c.category_id = cat.category_id
-            LEFT JOIN image_tbl    img ON img.user_id   = u.user_id AND img.image_type_id = 1
-            WHERE u.user_id = ?
-            ORDER BY c.commission_date DESC
-        ');
+        $stmt = $db->prepare($baseSelect . 'WHERE u.user_id = ? ORDER BY c.commission_date DESC');
         $stmt->execute([$id]);
 
-    // 3. ADMIN: Sees everything
     } elseif ($role === 'admin') {
-        $stmt = $db->prepare('
-            SELECT
-                c.*,
-                a.username  AS posted_by,
-                a.first_name,
-                a.last_name,
-                cat.category_name,
-                img.image_url AS client_avatar_url
-            FROM commission_tbl c
-            JOIN user_tbl      u   ON c.user_id     = u.user_id
-            JOIN account_tbl   a   ON u.account_id  = a.account_id
-            LEFT JOIN category_tbl cat ON c.category_id = cat.category_id
-            LEFT JOIN image_tbl    img ON img.user_id   = u.user_id AND img.image_type_id = 1
-            ORDER BY c.commission_date DESC
-        ');
+        $stmt = $db->prepare($baseSelect . 'ORDER BY c.commission_date DESC');
         $stmt->execute();
 
     } else {
