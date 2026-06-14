@@ -493,4 +493,4 @@ try {
     window.IS_ARTIST = <?php echo (isset($_SESSION['role']) && strtolower($_SESSION['role']) === 'artist') ? 'true' : 'false'; ?>;
 </script>
 <script src="<?php echo BASE_URL; ?>public/js/profile.js"></script>
-<script src="<?= BASE_URL ?>public/js/editCommission.js"></script>
+<script src="<?= BASE_URL ?>public/js/payments.js"></script>

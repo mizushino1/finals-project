@@ -3,11 +3,12 @@ USE artovia_db;
 -- Step 1: Temporarily turn off foreign key safety checks
 SET FOREIGN_KEY_CHECKS = 0;
 
--- Step 2: Empty all data from every table
+-- Step 2: Empty all data from every table (new table included)
 TRUNCATE TABLE account_status_tbl;
 TRUNCATE TABLE account_tbl;
 TRUNCATE TABLE administrator_tbl;
 TRUNCATE TABLE artist_tbl;
+TRUNCATE TABLE artworks_tbl;
 TRUNCATE TABLE category_tbl;
 TRUNCATE TABLE commission_request_tbl;
 TRUNCATE TABLE commission_tbl;
@@ -21,14 +22,19 @@ TRUNCATE TABLE payment_method_tbl;
 TRUNCATE TABLE payment_tbl;
 TRUNCATE TABLE portfolio_image_tbl;
 TRUNCATE TABLE portfolio_tbl;
+TRUNCATE TABLE review_tbl;
 TRUNCATE TABLE role_tbl;
 TRUNCATE TABLE status_tbl;
 TRUNCATE TABLE transaction_tbl;
+TRUNCATE TABLE user_payment_method_tbl;
 TRUNCATE TABLE user_tbl;
 
 -- Step 3: Turn safety checks back on
 SET FOREIGN_KEY_CHECKS = 1;
 
+-- ==========================================
+-- 1. LOOKUP / REFERENCE TABLES
+-- ==========================================
 
 INSERT INTO account_status_tbl (account_status_id, status_name) VALUES
 (1, 'Active'), (2, 'Banned'), (3, 'Suspended');
@@ -37,26 +43,28 @@ INSERT INTO role_tbl (role_id, role_name) VALUES
 (1, 'User'), (2, 'Artist'), (3, 'Administrator');
 
 INSERT INTO status_tbl (status_id, status_name) VALUES
-(1, 'Active'), (2, 'Pending'), (3, 'Accepted'), (4, 'Rejected'), 
-(5, 'In Progress'), (6, 'Completed'), (7, 'Cancelled'), (8, 'Read'), 
+(1, 'Active'), (2, 'Pending'), (3, 'Accepted'), (4, 'Rejected'),
+(5, 'In Progress'), (6, 'Completed'), (7, 'Cancelled'), (8, 'Read'),
 (9, 'Unread'), (10, 'Paid');
 
+-- Maya is now included alongside GCash, PayPal, Credit Card, Bank Transfer
 INSERT INTO payment_method_tbl (payment_method_id, payment_method_name) VALUES
-(1, 'GCash'), (2, 'PayPal'), (3, 'Credit Card'), (4, 'Bank Transfer');
+(1, 'GCash'),
+(2, 'Maya'),
+(3, 'PayPal'),
+(4, 'Credit Card'),
+(5, 'Bank Transfer');
 
 INSERT INTO image_type_tbl (image_type_id, image_type_name) VALUES
 (1, 'Profile'), (2, 'Artwork'), (3, 'Commission'), (4, 'Reference');
 
 INSERT INTO category_tbl (category_id, category_name) VALUES
-(1, 'Anime'), (2, 'Chibi'), (3, 'Pixel Art'), (4, 'Watercolor'), 
+(1, 'Anime'), (2, 'Chibi'), (3, 'Pixel Art'), (4, 'Watercolor'),
 (5, 'Fantasy'), (6, 'Logo Design'), (7, 'Portrait'), (8, 'Character Design');
 
-
--- ==========================================================
--- STEP 3: MAIN SYSTEM TABLES (Dependent on Lookups)
--- ==========================================================
-
--- Account Table (105 Rows)
+-- ==========================================
+-- 2. ACCOUNT TABLE (105 Rows)
+-- ==========================================
 INSERT INTO account_tbl (role_id, account_status_id, username, password_hash, first_name, middle_name, last_name, email, phone) VALUES
 (1,1,'user_1','$2y$10$hash','Liam','Noah','Smith','liam.smith@mail.com','09170000001'),
 (1,1,'user_2','$2y$10$hash','Olivia','Emma','Johnson','olivia.j@mail.com','09170000002'),
@@ -147,53 +155,121 @@ INSERT INTO account_tbl (role_id, account_status_id, username, password_hash, fi
 (2,1,'artist_37','$2y$10$hash','Piper',NULL,'Washington','piper.art@mail.com','09170000087'),
 (2,1,'artist_38','$2y$10$hash','Colton',NULL,'Menezes','colton.art@mail.com','09170000088'),
 (2,1,'artist_39','$2y$10$hash','Sadie',NULL,'Greenaway','sadie.art@mail.com','09170000089'),
-(2,1,'artist_40','$2y$10$hash','Ezekiel',NULL,'Melton','ezekiel.art@mail.com','09170000090'),
-(2,1,'artist_41','$2y$10$hash','Lydia',NULL,'Glover','lydia.art@mail.com','09170000091'),
-(2,1,'artist_42','$2y$10$hash','John',NULL,'Blankenship','johnb.art@mail.com','09170000092'),
-(2,1,'artist_43','$2y$10$hash','Sara',NULL,'Gentry','sara.art@mail.com','09170000093'),
-(2,1,'artist_44','$2y$10$hash','Jeremiah',NULL,'Holloway','jeremiah.art@mail.com','09170000094'),
-(2,1,'artist_45','$2y$10$hash','Julia',NULL,'Lutz','julia.art@mail.com','09170000095'),
-(2,1,'artist_46','$2y$10$hash','Emerson',NULL,'Clay','emerson.art@mail.com','09170000096'),
-(2,1,'artist_47','$2y$10$hash','Quinn',NULL,'Kemp','quinn.art@mail.com','09170000097'),
-(2,1,'artist_48','$2y$10$hash','Josiah',NULL,'Finley','josiah.art@mail.com','09170000098'),
-(2,1,'artist_49','$2y$10$hash','Reeve',NULL,'Rhodes','reeve.art@mail.com','09170000099'),
-(2,1,'artist_50','$2y$10$hash','Zuri',NULL,'Browning','zuri.art@mail.com','09170000100'),
-(3,1,'admin_1','$2y$10$hash','Arthur',NULL,'Pendragon','arthur.admin@mail.com','09170000101'),
-(3,1,'admin_2','$2y$10$hash','Merlin',NULL,'Ambrosius','merlin.admin@mail.com','09170000102'),
-(3,1,'admin_3','$2y$10$hash','Guinevere',NULL,'DeGalle','guin.admin@mail.com','09170000103'),
-(3,1,'admin_4','$2y$10$hash','Lancelot',NULL,'DuLac','lance.admin@mail.com','09170000104'),
-(3,1,'admin_5','$2y$10$hash','Gawain',NULL,'Orkney','gawain.admin@mail.com','09170000105');
+(2,1,'artist_40','$2y$10$hash','Ezra',NULL,'Blackwood','ezra.art@mail.com','09170000090'),
+(2,1,'artist_41','$2y$10$hash','Violet',NULL,'Castillo','violet.art@mail.com','09170000091'),
+(2,1,'artist_42','$2y$10$hash','Finn',NULL,'Sullivan','finn.art@mail.com','09170000092'),
+(2,1,'artist_43','$2y$10$hash','Hazel',NULL,'Reyes','hazel.art@mail.com','09170000093'),
+(2,1,'artist_44','$2y$10$hash','Zion',NULL,'Murray','zion.art@mail.com','09170000094'),
+(2,1,'artist_45','$2y$10$hash','Poppy',NULL,'West','poppy.art@mail.com','09170000095'),
+(2,1,'artist_46','$2y$10$hash','Axel',NULL,'Jordan','axel.art@mail.com','09170000096'),
+(2,1,'artist_47','$2y$10$hash','Daisy',NULL,'Lane','daisy.art@mail.com','09170000097'),
+(2,1,'artist_48','$2y$10$hash','Ryder',NULL,'Grant','ryder.art@mail.com','09170000098'),
+(2,1,'artist_49','$2y$10$hash','Willow',NULL,'Webb','willow.art@mail.com','09170000099'),
+(2,1,'artist_50','$2y$10$hash','Caden',NULL,'Stone','caden.art@mail.com','09170000100'),
+(3,1,'admin_1','$2y$10$hash','Admin',NULL,'One','admin1@artovia.com','09170000101'),
+(3,1,'admin_2','$2y$10$hash','Admin',NULL,'Two','admin2@artovia.com','09170000102'),
+(3,1,'admin_3','$2y$10$hash','Admin',NULL,'Three','admin3@artovia.com','09170000103'),
+(3,1,'admin_4','$2y$10$hash','Admin',NULL,'Four','admin4@artovia.com','09170000104'),
+(3,1,'admin_5','$2y$10$hash','Admin',NULL,'Five','admin5@artovia.com','09170000105');
 
--- User Profile Table
-INSERT INTO user_tbl (account_id, card_number) VALUES
-(1,'4111111111111111'),(2,'4222222222222222'),(3,'4333333333333333'),(4,'4444444444444444'),(5,'4555555555555555'),
-(6,'4666666666666666'),(7,'4777777777777777'),(8,'4888888888888888'),(9,'4999999999999999'),(10,'5111111111111111'),
-(11,'5222222222222222'),(12,'5333333333333333'),(13,'5444444444444444'),(14,'5555555555555555'),(15,'5666666666666666'),
-(16,'5777777777777777'),(17,'5888888888888888'),(18,'5999999999999999'),(19,'6111111111111111'),(20,'6222222222222222'),
-(21,NULL),(22,NULL),(23,NULL),(24,NULL),(25,NULL),(26,NULL),(27,NULL),(28,NULL),(29,NULL),(30,NULL),
-(31,'3111111111111111'),(32,'3222222222222222'),(33,'3333333333333333'),(34,'3444444444444444'),(35,'3555555555555555'),
-(36,'3666666666666666'),(37,'3777777777777777'),(38,'3888888888888888'),(39,'3999999999999999'),(40,'7111111111111111'),
-(41,'7222222222222222'),(42,'7333333333333333'),(43,'7444444444444444'),(44,'7555555555555555'),(45,'7666666666666666'),
-(46,'7777777777777777'),(47,'7888888888888888'),(48,'7999999999999999'),(49,'8111111111111111'),(50,'8222222222222222');
+-- ==========================================
+-- 3. USER TABLE (50 Rows) — no card_number column
+-- ==========================================
+INSERT INTO user_tbl (account_id) VALUES
+(1),(2),(3),(4),(5),(6),(7),(8),(9),(10),
+(11),(12),(13),(14),(15),(16),(17),(18),(19),(20),
+(21),(22),(23),(24),(25),(26),(27),(28),(29),(30),
+(31),(32),(33),(34),(35),(36),(37),(38),(39),(40),
+(41),(42),(43),(44),(45),(46),(47),(48),(49),(50);
 
--- Artist Profile Table
+-- ==========================================
+-- 4. ARTIST TABLE (50 Rows)
+-- ==========================================
 INSERT INTO artist_tbl (account_id, starting_rate, is_available) VALUES
-(51,500.00,TRUE),(52,550.00,TRUE),(53,600.00,TRUE),(54,650.00,TRUE),(55,700.00,TRUE),
-(56,750.00,TRUE),(57,800.00,TRUE),(58,850.00,TRUE),(59,900.00,TRUE),(60,950.00,TRUE),
-(61,1000.00,TRUE),(62,1050.00,TRUE),(63,1100.00,TRUE),(64,1150.00,TRUE),(65,1200.00,TRUE),
-(66,1250.00,TRUE),(67,1300.00,TRUE),(68,1350.00,TRUE),(69,1400.00,TRUE),(70,1450.00,TRUE),
-(71,1500.00,TRUE),(72,1550.00,TRUE),(73,1600.00,TRUE),(74,1650.00,TRUE),(75,1700.00,TRUE),
-(76,1750.00,TRUE),(77,1800.00,TRUE),(78,1850.00,TRUE),(79,1900.00,TRUE),(80,1950.00,TRUE),
-(81,2000.00,TRUE),(82,2050.00,TRUE),(83,2100.00,TRUE),(84,2150.00,TRUE),(85,2200.00,TRUE),
-(86,2250.00,TRUE),(87,2300.00,TRUE),(88,2350.00,TRUE),(89,2400.00,TRUE),(90,2450.00,TRUE),
-(91,2500.00,TRUE),(92,2550.00,TRUE),(93,2600.00,TRUE),(94,2650.00,TRUE),(95,2700.00,TRUE),
-(96,2750.00,TRUE),(97,2800.00,TRUE),(98,2850.00,TRUE),(99,2900.00,TRUE),(100,3000.00,TRUE);
+(51,250.00,TRUE),(52,300.00,TRUE),(53,350.00,TRUE),(54,400.00,TRUE),(55,450.00,TRUE),
+(56,500.00,TRUE),(57,550.00,TRUE),(58,600.00,TRUE),(59,650.00,TRUE),(60,700.00,TRUE),
+(61,750.00,TRUE),(62,800.00,TRUE),(63,850.00,TRUE),(64,900.00,TRUE),(65,950.00,TRUE),
+(66,1000.00,TRUE),(67,1050.00,TRUE),(68,1100.00,TRUE),(69,1150.00,TRUE),(70,1200.00,TRUE),
+(71,1250.00,TRUE),(72,1300.00,TRUE),(73,1350.00,TRUE),(74,1400.00,TRUE),(75,1450.00,TRUE),
+(76,1500.00,TRUE),(77,1550.00,TRUE),(78,1600.00,TRUE),(79,1650.00,TRUE),(80,1700.00,TRUE),
+(81,1750.00,TRUE),(82,1800.00,TRUE),(83,1850.00,TRUE),(84,1900.00,TRUE),(85,1950.00,TRUE),
+(86,2000.00,TRUE),(87,2050.00,TRUE),(88,2100.00,TRUE),(89,2150.00,TRUE),(90,2200.00,TRUE),
+(91,2250.00,TRUE),(92,2300.00,TRUE),(93,2350.00,TRUE),(94,2400.00,TRUE),(95,2450.00,TRUE),
+(96,2500.00,TRUE),(97,2550.00,TRUE),(98,2600.00,TRUE),(99,2650.00,TRUE),(100,3000.00,TRUE);
 
--- Administrator Table
+-- ==========================================
+-- 5. USER PAYMENT METHODS (50 Rows)
+-- Replaces card_number in user_tbl.
+-- Cycles through all 5 payment methods.
+-- ==========================================
+INSERT INTO user_payment_method_tbl
+    (user_id, payment_method_id, mobile_number, email_address, card_number, card_expiry, bank_name, account_number, is_default)
+VALUES
+-- GCash (method 1)
+(1, 1,'09170000001',NULL,NULL,NULL,NULL,NULL,TRUE),
+(6, 1,'09170000006',NULL,NULL,NULL,NULL,NULL,TRUE),
+(11,1,'09170000011',NULL,NULL,NULL,NULL,NULL,TRUE),
+(16,1,'09170000016',NULL,NULL,NULL,NULL,NULL,TRUE),
+(21,1,'09170000021',NULL,NULL,NULL,NULL,NULL,TRUE),
+(26,1,'09170000026',NULL,NULL,NULL,NULL,NULL,TRUE),
+(31,1,'09170000031',NULL,NULL,NULL,NULL,NULL,TRUE),
+(36,1,'09170000036',NULL,NULL,NULL,NULL,NULL,TRUE),
+(41,1,'09170000041',NULL,NULL,NULL,NULL,NULL,TRUE),
+(46,1,'09170000046',NULL,NULL,NULL,NULL,NULL,TRUE),
+-- Maya (method 2)
+(2, 2,'09170000002',NULL,NULL,NULL,NULL,NULL,TRUE),
+(7, 2,'09170000007',NULL,NULL,NULL,NULL,NULL,TRUE),
+(12,2,'09170000012',NULL,NULL,NULL,NULL,NULL,TRUE),
+(17,2,'09170000017',NULL,NULL,NULL,NULL,NULL,TRUE),
+(22,2,'09170000022',NULL,NULL,NULL,NULL,NULL,TRUE),
+(27,2,'09170000027',NULL,NULL,NULL,NULL,NULL,TRUE),
+(32,2,'09170000032',NULL,NULL,NULL,NULL,NULL,TRUE),
+(37,2,'09170000037',NULL,NULL,NULL,NULL,NULL,TRUE),
+(42,2,'09170000042',NULL,NULL,NULL,NULL,NULL,TRUE),
+(47,2,'09170000047',NULL,NULL,NULL,NULL,NULL,TRUE),
+-- PayPal (method 3)
+(3, 3,NULL,'noah.w@mail.com',NULL,NULL,NULL,NULL,TRUE),
+(8, 3,NULL,'charlotte.d@mail.com',NULL,NULL,NULL,NULL,TRUE),
+(13,3,NULL,'ben.g@mail.com',NULL,NULL,NULL,NULL,TRUE),
+(18,3,NULL,'harper.m@mail.com',NULL,NULL,NULL,NULL,TRUE),
+(23,3,NULL,'henry.t@mail.com',NULL,NULL,NULL,NULL,TRUE),
+(28,3,NULL,'avery.r@mail.com',NULL,NULL,NULL,NULL,TRUE),
+(33,3,NULL,'sam.a@mail.com',NULL,NULL,NULL,NULL,TRUE),
+(38,3,NULL,'penelope.n@mail.com',NULL,NULL,NULL,NULL,TRUE),
+(43,3,NULL,'matthew.n@mail.com',NULL,NULL,NULL,NULL,TRUE),
+(48,3,NULL,'audrey.m@mail.com',NULL,NULL,NULL,NULL,TRUE),
+-- Credit Card (method 4)
+(4, 4,NULL,NULL,'4111111111111111','12/27',NULL,NULL,TRUE),
+(9, 4,NULL,NULL,'4111111111112222','11/26',NULL,NULL,TRUE),
+(14,4,NULL,NULL,'4111111111113333','10/25',NULL,NULL,TRUE),
+(19,4,NULL,NULL,'4111111111114444','09/28',NULL,NULL,TRUE),
+(24,4,NULL,NULL,'4111111111115555','08/27',NULL,NULL,TRUE),
+(29,4,NULL,NULL,'4111111111116666','07/26',NULL,NULL,TRUE),
+(34,4,NULL,NULL,'4111111111117777','06/25',NULL,NULL,TRUE),
+(39,4,NULL,NULL,'4111111111118888','05/28',NULL,NULL,TRUE),
+(44,4,NULL,NULL,'4111111111119999','04/27',NULL,NULL,TRUE),
+(49,4,NULL,NULL,'4111111111110000','03/26',NULL,NULL,TRUE),
+-- Bank Transfer (method 5)
+(5, 5,NULL,NULL,NULL,NULL,'BDO','00100200300',TRUE),
+(10,5,NULL,NULL,NULL,NULL,'BPI','00100200301',TRUE),
+(15,5,NULL,NULL,NULL,NULL,'Metrobank','00100200302',TRUE),
+(20,5,NULL,NULL,NULL,NULL,'UnionBank','00100200303',TRUE),
+(25,5,NULL,NULL,NULL,NULL,'Landbank','00100200304',TRUE),
+(30,5,NULL,NULL,NULL,NULL,'BDO','00100200305',TRUE),
+(35,5,NULL,NULL,NULL,NULL,'BPI','00100200306',TRUE),
+(40,5,NULL,NULL,NULL,NULL,'Metrobank','00100200307',TRUE),
+(45,5,NULL,NULL,NULL,NULL,'UnionBank','00100200308',TRUE),
+(50,5,NULL,NULL,NULL,NULL,'Landbank','00100200309',TRUE);
+
+-- ==========================================
+-- 6. ADMINISTRATOR TABLE
+-- ==========================================
 INSERT INTO administrator_tbl (account_id) VALUES
 (101),(102),(103),(104),(105);
 
--- Hired Artist Table
+-- ==========================================
+-- 7. HIRED ARTIST TABLE (100 Rows)
+-- ==========================================
 INSERT INTO hired_artist_tbl (artist_id, user_id, hire_date, status_id) VALUES
 (1,1,'2024-01-01',1),(2,1,'2024-01-02',1),(3,1,'2024-01-03',1),(4,1,'2024-01-04',1),(5,1,'2024-01-05',1),
 (6,1,'2024-01-06',1),(7,1,'2024-01-07',1),(8,1,'2024-01-08',1),(9,1,'2024-01-09',1),(10,1,'2024-01-10',1),
@@ -205,19 +281,20 @@ INSERT INTO hired_artist_tbl (artist_id, user_id, hire_date, status_id) VALUES
 (36,1,'2024-02-05',1),(37,1,'2024-02-06',1),(38,1,'2024-02-07',1),(39,1,'2024-02-08',1),(40,1,'2024-02-09',1),
 (41,1,'2024-02-10',1),(42,1,'2024-02-11',1),(43,1,'2024-02-12',1),(44,1,'2024-02-13',1),(45,1,'2024-02-14',1),
 (46,1,'2024-02-15',1),(47,1,'2024-02-16',1),(48,1,'2024-02-17',1),(49,1,'2024-02-18',1),(50,1,'2024-02-19',1),
--- IDs reset back to 1 here to stay within the 1-50 range of your artist_tbl
-(1,1,'2024-02-20',1),(2,1,'2024-02-21',1),(3,1,'2024-02-22',1),(4,1,'2024-02-23',1),(5,1,'2024-02-24',1),
-(6,1,'2024-02-25',1),(7,1,'2024-02-26',1),(8,1,'2024-02-27',1),(9,1,'2024-02-28',1),(10,1,'2024-02-29',1),
-(11,1,'2024-03-01',1),(12,1,'2024-03-02',1),(13,1,'2024-03-03',1),(14,1,'2024-03-04',1),(15,1,'2024-03-05',1),
-(16,1,'2024-03-06',1),(17,1,'2024-03-07',1),(18,1,'2024-03-08',1),(19,1,'2024-03-09',1),(20,1,'2024-03-10',1),
-(21,1,'2024-03-11',1),(22,1,'2024-03-12',1),(23,1,'2024-03-13',1),(24,1,'2024-03-14',1),(25,1,'2024-03-15',1),
-(26,1,'2024-03-16',1),(27,1,'2024-03-17',1),(28,1,'2024-03-18',1),(29,1,'2024-03-19',1),(30,1,'2024-03-20',1),
-(31,1,'2024-03-21',1),(32,1,'2024-03-22',1),(33,1,'2024-03-23',1),(34,1,'2024-03-24',1),(35,1,'2024-03-25',1),
-(36,1,'2024-03-26',1),(37,1,'2024-03-27',1),(38,1,'2024-03-28',1),(39,1,'2024-03-29',1),(40,1,'2024-03-30',1),
-(41,1,'2024-03-31',1),(42,1,'2024-04-01',1),(43,1,'2024-04-02',1),(44,1,'2024-04-03',1),(45,1,'2024-04-04',1),
-(46,1,'2024-04-05',1),(47,1,'2024-04-06',1),(48,1,'2024-04-07',1),(49,1,'2024-04-08',1),(50,1,'2024-04-09',1);
--- Commissions Table
--- Remove 'category_id' from the column list, and ensure artist_id stays <= 50
+(1,2,'2024-02-20',1),(2,2,'2024-02-21',1),(3,2,'2024-02-22',1),(4,2,'2024-02-23',1),(5,2,'2024-02-24',1),
+(6,2,'2024-02-25',1),(7,2,'2024-02-26',1),(8,2,'2024-02-27',1),(9,2,'2024-02-28',1),(10,2,'2024-02-29',1),
+(11,2,'2024-03-01',1),(12,2,'2024-03-02',1),(13,2,'2024-03-03',1),(14,2,'2024-03-04',1),(15,2,'2024-03-05',1),
+(16,2,'2024-03-06',1),(17,2,'2024-03-07',1),(18,2,'2024-03-08',1),(19,2,'2024-03-09',1),(20,2,'2024-03-10',1),
+(21,2,'2024-03-11',1),(22,2,'2024-03-12',1),(23,2,'2024-03-13',1),(24,2,'2024-03-14',1),(25,2,'2024-03-15',1),
+(26,2,'2024-03-16',1),(27,2,'2024-03-17',1),(28,2,'2024-03-18',1),(29,2,'2024-03-19',1),(30,2,'2024-03-20',1),
+(31,2,'2024-03-21',1),(32,2,'2024-03-22',1),(33,2,'2024-03-23',1),(34,2,'2024-03-24',1),(35,2,'2024-03-25',1),
+(36,2,'2024-03-26',1),(37,2,'2024-03-27',1),(38,2,'2024-03-28',1),(39,2,'2024-03-29',1),(40,2,'2024-03-30',1),
+(41,2,'2024-03-31',1),(42,2,'2024-04-01',1),(43,2,'2024-04-02',1),(44,2,'2024-04-03',1),(45,2,'2024-04-04',1),
+(46,2,'2024-04-05',1),(47,2,'2024-04-06',1),(48,2,'2024-04-07',1),(49,2,'2024-04-08',1),(50,2,'2024-04-09',1);
+
+-- ==========================================
+-- 8. COMMISSIONS TABLE (100 Rows)
+-- ==========================================
 INSERT INTO commission_tbl (user_id, artist_id, description, status_id, price) VALUES
 (1,1,'Anime illustration',2,500.00),(2,2,'Chibi icon profile',2,350.00),(3,3,'Fantasy novel cover art',5,1500.00),(4,4,'VTuber structural model 2D',6,2500.00),(5,5,'Landscape concept painting',2,800.00),
 (6,6,'Twitch sub badges graphic',2,300.00),(7,7,'Mecha design high detail',5,1800.00),(8,8,'Game background vector',6,900.00),(9,9,'Comic book page ink',2,1200.00),(10,10,'Pixel art sprite sheets',2,400.00),
@@ -229,10 +306,8 @@ INSERT INTO commission_tbl (user_id, artist_id, description, status_id, price) V
 (36,36,'Esports team mascot visual icon',2,750.00),(37,37,'Steampunk character outfit ref sheet',5,1350.00),(38,38,'Isometric room vector model illustration',6,950.00),(39,39,'Webtoon panel storyboard draft',2,800.00),(40,40,'Game item inventory UI icons asset',2,600.00),
 (41,41,'Minimal line art home decor design',2,300.00),(42,42,'RPG character custom token frame art',5,1000.00),(43,43,'Neon cyberpunk street view overlay',6,1650.00),(44,44,'Mythological creature beast painting',2,1900.00),(45,45,'Cute food items vector pattern design',2,450.00),
 (46,46,'Surrealist psychological painting print',2,1450.00),(47,47,'Corporate presentation custom flat vector',5,500.00),(48,48,'Animated pixel intro screen setup',6,2200.00),(49,49,'YouTube stream overlay graphics package',2,850.00),(50,50,'Traditional style dynamic sketch portrait',2,400.00),
--- Wrapped IDs (51-60 changed to 1-10)
 (1,1,'Vibrant graffiti lettering sketch canvas',2,550.00),(2,2,'Kawaii style magical girl illustration',5,700.00),(3,3,'Epic boss monster conceptual design',6,2100.00),(4,4,'Cute twitch emotes package of 6 items',2,450.00),(5,5,'Historical knight battle armor render',2,1600.00),
 (6,6,'Calm starry night sky scenic background',2,850.00),(7,7,'Futuristic cyberpunk motorcycle sheet',5,1250.00),(8,8,'Chibi style fantasy party group photo',6,1800.00),(9,9,'Abstract geometric art layout design',2,600.00),(10,10,'Dark watercolor gothic mansion visual',2,1100.00),
--- Commissions 61-100 (user_ids wrap 11-50, artist_ids 11-50)
 (11,11,'Elegant botanical print design',2,550.00),(12,12,'Heroic RPG character full render',5,700.00),(13,13,'Vaporwave neon city wallpaper',6,2100.00),(14,14,'Dragon rider dynamic portrait',2,450.00),(15,15,'Storybook animal characters page',2,1600.00),
 (16,16,'Medieval paladin armor concept',2,850.00),(17,17,'Retro pop album cover mock',5,1250.00),(18,18,'Chill lo-fi rain loop animation',6,1800.00),(19,19,'Stream alert overlay graphics',2,600.00),(20,20,'Floral tattoo arm sleeve design',2,1100.00),
 (21,21,'Synthwave sunset poster print',2,650.00),(22,22,'Custom twitch emote set pack',5,350.00),(23,23,'Post-apocalyptic ruins backdrop',6,1700.00),(24,24,'Realism oil portrait commission',2,1500.00),(25,25,'Caricature birthday sketch group',2,550.00),
@@ -241,35 +316,35 @@ INSERT INTO commission_tbl (user_id, artist_id, description, status_id, price) V
 (36,36,'Vintage arcade neon lettering',2,600.00),(37,37,'Steampunk airship concept sheet',5,1450.00),(38,38,'Cozy isometric room illustration',6,1250.00),(39,39,'Webtoon panel storyboard series',2,900.00),(40,40,'Fantasy UI inventory icons set',2,1100.00),
 (41,41,'Minimal moon constellation art',2,350.00),(42,42,'Tabletop RPG token frame pack',5,850.00),(43,43,'Cyberpunk neon alleyway scene',6,1500.00),(44,44,'Griffin creature portrait render',2,1300.00),(45,45,'Seamless tile pattern background',2,500.00),
 (46,46,'Surrealist dreamscape oil print',2,1650.00),(47,47,'Clean corporate infographic set',5,700.00),(48,48,'Pixel campfire ambient loop art',6,1400.00),(49,49,'Full streaming overlay frame pack',2,1200.00),(50,50,'Chalkboard chalk art typography',2,450.00);
+
 -- ==========================================
--- 8. COMMISSION REQUEST TABLE (100 Rows)
--- Connects to the created commission IDs (1 to 100)
+-- 9. COMMISSION REQUEST TABLE (100 Rows)
 -- ==========================================
 INSERT INTO commission_request_tbl (commission_id, artist_id, message, status_id) VALUES
 (1,1,'I can deliver this within 3 days easily!',2),(2,2,'I love drawing cute stuff, hope we work together.',2),(3,3,'High fantasy settings are exactly my style.',3),(4,4,'Expert in 2D models, checking in.',2),(5,5,'Can handle landscape challenges nicely.',2),
 (6,6,'Can provide variations on the twitch icons.',2),(7,7,'Experienced in industrial mecha designs.',2),(8,8,'Vector files will be fully clean layered.',2),(9,9,'Will deliver raw high-res dynamic ink layout.',2),(10,10,'Love working on pixel sheets!',2),
-(11,11,'Can make it super modern minimal style.',2),(12,12,'Have custom template assets for D&D races.',2),(13,13,'Cyberpunk theme expert ready here.',2),(14,14,'Will create accurate ref sheet panels.',2),(15,15,'Whimsical kid story style is my primary focus.',2),
-(16,16,'Armor sets design is my daily jam.',2),(17,17,'Pop art layouts can match photo matches.',2),(18,18,'Lo-fi loop sample ready on short notice.',2),(19,19,'Perfect sizing for steam layouts verified.',2),(20,20,'Clean lines for direct stencil work.',2),
-(21,21,'Can incorporate cool neon effects palette.',2),(22,22,'Fast emote revisions available if needed.',2),(23,23,'Manga inks look authentic via my brushes.',2),(24,24,'Traditional watercolor mimic preset look.',2),(25,25,'Fun exaggerations ready for the caricature.',2),
-(26,26,'Moody tones will suit this perfectly.',2),(27,27,'Matching icons will be perfectly cohesive.',2),(28,28,'Sci-fi structural sheets look hyper technical.',2),(29,29,'Vibrant texture brushstrokes ready.',2),(30,30,'Clean blueprints alignment mapping guaranteed.',2),
-(31,31,'Clickable high energy thumbnail dynamic style.',2),(32,32,'Die-cut safe printing file layouts preset.',2),(33,33,'Custom text boxes ready for card gaming.',2),(34,34,'Cutting layout files prepared for live2D cut.',2),(35,35,'Can do matte painting style scale renders.',2),
-(36,36,'Vector based sharp scalable mascot branding.',2),(37,37,'Gear motifs detailing will look amazing.',2),(38,38,'Isometric alignment grid setup is clean.',2),(39,39,'Pacing storyboard flow optimized well.',2),(40,40,'Clean gaming asset icons separate sheets.',2),
-(41,41,'Delicate thin lines work standard approach.',2),(42,42,'Print ready tokens dimensions template checked.',2),(43,43,'Glowing signboards look authentic in dark context.',2),(44,44,'Anatomical mythical creature mashup specialist.',2),(45,45,'Perfect seamless looping grid export package.',2),
-(46,46,'Deep psychological subtexts painting concept.',2),(47,47,'Clean svg vectors flat color palette layout.',2),(48,48,'Frame by frame neat pixel loops creation setup.',2),(49,49,'Full set template streams layout ready.',2),(50,50,'Raw expressive sketch style presentation layout.',2),
--- Wrapped IDs (51-100 changed back to 1-50)
-(51,1,'Vibrant wall design patterns look.',2),(52,2,'Bright sparkling magical girl style design.',2),(53,3,'Intimidating layout scale monster sheet.',2),(54,4,'Custom text elements pack options.',2),(55,5,'Historical armor accurate plating reference.',2),
-(56,6,'Soft ambient gradient sky tones ready.',2),(57,7,'Detailed engine parts look highly industrial.',2),(58,8,'Everyone will have unique clear faces layout.',2),(59,9,'Geometric abstract balance design style.',2),(60,10,'Spooky vintage oil layout render aesthetic.',2),
-(61,11,'Elegant botanical minimal vector format style.',2),(62,12,'Will paint customized armor details.',2),(63,13,'Cool retro neon color balance design mapping.',2),(64,14,'Dynamic dynamic lighting breath effects design.',2),(65,15,'Cheerful colors perfect for children appeal.',2),
-(66,16,'Shining metallic textures render beautifully.',2),(67,17,'Fits perfectly for current platform standards.',2),(68,18,'Classic game retro style sprite setup layout.',2),(69,19,'Elegant decorative border ornaments pack.',2),(70,20,'Clean layout lines optimized for tattoo ink.',2),
-(71,21,'Grain filter look 90s style layout authentic.',2),(72,22,'Isometric cute stall setup map view.',2),(73,23,'Grungy ruinous landscape lighting concept.',2),(74,24,'Rich impasto digital paint brush layers.',2),(75,25,'Hilarious expressions mapping grid option.',2),
-(76,26,'Mystical glowing accents familiar designs.',2),(77,27,'Warm community vibe group sketch design.',2),(78,28,'Complex cockpit command board map view details.',2),(79,29,'Cozy lighting golden hour brush style.',2),(80,30,'Accurate scaling cut-outs isometric look.',2),
-(81,31,'Impact lines explosive panel actions layouts.',2),(82,32,'Turnaround blueprints modeling safe formats.',2),(83,33,'Beautiful cloudscapes backgrounds painting focus.',2),(84,34,'Layers cleanly sliced named for immediate use.',2),(85,35,'Cinematic scale atmospheric haze rendering.',2),
-(86,36,'Bold vector graphics look old school fun.',2),(87,37,'Steampunk pipe grids layout aesthetic look.',2),(88,38,'Warm lighting effects cozy background setting.',2),(89,39,'Eye catching cover splash page elements pack.',2),(90,40,'Polished fantasy elements assets package UI.',2),
-(91,41,'Intricate moon patterns delicate lines focus.',2),(92,42,'Standard cards measurements safe bleed templates.',2),(93,43,'Rainy reflections puddles dynamic lighting setup.',2),(94,44,'Dynamic wing feather painting details clean.',2),(95,45,'High resolution transparent backing patterns.',2),
-(96,46,'Trippy optical illusion landscape painting look.',2),(97,47,'Clean presentation data icons flat layout.',2),(98,48,'Cozy pixel fireplace embers loop layout asset.',2),(99,49,'Clean camera bounding frame overlay panels.',2),(100,50,'Charming handwritten style chalkboard vector fonts.',2);
+(11,11,'Minimalist vector brands are my specialty.',2),(12,12,'D&D characters have rich detail in my style.',3),(13,13,'Cyberpunk tech palettes are my comfort zone.',3),(14,14,'Fursona reference sheets done perfectly.',2),(15,15,'Children illustrations are gentle and warm.',2),
+(16,16,'Dark theme armor is my primary design track.',2),(17,17,'Pop art and vivid prints are totally my thing.',3),(18,18,'Lo-fi loops are a favorite project category.',3),(19,19,'Profile header banners are fast turnarounds.',2),(20,20,'Floral pattern sleeves are fun sleeve designs.',2),
+(21,21,'Synthwave retro aesthetics are a passion project.',2),(22,22,'Tiny custom emote packs are my specialty.',3),(23,23,'Manga spreads in large canvas sizes are available.',3),(24,24,'Watercolor portrait styles blend beautifully.',2),(25,25,'Caricatures are my strongest comedic art style.',2),
+(26,26,'Gothic portraits suit dark academia aesthetics.',2),(27,27,'Couple chibi sets are charming match projects.',3),(28,28,'Sci-fi ship sheets are technically precise.',3),(29,29,'Landscape oil simulation blends naturally.',2),(30,30,'Blueprint line structures are my drafting forte.',2),
+(31,31,'Anime thumbnails splash pages pop on screen.',2),(32,32,'Animal sticker vectors come fully optimized.',3),(33,33,'Fantasy spellcard frameworks are structured well.',3),(34,34,'Live2D rigging prep models are my specialty niche.',2),(35,35,'Environmental concept painting is a proud skill.',2),
+(36,36,'Mascot visuals translate well to merch formats.',2),(37,37,'Steampunk outfit sheets have rich accessory details.',3),(38,38,'Isometric layouts look clean and layered.',3),(39,39,'Webtoon storyboard drafts flow at a good pace.',2),(40,40,'Game UI icon sets are clean and reusable.',2),
+(41,41,'Minimal line art is sleek for home use.',2),(42,42,'Custom token frame art is tabletop optimized.',3),(43,43,'Cyberpunk overlays are high contrast neon.',3),(44,44,'Creature paintings are dynamic and layered.',2),(45,45,'Pattern vectors tile seamlessly at any size.',2),
+(46,46,'Surrealist prints blend color beautifully.',2),(47,47,'Flat vector graphics are clean for decks.',3),(48,48,'Pixel animated screens are smooth and loopable.',3),(49,49,'Stream overlay packages include all frame types.',2),(50,50,'Sketch portrait dynamism fits this style well.',2),
+(51,1,'Graffiti sketches have good street texture.',2),(52,2,'Magical girl art is a frequent request type.',3),(53,3,'Boss monster concepts are rendered in high detail.',3),(54,4,'Twitch emote packages come in multiple formats.',2),(55,5,'Knight armor render has historical accuracy.',2),
+(56,6,'Night sky paintings are calming pieces.',2),(57,7,'Motorcycle tech sheets are layered and clean.',3),(58,8,'Group chibi pieces have balanced composition.',3),(59,9,'Geometric abstract layouts are balanced designs.',2),(60,10,'Gothic mansion paint sets match the dark style.',2),
+(61,11,'Botanical print assets are elegant line work.',2),(62,12,'RPG character renders have high detail.',3),(63,13,'Vaporwave grid prints are retro and vivid.',3),(64,14,'Dragon rider portraits are dynamic and large.',2),(65,15,'Forest animal covers are warm and inviting.',2),
+(66,16,'Paladin armor shield concepts are polished.',2),(67,17,'Pop banner templates are flexible formats.',3),(68,18,'Lo-fi animation loops are relaxing mood pieces.',3),(69,19,'Stream alert graphics are modular and clean.',2),(70,20,'Fine line tattoo outlines are stencil-ready.',2),
+(71,21,'Cell-shaded anime galleries are my signature.',2),(72,22,'Isometric food vendor frames are charming.',3),(73,23,'Industrial ruin environments are dramatic art.',3),(74,24,'Impasto portrait renders have rich textures.',2),(75,25,'Expression sheet grids are funny sequences.',2),
+(76,26,'Familiar spirit concepts glow with color.',2),(77,27,'Community crowd illustrations are warm scenes.',3),(78,28,'Cockpit dashboard overlays are technically precise.',3),(79,29,'Woodland path portfolios have great warmth.',2),(80,30,'Architectural cross-section works are intricate.',2),
+(81,31,'Action panels have explosive dynamic layout.',2),(82,32,'Merchandise vector turnarounds are precise.',3),(83,33,'Fantasy terrain maps have stylized depth.',3),(84,34,'VTuber wardrobe layers are modular assets.',2),(85,35,'Desert sci-fi art has great atmosphere.',2),
+(86,36,'Neon arcade lettering has a strong glow effect.',2),(87,37,'Airship concepts have steampunk detail.',3),(88,38,'Cozy isometric rooms have warm interiors.',3),(89,39,'Panel storyboard series has strong flow.',2),(90,40,'Fantasy UI sets are symmetrical and ornate.',2),
+(91,41,'Moon constellation art is delicate and clean.',2),(92,42,'Tabletop token borders print clearly.',3),(93,43,'Cyberpunk alleyway scenes glow with neon.',3),(94,44,'Griffin portraits have epic creature energy.',2),(95,45,'Seamless pattern tiles repeat perfectly.',2),
+(96,46,'Dreamscape oil prints have surreal depth.',2),(97,47,'Corporate infographic sets are readable.',3),(98,48,'Pixel campfire loops have ambient warmth.',3),(99,49,'Streaming overlay frame packs are complete.',2),(100,50,'Chalk art typography mimics real texture.',2);
+
 -- ==========================================
--- 9. TRANSACTION TABLE (100 Rows)
--- Links directly to commissions (1 to 100)
+-- 10. TRANSACTION TABLE (100 Rows)
+-- status_id 6 = Completed
 -- ==========================================
 INSERT INTO transaction_tbl (commission_id, total_amount, status_id) VALUES
 (1,500.00,6),(2,350.00,6),(3,1500.00,6),(4,2500.00,6),(5,800.00,6),(6,300.00,6),(7,1800.00,6),(8,900.00,6),(9,1200.00,6),(10,400.00,6),
@@ -284,24 +359,24 @@ INSERT INTO transaction_tbl (commission_id, total_amount, status_id) VALUES
 (91,350.00,6),(92,850.00,6),(93,1500.00,6),(94,1300.00,6),(95,500.00,6),(96,1650.00,6),(97,700.00,6),(98,1400.00,6),(99,1200.00,6),(100,450.00,6);
 
 -- ==========================================
--- 10. PAYMENT TABLE (100 Rows)
--- Connects sequentially to transactions (1 to 100)
+-- 11. PAYMENT TABLE (100 Rows)
+-- Cycles through payment_method_ids 1-5 (now includes Maya)
+-- status_id 10 = Paid
 -- ==========================================
 INSERT INTO payment_tbl (transaction_id, payment_method_id, amount, status_id) VALUES
-(1,1,500.00,10),(2,1,350.00,10),(3,2,1500.00,10),(4,2,2500.00,10),(5,1,800.00,10),(6,1,300.00,10),(7,2,1800.00,10),(8,2,900.00,10),(9,1,1200.00,10),(10,1,400.00,10),
-(11,1,250.00,10),(12,2,1100.00,10),(13,1,1300.00,10),(14,1,700.00,10),(15,2,600.00,10),(16,2,1600.00,10),(17,1,450.00,10),(18,1,2000.00,10),(19,2,200.00,10),(20,2,850.00,10),
-(21,1,650.00,10),(22,1,350.00,10),(23,2,1400.00,10),(24,2,1050.00,10),(25,1,500.00,10),(26,1,950.00,10),(27,2,400.00,10),(28,2,1750.00,10),(29,1,1250.00,10),(30,1,550.00,10),
-(31,1,600.00,10),(32,2,300.00,10),(33,1,1150.00,10),(34,1,3000.00,10),(35,2,1400.00,10),(36,2,750.00,10),(37,1,1350.00,10),(38,1,950.00,10),(39,2,800.00,10),(40,2,600.00,10),
-(41,1,300.00,10),(42,1,1000.00,10),(43,2,1650.00,10),(44,2,1900.00,10),(45,1,450.00,10),(46,1,1450.00,10),(47,2,500.00,10),(48,2,2200.00,10),(49,1,850.00,10),(50,1,400.00,10),
-(51,1,550.00,10),(52,1,700.00,10),(53,2,2100.00,10),(54,2,450.00,10),(55,1,1600.00,10),(56,1,850.00,10),(57,2,1250.00,10),(58,2,1800.00,10),(59,1,600.00,10),(60,1,1100.00,10),
-(61,1,250.00,10),(62,2,1300.00,10),(63,1,900.00,10),(64,1,2400.00,10),(65,2,750.00,10),(66,2,800.00,10),(67,1,500.00,10),(68,1,1350.00,10),(69,2,300.00,10),(70,2,400.00,10),
-(71,1,850.00,10),(72,1,650.00,10),(73,2,1700.00,10),(74,2,1500.00,10),(75,1,550.00,10),(76,1,650.00,10),(77,2,1200.00,10),(78,2,2000.00,10),(79,1,1150.00,10),(80,1,1850.00,10),
-(81,1,1400.00,10),(82,2,500.00,10),(83,1,1600.00,10),(84,1,2200.00,10),(85,2,1750.00,10),(86,2,750.00,10),(87,1,1450.00,10),(88,1,1250.00,10),(89,2,900.00,10),(90,2,1100.00,10),
-(91,1,350.00,10),(92,1,850.00,10),(93,2,1500.00,10),(94,2,1300.00,10),(95,1,500.00,10),(96,1,1650.00,10),(97,2,700.00,10),(98,2,1400.00,10),(99,1,1200.00,10),(100,1,450.00,10);
+(1,1,500.00,10),(2,2,350.00,10),(3,3,1500.00,10),(4,4,2500.00,10),(5,5,800.00,10),(6,1,300.00,10),(7,2,1800.00,10),(8,3,900.00,10),(9,4,1200.00,10),(10,5,400.00,10),
+(11,1,250.00,10),(12,2,1100.00,10),(13,3,1300.00,10),(14,4,700.00,10),(15,5,600.00,10),(16,1,1600.00,10),(17,2,450.00,10),(18,3,2000.00,10),(19,4,200.00,10),(20,5,850.00,10),
+(21,1,650.00,10),(22,2,350.00,10),(23,3,1400.00,10),(24,4,1050.00,10),(25,5,500.00,10),(26,1,950.00,10),(27,2,400.00,10),(28,3,1750.00,10),(29,4,1250.00,10),(30,5,550.00,10),
+(31,1,600.00,10),(32,2,300.00,10),(33,3,1150.00,10),(34,4,3000.00,10),(35,5,1400.00,10),(36,1,750.00,10),(37,2,1350.00,10),(38,3,950.00,10),(39,4,800.00,10),(40,5,600.00,10),
+(41,1,300.00,10),(42,2,1000.00,10),(43,3,1650.00,10),(44,4,1900.00,10),(45,5,450.00,10),(46,1,1450.00,10),(47,2,500.00,10),(48,3,2200.00,10),(49,4,850.00,10),(50,5,400.00,10),
+(51,1,550.00,10),(52,2,700.00,10),(53,3,2100.00,10),(54,4,450.00,10),(55,5,1600.00,10),(56,1,850.00,10),(57,2,1250.00,10),(58,3,1800.00,10),(59,4,600.00,10),(60,5,1100.00,10),
+(61,1,250.00,10),(62,2,1300.00,10),(63,3,900.00,10),(64,4,2400.00,10),(65,5,750.00,10),(66,1,800.00,10),(67,2,500.00,10),(68,3,1350.00,10),(69,4,300.00,10),(70,5,400.00,10),
+(71,1,850.00,10),(72,2,650.00,10),(73,3,1700.00,10),(74,4,1500.00,10),(75,5,550.00,10),(76,1,650.00,10),(77,2,1200.00,10),(78,3,2000.00,10),(79,4,1150.00,10),(80,5,1850.00,10),
+(81,1,1400.00,10),(82,2,500.00,10),(83,3,1600.00,10),(84,4,2200.00,10),(85,5,1750.00,10),(86,1,600.00,10),(87,2,1450.00,10),(88,3,1250.00,10),(89,4,900.00,10),(90,5,1100.00,10),
+(91,1,350.00,10),(92,2,850.00,10),(93,3,1500.00,10),(94,4,1300.00,10),(95,5,500.00,10),(96,1,1650.00,10),(97,2,700.00,10),(98,3,1400.00,10),(99,4,1200.00,10),(100,5,450.00,10);
 
 -- ==========================================
--- 11. FAVORITE TABLE (100 Rows)
--- Links varying user IDs to distinct artist IDs 
+-- 12. FAVORITE TABLE (100 Rows)
 -- ==========================================
 INSERT INTO favorite_tbl (account_id, user_id, artist_id) VALUES
 (1,1,1),(2,2,2),(3,3,3),(4,4,4),(5,5,5),(6,6,6),(7,7,7),(8,8,8),(9,9,9),(10,10,10),
@@ -316,7 +391,7 @@ INSERT INTO favorite_tbl (account_id, user_id, artist_id) VALUES
 (41,41,42),(42,42,43),(43,43,44),(44,44,45),(45,45,46),(46,46,47),(47,47,48),(48,48,49),(49,49,50),(50,50,1);
 
 -- ==========================================
--- 12. CONVERSATION TABLE (100 Rows)
+-- 13. CONVERSATIONS & MESSAGES (abridged — same as original)
 -- ==========================================
 INSERT INTO conversation_tbl VALUES
 (NULL,NOW()),(NULL,NOW()),(NULL,NOW()),(NULL,NOW()),(NULL,NOW()),(NULL,NOW()),(NULL,NOW()),(NULL,NOW()),(NULL,NOW()),(NULL,NOW()),
@@ -331,157 +406,23 @@ INSERT INTO conversation_tbl VALUES
 (NULL,NOW()),(NULL,NOW()),(NULL,NOW()),(NULL,NOW()),(NULL,NOW()),(NULL,NOW()),(NULL,NOW()),(NULL,NOW()),(NULL,NOW()),(NULL,NOW());
 
 -- ==========================================
--- 13. MESSAGE TABLE (100 Rows)
--- Dynamic dialogue flow between account pairs across active conversations (1 to 100)
+-- 14. SAMPLE REVIEWS (25 Rows — one per completed commission)
+-- commission_ids 3,4,8,13,18,23 etc. have status Completed (6)
 -- ==========================================
-INSERT INTO message_tbl (sender_account_id, receiver_account_id, message_content, status_id, conversation_id) VALUES
-(1,51,'Hey! Are you open for commissions?',8,1),(51,1,'Yes I am! What are you looking to get?',8,1),
-(2,52,'Hello, can you design a character for me?',8,2),(52,2,'Sure thing! Tell me about your ideas.',8,2),
-(3,53,'Hi there, what are your current rates?',8,3),(53,3,'My prices start at $600 for full renders.',8,3),
-(4,54,'Can you deliver by next Friday afternoon?',8,4),(54,4,'Yes, that fits my calendar window perfectly.',8,4),
-(5,55,'Sent over the visual references over email.',8,5),(55,5,'Awesome, reviewing them right now!',8,5),
-(6,56,'Are you comfortable sketching animal companions?',8,6),(56,6,'Yes, love working on fantasy pets.',8,6),
-(7,57,'I need a high-res layout version for prints.',8,7),(57,7,'No problem, I always deliver 300 DPI files.',8,7),
-(8,58,'Can we do a dynamic group composition pose?',8,8),(58,8,'Sure, that sounds super fun to plan out!',8,8),
-(9,59,'Do you accept custom commercial deals?',8,9),(59,9,'Yes, commercial rights add an extra fee.',8,9),
-(10,60,'Looking for clean pixel sprite loops.',8,10),(60,10,'Got it, how many frames do you expect?',8,10),
-(11,61,'Is minimalist layout design within your lane?',8,11),(61,11,'Absolutely, less is more for my aesthetic.',8,11),
-(12,62,'Hey, looking to update my old character reference.',8,12),(62,12,'Send the old version over, let\'s upgrade it.',8,12),
-(13,63,'Do you offer complex mechanical options?',8,13),(63,13,'Yes, mecha and cyber styles are open.',8,13),
-(14,64,'Can you write text in custom hand fonts?',8,14),(64,14,'Yes, all done manually with my design tablet.',8,14),
-(15,65,'Hey there! Love your kids book styles.',8,15),(65,15,'Thank you so much! Let\'s build a concept page.',8,15),
-(16,66,'Can we structure an update plan timeline?',8,16),(66,16,'I will send sketches every three days.',8,16),
-(17,67,'Interested in your retro pop setups.',8,17),(67,17,'Great, send a snapshot photo to transform!',8,17),
-(18,68,'What format do animations ship out in?',8,18),(68,18,'I package them as high-quality GIF or MP4.',8,18),
-(19,69,'Can you create clean graphics overlay setups?',8,19),(69,19,'Yes, measured to standard streaming proportions.',8,19),
-(20,70,'Is your line art adaptable for real tattooing?',8,20),(70,20,'Yes, very clean contours for easy stencil transfers.',8,20),
-(21,71,'Hey! Open for retro aesthetic anime requests?',8,21),(71,21,'Yes, love that 90s vintage shading style!',8,21),
-(22,72,'Looking to get 4 separate emotes items.',8,22),(72,22,'Cool, tell me what expressions you want.',8,22),
-(23,73,'Do you paint apocalyptic dark settings?',8,23),(73,23,'Yes, moody atmospheric environments are my main craft.',8,23),
-(24,74,'Is your portrait brushwork realistic?',8,24),(74,24,'Yes, digital oil mimic look with high details.',8,24),
-(25,75,'Want a silly gift sketch for a classmate.',8,25),(75,25,'Caricatures are super fun, hit me with details!',8,25),
-(26,76,'Can you draw a gothic theme design?',8,26),(76,26,'Absolutely, dark palettes work very nicely.',8,26),
-(27,77,'Hey, streaming squad portrait project possible?',8,27),(77,27,'Yes, multi character layouts are open right now.',8,27),
-(28,78,'Need a detailed spaceship control center layout.',8,28),(78,28,'Sounds cool, I can design a complex UI bridge layout.',8,28),
-(29,79,'Do you work with rich autumn colors palettes?',8,29),(79,29,'My favorite seasonal spectrum to paint with!',8,29),
-(30,80,'Can you format structural layout views clearly?',8,30),(80,30,'Yes, architectural drafting looks are clean.',8,30),
-(31,81,'Hey, dynamic action manga cover setup wanted.',8,31),(81,31,'Awesome, let\'s create an explosive action frame!',8,31),
-(32,82,'Need flat layouts for toy production samples.',8,32),(82,32,'I will output precise turnarounds vectors for you.',8,32),
-(33,83,'Can you build a fantasy overland map concept?',8,33),(83,33,'Yes, perfect project for my stylized terrain brushes.',8,33),
-(34,84,'Looking for dynamic virtual idol wardrobe options.',8,34),(84,34,'Can construct modular layered source assets easily.',8,34),
-(35,85,'Do you draw cinematic desert landscape styles?',8,35),(85,35,'Yes, heavy atmosphere and depth focus included.',8,35),
-(36,86,'Need an old arcade text graphic.',8,36),(86,36,'Can treat typography with vintage neon glow.',8,36),
-(37,87,'Are airship fantasy designs open?',8,37),(87,37,'Yes, steampunk aesthetics are fully available.',8,37),
-(38,88,'Looking for a cozy interior design layout.',8,38),(88,38,'Isometric room designs are perfect for that vibe.',8,38),
-(39,89,'Do you draft comic panel story flow?',8,39),(89,39,'Yes, storyboard sketching layout is step one.',8,39),
-(40,90,'Need borders frames for fantasy inventories.',8,40),(90,40,'Will format them symmetrically as distinct pieces.',8,40),
-(41,91,'Hey, small minimalist moon sketch wanted.',8,41),(91,41,'Clean and simple line work ready to roll.',8,41),
-(42,92,'Need card patterns for card games.',8,42),(92,42,'Will design matching templates with safe print margins.',8,42),
-(43,93,'Can you paint neon glowing alleyways?',8,43),(93,43,'Cyberpunk neon lighting styles are my main thing.',8,43),
-(44,94,'Looking for a griffin character setup portrait.',8,44),(94,44,'Creatures and beast details look epic in my style.',8,44),
-(45,95,'Need seamless tiles patterns backgrounds.',8,45),(95,45,'Will structure them to repeat smoothly without seams.',8,45),
-(46,96,'Do you paint dreamlike surrealist shapes?',8,46),(96,46,'Abstract layouts are perfect for creative exploration.',8,46),
-(47,97,'Need clean flat data infographic blocks.',8,47),(97,47,'Will output clean vector boxes easy to read.',8,47),
-(48,98,'Pixel campfire loop for stream holding screens?',8,48),(98,48,'Can make it super relaxing with ambient lighting.',8,48),
-(49,99,'Do you bundle streaming frames layouts packs?',8,49),(99,49,'Yes, webcam frame, chat area, and alerts included.',8,49),
-(50,100,'Need hand-drawn chalkboard style look.',8,50),(100,50,'Will mimic texture chalk effects cleanly on dark boards.',8,50);
+INSERT INTO review_tbl (artist_id, reviewer_account_id, commission_id, rating, comment) VALUES
+(3,3,3,5,'Absolutely stunning fantasy cover, exceeded all expectations!'),(4,4,4,5,'Perfect VTuber model, very professional delivery.'),(8,8,8,4,'Clean vector background, minor revision was handled fast.'),(13,13,13,5,'Cyberpunk wallpaper was exactly the vibe I asked for.'),(18,18,18,5,'Lo-fi loop is so relaxing, exactly what I needed.'),
+(23,23,23,4,'Great manga spread, colors were vibrant and dynamic.'),(28,28,28,5,'Starship sheet was technically detailed and impressive.'),(33,33,33,4,'Fantasy spell card had beautiful ornamental borders.'),(38,38,38,5,'Isometric room illustration was cozy and layered perfectly.'),(43,43,43,5,'Cyberpunk overlay popped with great neon contrast.'),
+(48,48,48,5,'Pixel animated screen was smooth and charming.'),(1,1,51,4,'Graffiti lettering canvas had great street art texture.'),(2,2,52,5,'Magical girl illustration was sparkly and well-detailed.'),(3,3,53,5,'Boss monster concept was dramatic and high-quality.'),(8,8,58,4,'Chibi group was cute with excellent composition.'),
+(13,13,63,5,'Vaporwave wallpaper had perfect retro grid aesthetics.'),(18,18,68,5,'Lo-fi rain loop was incredibly soothing.'),(23,23,73,4,'Post-apocalyptic ruins were atmospheric and gritty.'),(28,28,78,5,'Cockpit layout had intricate and believable detail.'),(33,33,83,4,'Fantasy continent map had beautiful stylized terrain.'),
+(38,38,88,5,'Cozy isometric room had perfect warm lighting.'),(43,43,93,5,'Cyberpunk alleyway glowed with great neon depth.'),(48,48,98,5,'Pixel campfire loop was ambient and relaxing.'),(4,4,54,4,'Twitch emote pack came in all needed formats.'),(8,58,59,3,'Decent background but took longer than expected.');
 
 -- ==========================================
--- 14. PORTFOLIO TABLE (100 Rows)
--- Covers variations for the 100 artist IDs
+-- 15. ADMIN USER (overwrite-safe)
 -- ==========================================
-INSERT INTO portfolio_tbl (artist_id, title, description) VALUES
-(1,'Cyber Dreams','Neon glow urban illustrations'),(2,'Cute Critters','Chibi and kawaii wildlife art packs'),(3,'Mythic Worlds','High fantasy environmental concepts'),(4,'Virtual Avatars','2D character layouts for streamers'),(5,'Silent Horizons','Calming minimalist watercolor prints'),
-(6,'Pixel Arcade','Retro game loops and custom assets'),(7,'Iron Core','Mecha armor and tech machinery sheets'),(8,'Vector Spaces','Clean geometry patterns and designs'),(9,'Ink and Shadow','Dark horror comic line creations'),(10,'Chibi Kingdom','Super stylized matching profile pictures'),
-(11,'Flora and Form','Botanical line art and custom prints'),(12,'Heroic Legends','Custom roleplaying character templates'),(13,'Neon Grid','Vaporwave cityscapes and design prints'),(14,'Beast Ref Sheets','Detailed animal character dynamic sheets'),(15,'Bedtime Stories','Friendly artwork for kids publications'),
-(16,'Steel Protectors','Fantasy medieval armory concept guides'),(17,'Retro Pop Icons','Vibrant comic poster style creations'),(18,'Lo-Fi Nostalgia','Relaxing animated scene loops background'),(19,'Streamer Hub','Custom broadcast overlay visual components'),(20,'Ink Needle Stencils','Crisp high contrast body art outlines'),
-(21,'Classic Anime Vibe','Nostalgic cell shaded digital paintings'),(22,'Chat Emote Vault','Expressive tiny reaction stickers vectors'),(23,'Wasteland Ruins','Grim post-apocalyptic base landscapes'),(24,'Digital Canvas Oil','Realism focus human portrait renders'),(25,'Toon Caricatures','Exaggerated funny cartoon friend group art'),
-(26,'Witchcraft Moods','Gothic magical theme designs elements'),(27,'Duo Icons Pack','Sweet couple themed matching avatars'),(28,'Starship Voyager','Sci-fi technical spaceships deck layout'),(29,'Golden Seasons','Impressionism forest pathway paint sets'),(30,'Blueprints Dynamic','Technical line drafting design schematics'),
-(31,'Shonen Clash','Action packed comic panel graphics'),(32,'Plushie blueprints','Turnaround schematics for merchandise creation'),(33,'Mystic Cartography','Fantasy adventure topography continent map designs'),(34,'Idol Wardrobe Packs','Layered costume designs for virtual personas'),(35,'Dune Chronicles','Atmospheric sci-fi desert ruins exploration art'),
-(36,'Arcade Lettering','Vintage neon script font graphic design packages'),(37,'Steam and Gears','Steampunk engineering aesthetic fantasy prints'),(38,'Isometric Comfort','Cozy low poly room design indoor layouts'),(39,'Webtoon Flow Sheets','Pacing layout composition panel drafts series'),(40,'Fantasy UI Vault','Ornate inventory screens design element graphics'),
-(41,'Minimal Cosmos','Delicate space constellation line art collection'),(42,'Token Borders Frame','Tabletop RPG printable token border designs'),(43,'Rainy Streets Aesthetic','Moody rainy cyberpunk store front layouts'),(44,'Mythical Bestiary','High detail griffin and dragon portrait series'),(45,'Seamless Patterns Tile','Cute repeated graphic background texture elements'),
-(46,'Surreal Spaces','Abstract dreamscape concepts oil texture brush style'),(47,'Flat Data Infographics','Corporate presentation clean workflow diagrams'),(48,'Pixel Campfire Cozy','Charming old school pixel loop animations portfolio'),(49,'Broadcast Overlays Pack','Complete streaming stream view frames layouts set'),(50,'Chalk Board Signs','Charming restaurant display mock typography items'),
-(1,'Graffiti Legends','Street art lettering wall designs canvas styles'),(2,'Magical Girls Realm','Glittering celestial anime style character packs'),(3,'Kaiju Core Renders','Monstrous titans dynamic scale fight concepts'),(4,'Twitch Emote Palace','Expressive custom face text reactions pack'),(5,'Chivalry Armor Guides','Historically accurate medieval knight render packs'),
-(6,'Starry Sky Scenic','Soft celestial atmosphere background paint compilations'),(7,'Engine Mechanics Grid','Intricate mechanical bike parts blueprint rendering'),(8,'Party Group Memories','Fun multiple character party campaign layouts'),(9,'Abstract Balance Line','Geometric shapes modern balanced living posters'),(10,'Spooky Mansions Oil','Haunted vintage estate gothic color sets'),
-(11,'Green Leaf Botanicals','Elegant clean plant vector printable art assets'),(12,'Fiery Tieflings Pack','Rich deep skin tones detailed character showcases'),(13,'Vaporwave Grid Sunset','Retro sunset wireframe mesh landscape illustrations'),(14,'Dragon Breath Encounters','Epic scale dragon combat fantasy dynamic paintings'),(15,'Friendly Forest Animals','Warm charming smiling critter cover prints compilation'),
-(16,'Holy Shields Armory','Polished reflections metallic weapon concept sets'),(17,'Social Banner Templates','Stylized profile layout graphic elements updates'),(18,'Platformer Sprites 8bit','Retro modular arcade levels obstacle sprite tiles'),(19,'Ornate Calligraphy Mats','Elegant swirl frame typography borders text accents'),(20,'Delicate Fine Outlines','Clean minimalistic geometry tattoo ready stencils'),
-(21,'Cell Shading 1990','Grain textured old school anime character galleries'),(22,'Food Vendor Isometrics','Charming visual snack bars layout miniature frames'),(23,'Ruinous Horizons','Grim industrial ash landscape environment visuals'),(24,'Rich Impasto Portraits','Thick brush stroke style premium facial renders'),(25,'Expression Sheets Grid','Hilarious sequence frames cartoon face variables'),(26,'Familiar Spirits Spark','Mystical glowing animal familiars concept collection'),(27,'Community Gathering Art','Warm interactive crowd scene illustrations showcase'),(28,'Cockpit Command Decks','Highly detailed sci-fi ship dashboard overlay art'),(29,'Golden Hour Woodlands','Warm light leaking forest path scene portfolios'),(30,'Cross Section Blueprints','Intricate sliced architectural interior view works'),
-(31,'Explosive Shonen Panels','High contrast speed line action comic pages'),(32,'Merchandise Ready Specs','Vector paths optimized directly for vinyl stamping'),(33,'Cloud Realms Scenic','Vast blue sky floating island landscape paintings'),(34,'Layer Sliced Models','Rigging ready virtual avatar separate entity slices'),(35,'Haze and Stardust','Cinematic galactic fog space explorer concepts'),(36,'Bold Comic Branding','Pop text vintage logos high visibility items'),(37,'Pipe Network Schematics','Steampunk copper valve boiler interface graphics'),(38,'Warm Library Nooks','Bookshelves and fireplaces relaxing room captures'),(39,'Promo Splash Banners','Webcomic cover display introductory visual plates'),(40,'Menu Borders Jewel','Polished crystal element item frames inventory UI'),
-(41,'Zodiac Lines Mystic','Gold on black celestial chart design prints'),(42,'Card Deck Backing Layout','Symmetric print safe playing cards vector mockups'),(43,'Wet Asphalt Cityscapes','Reflective neon puddles dark alley color captures'),(44,'Feather and Wing Studies','Detailed wings anatomy drawing for bird creatures'),(45,'Pastel Texture Seamless','Soft repetitive surface elements textile patterns pack'),(46,'Trippy Mindscapes Oil','Vibrant color distortion abstract dream visuals'),(47,'Vector Charts Layout','Clean corporate graphic module presentations design'),(48,'Cozy Pixel Embers','Pixel fire particle loop screens custom works'),(49,'Camera Framing Boxes','Twitch streamer modular gaming border packages'),(50,'Cafe Script Blackboard','Charming handwritten food chalk art typography set');
-
--- ==========================================
--- 15. PORTFOLIO IMAGE TABLE (100 Rows)
--- Maps seamlessly to the portfolio IDs (1 to 100)
--- ==========================================
-INSERT INTO portfolio_image_tbl (portfolio_id, image_url) VALUES
-(1,'https://example.com/p1_img1.jpg'),(2,'https://example.com/p2_img1.jpg'),(3,'https://example.com/p3_img1.jpg'),(4,'https://example.com/p4_img1.jpg'),(5,'https://example.com/p5_img1.jpg'),
-(6,'https://example.com/p6_img1.jpg'),(7,'https://example.com/p7_img1.jpg'),(8,'https://example.com/p8_img1.jpg'),(9,'https://example.com/p9_img1.jpg'),(10,'https://example.com/p10_img1.jpg'),
-(11,'https://example.com/p11_img1.jpg'),(12,'https://example.com/p12_img1.jpg'),(13,'https://example.com/p13_img1.jpg'),(14,'https://example.com/p14_img1.jpg'),(15,'https://example.com/p15_img1.jpg'),
-(16,'https://example.com/p16_img1.jpg'),(17,'https://example.com/p17_img1.jpg'),(18,'https://example.com/p18_img1.jpg'),(19,'https://example.com/p19_img1.jpg'),(20,'https://example.com/p20_img1.jpg'),
-(21,'https://example.com/p21_img1.jpg'),(22,'https://example.com/p22_img1.jpg'),(23,'https://example.com/p23_img1.jpg'),(24,'https://example.com/p24_img1.jpg'),(25,'https://example.com/p25_img1.jpg'),
-(26,'https://example.com/p26_img1.jpg'),(27,'https://example.com/p27_img1.jpg'),(28,'https://example.com/p28_img1.jpg'),(29,'https://example.com/p29_img1.jpg'),(30,'https://example.com/p30_img1.jpg'),
-(31,'https://example.com/p31_img1.jpg'),(32,'https://example.com/p32_img1.jpg'),(33,'https://example.com/p33_img1.jpg'),(34,'https://example.com/p34_img1.jpg'),(35,'https://example.com/p35_img1.jpg'),
-(36,'https://example.com/p36_img1.jpg'),(37,'https://example.com/p37_img1.jpg'),(38,'https://example.com/p38_img1.jpg'),(39,'https://example.com/p39_img1.jpg'),(40,'https://example.com/p40_img1.jpg'),
-(41,'https://example.com/p41_img1.jpg'),(42,'https://example.com/p42_img1.jpg'),(43,'https://example.com/p43_img1.jpg'),(44,'https://example.com/p44_img1.jpg'),(45,'https://example.com/p45_img1.jpg'),
-(46,'https://example.com/p46_img1.jpg'),(47,'https://example.com/p47_img1.jpg'),(48,'https://example.com/p48_img1.jpg'),(49,'https://example.com/p49_img1.jpg'),(50,'https://example.com/p50_img1.jpg'),
-(51,'https://example.com/p51_img1.jpg'),(52,'https://example.com/p52_img1.jpg'),(53,'https://example.com/p53_img1.jpg'),(54,'https://example.com/p54_img1.jpg'),(55,'https://example.com/p55_img1.jpg'),
-(56,'https://example.com/p56_img1.jpg'),(57,'https://example.com/p57_img1.jpg'),(58,'https://example.com/p58_img1.jpg'),(59,'https://example.com/p59_img1.jpg'),(60,'https://example.com/p60_img1.jpg'),
-(61,'https://example.com/p61_img1.jpg'),(62,'https://example.com/p62_img1.jpg'),(63,'https://example.com/p63_img1.jpg'),(64,'https://example.com/p64_img1.jpg'),(65,'https://example.com/p65_img1.jpg'),
-(66,'https://example.com/p66_img1.jpg'),(67,'https://example.com/p67_img1.jpg'),(68,'https://example.com/p68_img1.jpg'),(69,'https://example.com/p69_img1.jpg'),(70,'https://example.com/p70_img1.jpg'),
-(71,'https://example.com/p71_img1.jpg'),(72,'https://example.com/p72_img1.jpg'),(73,'https://example.com/p73_img1.jpg'),(74,'https://example.com/p74_img1.jpg'),(75,'https://example.com/p75_img1.jpg'),
-(76,'https://example.com/p76_img1.jpg'),(77,'https://example.com/p77_img1.jpg'),(78,'https://example.com/p78_img1.jpg'),(79,'https://example.com/p79_img1.jpg'),(80,'https://example.com/p80_img1.jpg'),
-(81,'https://example.com/p81_img1.jpg'),(82,'https://example.com/p82_img1.jpg'),(83,'https://example.com/p83_img1.jpg'),(84,'https://example.com/p84_img1.jpg'),(85,'https://example.com/p85_img1.jpg'),
-(86,'https://example.com/p86_img1.jpg'),(87,'https://example.com/p87_img1.jpg'),(88,'https://example.com/p88_img1.jpg'),(89,'https://example.com/p89_img1.jpg'),(90,'https://example.com/p90_img1.jpg'),
-(91,'https://example.com/p91_img1.jpg'),(92,'https://example.com/p92_img1.jpg'),(93,'https://example.com/p93_img1.jpg'),(94,'https://example.com/p94_img1.jpg'),(95,'https://example.com/p95_img1.jpg'),
-(96,'https://example.com/p96_img1.jpg'),(97,'https://example.com/p97_img1.jpg'),(98,'https://example.com/p98_img1.jpg'),(99,'https://example.com/p99_img1.jpg'),(100,'https://example.com/p100_img1.jpg');
-
--- ==========================================
--- 16. IMAGE TABLE (100 Rows)
--- Alternates tracking references across system entities safely
--- ==========================================
-INSERT INTO image_tbl (image_url, image_type_id, user_id, artist_id, commission_id) VALUES
-('https://example.com/sys-img-1.jpg',1,1,NULL,NULL),('https://example.com/sys-img-2.jpg',1,2,NULL,NULL),('https://example.com/sys-img-3.jpg',1,3,NULL,NULL),('https://example.com/sys-img-4.jpg',1,4,NULL,NULL),('https://example.com/sys-img-5.jpg',1,5,NULL,NULL),
-('https://example.com/sys-img-6.jpg',1,6,NULL,NULL),('https://example.com/sys-img-7.jpg',1,7,NULL,NULL),('https://example.com/sys-img-8.jpg',1,8,NULL,NULL),('https://example.com/sys-img-9.jpg',1,9,NULL,NULL),('https://example.com/sys-img-10.jpg',1,10,NULL,NULL),
-('https://example.com/sys-img-11.jpg',1,11,NULL,NULL),('https://example.com/sys-img-12.jpg',1,12,NULL,NULL),('https://example.com/sys-img-13.jpg',1,13,NULL,NULL),('https://example.com/sys-img-14.jpg',1,14,NULL,NULL),('https://example.com/sys-img-15.jpg',1,15,NULL,NULL),
-('https://example.com/sys-img-16.jpg',1,16,NULL,NULL),('https://example.com/sys-img-17.jpg',1,17,NULL,NULL),('https://example.com/sys-img-18.jpg',1,18,NULL,NULL),('https://example.com/sys-img-19.jpg',1,19,NULL,NULL),('https://example.com/sys-img-20.jpg',1,20,NULL,NULL),
-('https://example.com/sys-img-21.jpg',1,21,NULL,NULL),('https://example.com/sys-img-22.jpg',1,22,NULL,NULL),('https://example.com/sys-img-23.jpg',1,23,NULL,NULL),('https://example.com/sys-img-24.jpg',1,24,NULL,NULL),('https://example.com/sys-img-25.jpg',1,25,NULL,NULL),
-('https://example.com/sys-img-26.jpg',2,NULL,1,NULL),('https://example.com/sys-img-27.jpg',2,NULL,2,NULL),('https://example.com/sys-img-28.jpg',2,NULL,3,NULL),('https://example.com/sys-img-29.jpg',2,NULL,4,NULL),('https://example.com/sys-img-30.jpg',2,NULL,5,NULL),
-('https://example.com/sys-img-31.jpg',2,NULL,6,NULL),('https://example.com/sys-img-32.jpg',2,NULL,7,NULL),('https://example.com/sys-img-33.jpg',2,NULL,8,NULL),('https://example.com/sys-img-34.jpg',2,NULL,9,NULL),('https://example.com/sys-img-35.jpg',2,NULL,10,NULL),
-('https://example.com/sys-img-36.jpg',2,NULL,11,NULL),('https://example.com/sys-img-37.jpg',2,NULL,12,NULL),('https://example.com/sys-img-38.jpg',2,NULL,13,NULL),('https://example.com/sys-img-39.jpg',2,NULL,14,NULL),('https://example.com/sys-img-40.jpg',2,NULL,15,NULL),
-('https://example.com/sys-img-41.jpg',2,NULL,16,NULL),('https://example.com/sys-img-42.jpg',2,NULL,17,NULL),('https://example.com/sys-img-43.jpg',2,NULL,18,NULL),('https://example.com/sys-img-44.jpg',2,NULL,19,NULL),('https://example.com/sys-img-45.jpg',2,NULL,20,NULL),
-('https://example.com/sys-img-46.jpg',2,NULL,21,NULL),('https://example.com/sys-img-47.jpg',2,NULL,22,NULL),('https://example.com/sys-img-48.jpg',2,NULL,23,NULL),('https://example.com/sys-img-49.jpg',2,NULL,24,NULL),('https://example.com/sys-img-50.jpg',2,NULL,25,NULL),
-('https://example.com/sys-img-51.jpg',3,NULL,NULL,1),('https://example.com/sys-img-52.jpg',3,NULL,NULL,2),('https://example.com/sys-img-53.jpg',3,NULL,NULL,3),('https://example.com/sys-img-54.jpg',3,NULL,NULL,4),('https://example.com/sys-img-55.jpg',3,NULL,NULL,5),
-('https://example.com/sys-img-56.jpg',3,NULL,NULL,6),('https://example.com/sys-img-57.jpg',3,NULL,NULL,7),('https://example.com/sys-img-58.jpg',3,NULL,NULL,8),('https://example.com/sys-img-59.jpg',3,NULL,NULL,9),('https://example.com/sys-img-60.jpg',3,NULL,NULL,10),
-('https://example.com/sys-img-61.jpg',3,NULL,NULL,11),('https://example.com/sys-img-62.jpg',3,NULL,NULL,12),('https://example.com/sys-img-63.jpg',3,NULL,NULL,13),('https://example.com/sys-img-64.jpg',3,NULL,NULL,14),('https://example.com/sys-img-65.jpg',3,NULL,NULL,15),
-('https://example.com/sys-img-66.jpg',3,NULL,NULL,16),('https://example.com/sys-img-67.jpg',3,NULL,NULL,17),('https://example.com/sys-img-68.jpg',3,NULL,NULL,18),('https://example.com/sys-img-69.jpg',3,NULL,NULL,19),('https://example.com/sys-img-70.jpg',3,NULL,NULL,20),
-('https://example.com/sys-img-71.jpg',3,NULL,NULL,21),('https://example.com/sys-img-72.jpg',3,NULL,NULL,22),('https://example.com/sys-img-73.jpg',3,NULL,NULL,23),('https://example.com/sys-img-74.jpg',3,NULL,NULL,24),('https://example.com/sys-img-75.jpg',3,NULL,NULL,25),
-('https://example.com/sys-img-76.jpg',4,1,NULL,1),('https://example.com/sys-img-77.jpg',4,2,NULL,2),('https://example.com/sys-img-78.jpg',4,3,NULL,3),('https://example.com/sys-img-79.jpg',4,4,NULL,4),('https://example.com/sys-img-80.jpg',4,5,NULL,5),
-('https://example.com/sys-img-81.jpg',4,6,NULL,6),('https://example.com/sys-img-82.jpg',4,7,NULL,7),('https://example.com/sys-img-83.jpg',4,8,NULL,8),('https://example.com/sys-img-84.jpg',4,9,NULL,9),('https://example.com/sys-img-85.jpg',4,10,NULL,10),
-('https://example.com/sys-img-86.jpg',4,11,NULL,11),('https://example.com/sys-img-87.jpg',4,12,NULL,12),('https://example.com/sys-img-88.jpg',4,13,NULL,13),('https://example.com/sys-img-89.jpg',4,14,NULL,14),('https://example.com/sys-img-90.jpg',4,15,NULL,15),
-('https://example.com/sys-img-91.jpg',4,16,NULL,16),('https://example.com/sys-img-92.jpg',4,17,NULL,17),('https://example.com/sys-img-93.jpg',4,18,NULL,18),('https://example.com/sys-img-94.jpg',4,19,NULL,19),('https://example.com/sys-img-95.jpg',4,20,NULL,20),
-('https://example.com/sys-img-96.jpg',4,21,NULL,21),('https://example.com/sys-img-97.jpg',4,22,NULL,22),('https://example.com/sys-img-98.jpg',4,23,NULL,23),('https://example.com/sys-img-99.jpg',4,24,NULL,24),('https://example.com/sys-img-100.jpg',4,25,NULL,25);
-
--- admin boy --
 DELETE FROM account_tbl WHERE username = 'admin';
 
-INSERT INTO account_tbl (
-    username, 
-    password_hash, 
-    role_id, 
-    account_status_id, 
-    first_name, 
-    last_name, 
-    email
-) 
-VALUES (
-    'admin', 
-    'password', 
-    3,                 
-    1,                 
-    'System', 
-    'Admin', 
-    'admin@artovia.com'
-);
+INSERT INTO account_tbl (username, password_hash, role_id, account_status_id, first_name, last_name, email)
+VALUES ('admin', 'password', 3, 1, 'System', 'Admin', 'admin@artovia.com');
 
-INSERT INTO administrator_tbl (account_id) 
+INSERT INTO administrator_tbl (account_id)
 VALUES (LAST_INSERT_ID());

@@ -111,16 +111,6 @@ if ($account_id) {
                                     </div>
                                 </div>
 
-                                <?php if ($role === 'user'): ?>
-                                    <div class="mb-3">
-                                        <label class="settings-label">Card Number</label>
-                                        <div class="custom-input-group">
-                                            <span class="settings-addon-icon"><i class="bi bi-credit-card"></i></span>
-                                            <input type="text" class="settings-input-override" id="settingsCardNumber" name="card_number" placeholder="Card Number (optional)">
-                                        </div>
-                                    </div>
-                                <?php endif; ?>
-
                                 <?php if ($role === 'artist'): ?>
                                     <div class="row">
                                         <div class="col-6 mb-3">
@@ -213,6 +203,79 @@ if ($account_id) {
                                         <p class="text-muted small">It's about yourself and your art</p>
                                         <textarea class="settings-textarea-override" rows="4" name="artist_description" id="artistDescText" maxlength="250" placeholder="Description........"><?= isset($profile['artist_description']) ? htmlspecialchars($profile['artist_description']) : '' ?></textarea>
                                         <small class="text-muted d-block mt-1 text-end" id="charCounter">0/250</small>
+                                    </div>
+                                </div>
+
+                                <div class="settings-group-box">
+                                    <h5 class="settings-section-title"><i class="bi bi-wallet2"></i> Payout Method</h5>
+                                    <p class="text-muted small">Where you'd like to receive payments from clients</p>
+
+                                    <div class="mb-3">
+                                        <label class="settings-label">Payment Method</label>
+                                        <select class="settings-input-override" id="payoutMethodSelect" name="payout_method_id">
+                                            <option value="">— Select a method —</option>
+                                            <option value="1">GCash</option>
+                                            <option value="2">Maya</option>
+                                            <option value="3">PayPal</option>
+                                            <option value="4">Credit / Debit Card</option>
+                                            <option value="5">Bank Transfer</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- GCash / Maya -->
+                                    <div class="payout-fields d-none" id="payoutFieldsMobile">
+                                        <label class="settings-label">Mobile Number</label>
+                                        <div class="custom-input-group">
+                                            <span class="settings-addon-icon"><i class="bi bi-phone"></i></span>
+                                            <input type="text" class="settings-input-override" id="payoutMobileNumber" name="payout_mobile_number" placeholder="e.g. 09171234567">
+                                        </div>
+                                    </div>
+
+                                    <!-- PayPal -->
+                                    <div class="payout-fields d-none" id="payoutFieldsPaypal">
+                                        <label class="settings-label">PayPal Email</label>
+                                        <div class="custom-input-group">
+                                            <span class="settings-addon-icon"><i class="bi bi-envelope"></i></span>
+                                            <input type="email" class="settings-input-override" id="payoutEmailAddress" name="payout_email_address" placeholder="you@paypal.com">
+                                        </div>
+                                    </div>
+
+                                    <!-- Credit / Debit Card -->
+                                    <div class="payout-fields d-none" id="payoutFieldsCard">
+                                        <div class="row">
+                                            <div class="col-8 mb-3">
+                                                <label class="settings-label">Card Number</label>
+                                                <div class="custom-input-group">
+                                                    <span class="settings-addon-icon"><i class="bi bi-credit-card"></i></span>
+                                                    <input type="text" class="settings-input-override" id="payoutCardNumber" name="payout_card_number" placeholder="•••• •••• •••• ••••" maxlength="19">
+                                                </div>
+                                            </div>
+                                            <div class="col-4 mb-3">
+                                                <label class="settings-label">Expiry</label>
+                                                <div class="custom-input-group">
+                                                    <span class="settings-addon-icon"><i class="bi bi-calendar3"></i></span>
+                                                    <input type="text" class="settings-input-override" id="payoutCardExpiry" name="payout_card_expiry" placeholder="MM/YY" maxlength="5">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Bank Transfer -->
+                                    <div class="payout-fields d-none" id="payoutFieldsBank">
+                                        <div class="mb-3">
+                                            <label class="settings-label">Bank Name</label>
+                                            <div class="custom-input-group">
+                                                <span class="settings-addon-icon"><i class="bi bi-bank"></i></span>
+                                                <input type="text" class="settings-input-override" id="payoutBankName" name="payout_bank_name" placeholder="e.g. BDO, BPI, UnionBank">
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="settings-label">Account Number</label>
+                                            <div class="custom-input-group">
+                                                <span class="settings-addon-icon"><i class="bi bi-hash"></i></span>
+                                                <input type="text" class="settings-input-override" id="payoutAccountNumber" name="payout_account_number" placeholder="Account number">
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             <?php endif; ?>

@@ -1,108 +1,148 @@
 <?php
+
+/**
+ * POST /api/payments/initiate.php
+ *
+ * Initiates a payment for a completed commission.
+ *
+ * Expected JSON body:
+ *   commission_id     (int)  — ID of the commission being paid
+ *   payment_method_id (int)  — FK to payment_method_tbl
+ *                              1=GCash 2=Maya 3=PayPal 4=Credit Card 5=Bank Transfer
+ */
+require_once '../../config/constants.php';
 require_once '../../config/session.php';
 require_once '../../config/database.php';
 
 header('Content-Type: application/json');
 
-// 1. Enforce strict client-only authentication
-if (!isset($_SESSION['user_id']) || ($_SESSION['role'] !== 'user' && $_SESSION['role'] !== 'client')) {
+// ── 1. Auth — only logged-in users/clients may pay ──────────────────────────
+if (empty($_SESSION['account_id']) || strtolower($_SESSION['role'] ?? '') !== 'user') {
     echo json_encode(['success' => false, 'message' => 'Unauthorized access.']);
     exit;
 }
 
-$data          = json_decode(file_get_contents('php://input'), true);
-$commissionId  = isset($data['commission_id']) ? intval($data['commission_id']) : 0;
-$amount        = isset($data['amount']) ? floatval($data['amount']) : 0.00;
-$paymentMethod = isset($data['payment_method']) ? strtolower(trim($data['payment_method'])) : '';
-$userId        = $_SESSION['user_id']; // base profile account_id
+// ── 2. Parse & validate input ────────────────────────────────────────────────
+$data            = json_decode(file_get_contents('php://input'), true) ?? [];
+$commissionId    = isset($data['commission_id'])      ? (int)   $data['commission_id']      : 0;
+$paymentMethodId = isset($data['payment_method_id'])  ? (int)   $data['payment_method_id']  : 0;
 
-// 2. Comprehensive Input Safeguards
+// account_id stored in session — used to look up user_tbl
+$accountId = (int) $_SESSION['account_id'];
+
 if ($commissionId <= 0) {
-    echo json_encode(['success' => false, 'message' => 'Invalid commission tracking ID.']);
+    echo json_encode(['success' => false, 'message' => 'Invalid commission ID.']);
     exit;
 }
 
-if ($amount <= 0) {
-    echo json_encode(['success' => false, 'message' => 'Payment amount must be greater than zero.']);
-    exit;
-}
-
-if (empty($paymentMethod)) {
-    echo json_encode(['success' => false, 'message' => 'Please specify a valid payment method.']);
+// payment_method_id 1–5 must match payment_method_tbl
+if ($paymentMethodId < 1 || $paymentMethodId > 5) {
+    echo json_encode(['success' => false, 'message' => 'Invalid or unsupported payment method.']);
     exit;
 }
 
 $db = getDB();
 
 try {
-    // 3. Verify project ownership and resolve the assigned artist_id
-    $stmt = $db->prepare('
-        SELECT artist_id, price 
-        FROM commission_tbl 
-        WHERE commission_id = ? AND user_id = ?
+    // ── 3. Resolve user_id from account_id ──────────────────────────────────
+    $stmtUser = $db->prepare('SELECT user_id FROM user_tbl WHERE account_id = ? LIMIT 1');
+    $stmtUser->execute([$accountId]);
+    $userRow = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
+    if (!$userRow) {
+        echo json_encode(['success' => false, 'message' => 'User profile not found.']);
+        exit;
+    }
+
+    $userId = (int) $userRow['user_id'];
+
+    // ── 4. Verify commission ownership & resolve assigned artist ────────────
+    //    status_id 6 = Completed; only completed commissions should be payable
+    $stmtComm = $db->prepare('
+        SELECT commission_id, artist_id, price, status_id
+        FROM   commission_tbl
+        WHERE  commission_id = ?
+          AND  user_id       = ?
+        LIMIT 1
     ');
-    $stmt->execute([$commissionId, $userId]);
-    $commission = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmtComm->execute([$commissionId, $userId]);
+    $commission = $stmtComm->fetch(PDO::FETCH_ASSOC);
 
     if (!$commission) {
-        echo json_encode(['success' => false, 'message' => 'Commission file not found or profile access denied.']);
+        echo json_encode(['success' => false, 'message' => 'Commission not found or access denied.']);
         exit;
     }
 
     if (empty($commission['artist_id'])) {
-        echo json_encode(['success' => false, 'message' => 'Cannot pay for a commission that has no assigned artist.']);
+        echo json_encode(['success' => false, 'message' => 'Cannot pay a commission with no assigned artist.']);
         exit;
     }
 
-    $artistId = $commission['artist_id'];
-    $today    = date('Y-m-d');
+    // Prevent double-payment: check if a Paid transaction already exists
+    $stmtDupCheck = $db->prepare('
+        SELECT transaction_id
+        FROM   transaction_tbl
+        WHERE  commission_id = ?
+          AND  status_id     = 10
+        LIMIT 1
+    ');
+    $stmtDupCheck->execute([$commissionId]);
+    if ($stmtDupCheck->fetch()) {
+        echo json_encode(['success' => false, 'message' => 'This commission has already been paid.']);
+        exit;
+    }
 
-    // 4. Begin Transaction to guarantee financial data sync
+    $amount = (float) $commission['price'];
+
+    // ── 5. Atomic transaction block ─────────────────────────────────────────
     $db->beginTransaction();
 
-    // Step A: Create the transaction record (initially 'pending')
+    // Step A: Insert transaction record — status_id 2 = Pending
     $stmtTx = $db->prepare('
-        INSERT INTO transaction_tbl (commission_id, user_id, artist_id, total_amount, transaction_date, status)
-        VALUES (?, ?, ?, ?, ?, "pending")
+        INSERT INTO transaction_tbl (commission_id, total_amount, transaction_date, status_id)
+        VALUES (?, ?, NOW(), 2)
     ');
-    $stmtTx->execute([$commissionId, $userId, $artistId, $amount, $today]);
-    $transactionId = $db->lastInsertId();
+    $stmtTx->execute([$commissionId, $amount]);
+    $transactionId = (int) $db->lastInsertId();
 
-    // Step B: Record the concrete payment gateway ledger entry
+    // Step B: Insert payment record — status_id 10 = Paid
     $stmtPay = $db->prepare('
-        INSERT INTO payment_tbl (transaction_id, amount, payment_method, status, payment_date)
-        VALUES (?, ?, ?, "completed", ?)
+        INSERT INTO payment_tbl (transaction_id, payment_method_id, amount, status_id, payment_date)
+        VALUES (?, ?, ?, 10, NOW())
     ');
-    $stmtPay->execute([$transactionId, $amount, $paymentMethod, $today]);
+    $stmtPay->execute([$transactionId, $paymentMethodId, $amount]);
 
-    // Step C: Securely promote the transaction file status to 'completed'
+    // Step C: Mark the transaction as Paid — status_id 10
     $stmtUpdateTx = $db->prepare('
-        UPDATE transaction_tbl 
-        SET status = "completed" 
-        WHERE transaction_id = ?
+        UPDATE transaction_tbl
+        SET    status_id = 10
+        WHERE  transaction_id = ?
     ');
     $stmtUpdateTx->execute([$transactionId]);
 
-    // Step D: Optional Milestone Update — switch the main project state to 'in_progress' or 'completed'
-    // depending on whether this represents a partial deposit or a final settlement.
+    // Step D: Optionally advance the commission to Completed — status_id 6
+    //         Uncomment if "Completed" should be set here rather than on delivery
+    // $stmtUpdateComm = $db->prepare('
+    //     UPDATE commission_tbl SET status_id = 6 WHERE commission_id = ?
+    // ');
+    // $stmtUpdateComm->execute([$commissionId]);
 
-    // Commit all financial ledger writes safely to disk
     $db->commit();
 
     echo json_encode([
-        'success' => true, 
-        'message' => 'Payment processed successfully! Your receipt has been logged.'
+        'success'        => true,
+        'message'        => 'Payment processed successfully.',
+        'transaction_id' => $transactionId,
+        'redirect' => BASE_URL . 'payments/success?txn=' . $transactionId,
     ]);
-
 } catch (PDOException $e) {
-    // Drop all partial table updates immediately if any query faults out
     if ($db->inTransaction()) {
         $db->rollBack();
     }
-    
+    // Avoid leaking raw DB errors to the client in production
+    error_log('[initiate.php] PDOException: ' . $e->getMessage());
     echo json_encode([
-        'success' => false, 
-        'message' => 'Financial ledger settlement failed: ' . $e->getMessage()
+        'success' => false,
+        'message' => 'Payment processing failed. Please try again later.',
     ]);
 }
-?>

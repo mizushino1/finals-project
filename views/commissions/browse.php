@@ -351,7 +351,6 @@
 
 <?php require_once __DIR__ . '/partials/edit_modal.php'; // adjust relative path as needed ?>
 <?php require_once __DIR__ . '/partials/review_modal.php'; // adjust relative path as needed ?>
-<script src="<?= BASE_URL ?>public/js/editCommission.js"></script>
+<?php require_once __DIR__ . '/partials/payment_modal.php'; // adjust relative path as needed ?>
 
 <script src="<?= BASE_URL ?>public/js/commission.js"></script>
-<script src="<?= BASE_URL ?>public/js/review.js"></script>

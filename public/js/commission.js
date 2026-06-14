@@ -1308,7 +1308,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const reviewModalEl = document.getElementById('reviewModal'); 
         
         // Look for 'modalCommissionId' which is defined in review_modal.php
-        const hiddenInput = document.getElementById('modalCommissionId'); 
+        const hiddenInput   = document.getElementById('reviewCommissionId'); 
         
         if (!reviewModalEl) {
             console.error('Submit review modal could not be found in the DOM.');

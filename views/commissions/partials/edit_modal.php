@@ -74,3 +74,5 @@
         </div>
     </div>
 </div>
+
+<script src="<?= BASE_URL ?>public/js/editCommission.js"></script>

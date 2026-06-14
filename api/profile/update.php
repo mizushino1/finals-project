@@ -10,8 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Map session tracking fields safely.
-// $_SESSION['user_id'] holds sub-table IDs (user_id/artist_id/admin_id), NOT account_id.
+// $_SESSION['user_id'] holds sub-table IDs (user_id / artist_id / admin_id), NOT account_id.
 $id   = $_SESSION['user_id'] ?? null;
 $role = strtolower($_SESSION['role'] ?? '');
 
@@ -20,7 +19,7 @@ if (!$id) {
     exit;
 }
 
-// Collect form inputs
+// Collect core form inputs
 $first_name   = trim($_POST['first_name']   ?? '');
 $middle_name  = trim($_POST['middle_name']  ?? '');
 $last_name    = trim($_POST['last_name']    ?? '');
@@ -38,7 +37,7 @@ try {
     $db = getDB();
     $db->beginTransaction();
 
-    // 1. DYNAMIC REVERSE-LOOKUP: Trace the exact primary account_id using the session's sub-profile ID
+    // ── 1. Reverse-lookup account_id from session's sub-profile ID ────────────
     $account_id = null;
 
     if ($role === 'user') {
@@ -55,12 +54,11 @@ try {
         $account_id = $stmt->fetchColumn();
     }
 
-    // Safety fallback: Halt processing if the database cannot resolve who owns this identity session context
     if (!$account_id) {
         throw new Exception('Account context mapping mismatch error.');
     }
 
-    // 2. Securely update the master credentials/personal info row matching the resolved account record
+    // ── 2. Update master account credentials ──────────────────────────────────
     $stmt = $db->prepare('
         UPDATE account_tbl
         SET first_name = ?, middle_name = ?, last_name = ?, username = ?, email = ?, phone = ?
@@ -70,7 +68,7 @@ try {
 
     $_SESSION['username'] = $username;
 
-    // 3. Update descriptive fields on the extension tables using the session ID ($id)
+    // ── 3. Role-specific profile fields ───────────────────────────────────────
     if ($role === 'artist') {
         $starting_rate      = floatval($_POST['starting_rate'] ?? 0);
         $is_available       = isset($_POST['is_available']) ? 1 : 0;
@@ -82,17 +80,92 @@ try {
             WHERE artist_id = ?
         ');
         $stmt->execute([$starting_rate, $is_available, $artist_description ?: null, $id]);
+
+        // ── 3a. Artist payout method upsert ───────────────────────────────────
+        // Artists receive payments, so their payout method is saved in user_payment_method_tbl
+        // keyed to the user_id that shares the same account (dual-role) or their own account's user row.
+        $payoutMethodId = intval($_POST['payout_method_id'] ?? 0);
+
+        if ($payoutMethodId >= 1 && $payoutMethodId <= 5) {
+            // Resolve the user_id for this artist's account
+            $stmtUid = $db->prepare('SELECT user_id FROM user_tbl WHERE account_id = ?');
+            $stmtUid->execute([$account_id]);
+            $artistUserId = $stmtUid->fetchColumn();
+
+            if ($artistUserId) {
+                // Build credential columns based on the chosen method
+                // 1=GCash 2=Maya 3=PayPal 4=Credit Card 5=Bank Transfer
+                $mobileNumber  = null;
+                $emailAddress  = null;
+                $cardNumber    = null;
+                $cardExpiry    = null;
+                $bankName      = null;
+                $accountNumber = null;
+
+                switch ($payoutMethodId) {
+                    case 1: // GCash
+                    case 2: // Maya
+                        $mobileNumber = trim($_POST['payout_mobile_number'] ?? '') ?: null;
+                        break;
+                    case 3: // PayPal
+                        $emailAddress = trim($_POST['payout_email_address'] ?? '') ?: null;
+                        break;
+                    case 4: // Credit Card
+                        $cardNumber = trim($_POST['payout_card_number'] ?? '') ?: null;
+                        $cardExpiry = trim($_POST['payout_card_expiry'] ?? '') ?: null;
+                        break;
+                    case 5: // Bank Transfer
+                        $bankName      = trim($_POST['payout_bank_name']      ?? '') ?: null;
+                        $accountNumber = trim($_POST['payout_account_number'] ?? '') ?: null;
+                        break;
+                }
+
+                // Check if a payout method already exists for this user+method combo
+                $stmtCheck = $db->prepare('
+                    SELECT user_payment_method_id FROM user_payment_method_tbl
+                    WHERE user_id = ? AND payment_method_id = ?
+                    LIMIT 1
+                ');
+                $stmtCheck->execute([$artistUserId, $payoutMethodId]);
+                $existingId = $stmtCheck->fetchColumn();
+
+                if ($existingId) {
+                    // Update in place
+                    $stmtUpsert = $db->prepare('
+                        UPDATE user_payment_method_tbl
+                        SET mobile_number = ?, email_address = ?, card_number = ?,
+                            card_expiry = ?, bank_name = ?, account_number = ?, is_default = 1
+                        WHERE user_payment_method_id = ?
+                    ');
+                    $stmtUpsert->execute([
+                        $mobileNumber, $emailAddress, $cardNumber,
+                        $cardExpiry, $bankName, $accountNumber, $existingId
+                    ]);
+                } else {
+                    // Clear any previous default, then insert
+                    $db->prepare('UPDATE user_payment_method_tbl SET is_default = 0 WHERE user_id = ?')
+                       ->execute([$artistUserId]);
+
+                    $stmtUpsert = $db->prepare('
+                        INSERT INTO user_payment_method_tbl
+                            (user_id, payment_method_id, mobile_number, email_address,
+                             card_number, card_expiry, bank_name, account_number, is_default)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
+                    ');
+                    $stmtUpsert->execute([
+                        $artistUserId, $payoutMethodId, $mobileNumber, $emailAddress,
+                        $cardNumber, $cardExpiry, $bankName, $accountNumber
+                    ]);
+                }
+            }
+        }
     }
 
-    if ($role === 'user') {
-        $card_number = trim($_POST['card_number'] ?? '');
-        $stmt = $db->prepare('
-            UPDATE user_tbl SET card_number = ? WHERE user_id = ?
-        ');
-        $stmt->execute([$card_number ?: null, $id]);
-    }
+    // Users manage their own payment methods separately (checkout flow), 
+    // so no card_number update here — user_payment_method_tbl is handled
+    // via its own dedicated payment-method management endpoints.
 
-    // 4. Secure Password Updating block
+    // ── 4. Password update ────────────────────────────────────────────────────
     $current_password = $_POST['current_password'] ?? '';
     $new_password     = $_POST['new_password']     ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
@@ -113,7 +186,7 @@ try {
             ->execute([password_hash($new_password, PASSWORD_BCRYPT), $account_id]);
     }
 
-    // 5. Image & Avatar File Management Block
+    // ── 5. Avatar file management ─────────────────────────────────────────────
     if ($role === 'user' || $role === 'artist') {
         $col = ($role === 'user') ? 'user_id' : 'artist_id';
 
@@ -141,16 +214,13 @@ try {
 
             $relUrl = 'public/uploads/avatars/' . $newFile;
 
-            // 1. CLEAR DUPES: Explicitly remove previous avatar rows using the correct context identity variable ($id)
-            $clearOldAvatar = $db->prepare("DELETE FROM image_tbl WHERE {$col} = ? AND image_type_id = 1");
-            $clearOldAvatar->execute([$id]);
+            $db->prepare("DELETE FROM image_tbl WHERE {$col} = ? AND image_type_id = 1")
+               ->execute([$id]);
 
-            // 2. FRESH INSERT: Insert the new image path as the single source of truth
-            $insertNewAvatar = $db->prepare("
+            $db->prepare("
                 INSERT INTO image_tbl ({$col}, image_url, image_type_id, uploaded_at)
                 VALUES (?, ?, 1, NOW())
-            ");
-            $insertNewAvatar->execute([$id, $relUrl]);
+            ")->execute([$id, $relUrl]);
         }
     }
 

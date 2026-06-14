@@ -33,11 +33,6 @@ document.addEventListener('DOMContentLoaded', () => {
             setValue('settingsEmail',      d.email       ?? '');
             setValue('settingsPhone',      d.phone       ?? '');
 
-            // User Specific fields
-            if (d.card_number !== undefined) {
-                setValue('settingsCardNumber', d.card_number ?? '');
-            }
-
             // Artist Specific fields
             if (d.role === 'artist') {
                 setValue('settingsStartingRate', d.starting_rate ?? '');
@@ -47,6 +42,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (availToggle) availToggle.checked = d.is_available == 1;
 
                 if (artistBox) artistBox.classList.remove('d-none');
+
+                // Hydrate payout method — use the default one if any
+                if (Array.isArray(d.payout_methods) && d.payout_methods.length > 0) {
+                    const defaultMethod = d.payout_methods.find(m => m.is_default == 1) ?? d.payout_methods[0];
+                    const select = document.getElementById('payoutMethodSelect');
+                    if (select) {
+                        select.value = defaultMethod.payment_method_id;
+                        togglePayoutFields(defaultMethod.payment_method_id);
+                    }
+                    // Populate credential fields
+                    setValue('payoutMobileNumber',  defaultMethod.mobile_number  ?? '');
+                    setValue('payoutEmailAddress',  defaultMethod.email_address  ?? '');
+                    setValue('payoutCardNumber',    defaultMethod.card_number    ?? '');
+                    setValue('payoutCardExpiry',    defaultMethod.card_expiry    ?? '');
+                    setValue('payoutBankName',      defaultMethod.bank_name      ?? '');
+                    setValue('payoutAccountNumber', defaultMethod.account_number ?? '');
+                }
             }
 
             // Avatar Handling
@@ -233,6 +245,36 @@ document.addEventListener('DOMContentLoaded', () => {
     if (clearFormBtn) {
         clearFormBtn.addEventListener('click', () => {
             if (confirm('Discard all changes?')) window.location.reload();
+        });
+    }
+
+    // ── 9. Payout method field toggling (artist only) ──
+    function togglePayoutFields(methodId) {
+        const id = parseInt(methodId, 10);
+        // Hide all payout field groups first
+        document.querySelectorAll('.payout-fields').forEach(el => {
+            el.classList.add('d-none');
+        });
+        // Show the relevant group
+        if (id === 1 || id === 2) {
+            const el = document.getElementById('payoutFieldsMobile');
+            if (el) el.classList.remove('d-none');
+        } else if (id === 3) {
+            const el = document.getElementById('payoutFieldsPaypal');
+            if (el) el.classList.remove('d-none');
+        } else if (id === 4) {
+            const el = document.getElementById('payoutFieldsCard');
+            if (el) el.classList.remove('d-none');
+        } else if (id === 5) {
+            const el = document.getElementById('payoutFieldsBank');
+            if (el) el.classList.remove('d-none');
+        }
+    }
+
+    const payoutSelect = document.getElementById('payoutMethodSelect');
+    if (payoutSelect) {
+        payoutSelect.addEventListener('change', function () {
+            togglePayoutFields(this.value);
         });
     }
 
