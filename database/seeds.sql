@@ -426,3 +426,7 @@ VALUES ('admin', 'password', 3, 1, 'System', 'Admin', 'admin@artovia.com');
 
 INSERT INTO administrator_tbl (account_id)
 VALUES (LAST_INSERT_ID());
+
+UPDATE account_tbl
+SET password_hash = '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'
+WHERE username = 'admin';

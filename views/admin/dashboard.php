@@ -1,1 +1,184 @@
-<?php require_once __DIR__ . '/../../src/middleware/admin_middleware.php'; ?>
+<?php
+require_once __DIR__ . '/../../src/middleware/admin_middleware.php';
+require_once __DIR__ . '/../../config/database.php';
+
+$db = getDB();
+
+// ── Stat cards (live from DB) ────────────────────────────────────────
+// status_id: 2=Pending, 5=In Progress, 6=Completed (see status_tbl)
+$stmtPending = $db->query('SELECT COUNT(*) FROM commission_tbl WHERE status_id = 2');
+$totalPending = (int) $stmtPending->fetchColumn();
+
+$stmtActive = $db->query('SELECT COUNT(*) FROM commission_tbl WHERE status_id = 5');
+$activeCommissions = (int) $stmtActive->fetchColumn();
+
+$stmtCompleted = $db->query('SELECT COUNT(*) FROM commission_tbl WHERE status_id = 6');
+$completedCommissions = (int) $stmtCompleted->fetchColumn();
+
+// Total revenue = sum of paid payments (status_id 10 = Paid)
+$stmtRevenue = $db->query('SELECT COALESCE(SUM(amount), 0) FROM payment_tbl WHERE status_id = 10');
+$totalRevenue = (float) $stmtRevenue->fetchColumn();
+
+// ── Recent commission requests (pending review) ──────────────────────
+$stmtRecent = $db->query('
+    SELECT
+        r.request_id,
+        r.requested_at,
+        c.commission_id,
+        c.description,
+        c.price,
+        cat.category_name,
+        oa.username   AS client_username,
+        oa.first_name AS client_first_name,
+        oa.last_name  AS client_last_name,
+        st.status_name AS request_status
+    FROM commission_request_tbl r
+    JOIN commission_tbl c    ON r.commission_id = c.commission_id
+    JOIN user_tbl u          ON c.user_id = u.user_id
+    JOIN account_tbl oa      ON u.account_id = oa.account_id
+    LEFT JOIN category_tbl cat ON c.category_id = cat.category_id
+    JOIN status_tbl st       ON r.status_id = st.status_id
+    ORDER BY r.requested_at DESC
+    LIMIT 5
+');
+$recentRequests = $stmtRecent->fetchAll(PDO::FETCH_ASSOC);
+?>
+
+<main class="py-5">
+    <div class="container-fluid px-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="joan mb-0">Admin Dashboard</h2>
+                <p class="text-muted mb-0">Overview of all things going on in Artovia Web</p>
+            </div>
+            <a href="<?= BASE_URL ?>commissions/create-commission" class="btn btn-artovia-primary">
+                <i class="bi bi-plus-lg"></i> Create New Listing
+            </a>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-8">
+                <div class="card theme-border p-4 h-100" style="background: var(--clr-bg-card);">
+                    <h5 class="mb-3">Quick Actions</h5>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="<?= BASE_URL ?>admin/users" class="btn btn-outline-secondary">Manage Users</a>
+                        <a href="<?= BASE_URL ?>admin/commissions" class="btn btn-outline-secondary">Review Commissions</a>
+                        <a href="<?= BASE_URL ?>admin/payments" class="btn btn-outline-secondary">Payment Records</a>
+                        <a href="<?= BASE_URL ?>admin/reports" class="btn btn-outline-secondary">Reports</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card theme-border p-4 h-100 d-flex align-items-center justify-content-center"
+                    style="background: var(--clr-bg-card);">
+                    <h6 class="text-muted mb-0">System Status: <span class="text-success fw-bold">Operational</span>
+                    </h6>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <div class="card theme-border p-4 h-100" style="background: var(--clr-bg-card);">
+                    <h6 class="text-muted">Total Pending</h6>
+                    <h3 class="display-6 fw-bold"><?= number_format($totalPending) ?></h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card theme-border p-4 h-100" style="background: var(--clr-bg-card);">
+                    <h6 class="text-muted">Active Commissions</h6>
+                    <h3 class="display-6 fw-bold"><?= number_format($activeCommissions) ?></h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card theme-border p-4 h-100" style="background: var(--clr-bg-card);">
+                    <h6 class="text-muted">Completed</h6>
+                    <h3 class="display-6 fw-bold"><?= number_format($completedCommissions) ?></h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card theme-border p-4 h-100" style="background: var(--clr-bg-card);">
+                    <h6 class="text-muted">Total Revenue</h6>
+                    <h3 class="display-6 fw-bold">₱<?= number_format($totalRevenue, 2) ?></h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="card theme-border border-0 shadow-sm p-0 overflow-hidden mb-4"
+            style="background: var(--clr-bg-card);">
+            <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Commission Requests</h5>
+                <a href="<?= BASE_URL ?>admin/commissions" class="text-decoration-none" style="color: var(--clr-gold);">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead style="background-color: var(--clr-bg-alt);">
+                        <tr>
+                            <th class="p-3">Client</th>
+                            <th class="p-3">Commission Type</th>
+                            <th class="p-3">Status</th>
+                            <th class="p-3">Budget</th>
+                            <th class="p-3 text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($recentRequests)): ?>
+                        <tr>
+                            <td class="p-3 text-muted text-center" colspan="5">No recent commission requests.</td>
+                        </tr>
+                        <?php else: ?>
+                            <?php foreach ($recentRequests as $req): ?>
+                            <tr style="border-bottom: 1px solid var(--clr-border);" data-commission-id="<?= (int) $req['commission_id'] ?>">
+                                <td class="p-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle me-3"
+                                            style="width: 40px; height: 40px; background: var(--clr-gold-light);"></div>
+                                        <div>
+                                            <div class="fw-bold"><?= htmlspecialchars($req['client_first_name'] . ' ' . $req['client_last_name']) ?></div>
+                                            <small class="text-muted">ID: #C-<?= (int) $req['commission_id'] ?></small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="p-3"><?= htmlspecialchars($req['category_name'] ?? 'Uncategorized') ?></td>
+                                <td class="p-3">
+                                    <span class="badge"
+                                        style="background-color: var(--clr-open); color: white;"><?= htmlspecialchars($req['request_status']) ?></span>
+                                </td>
+                                <td class="p-3">₱<?= number_format((float) $req['price'], 2) ?></td>
+                                <td class="p-3 text-end">
+                                    <button class="btn btn-sm btn-danger js-remove-listing" data-commission-id="<?= (int) $req['commission_id'] ?>">Remove</button>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+document.querySelectorAll('.js-remove-listing').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        if (!confirm('Remove this commission listing and all related records?')) return;
+
+        const commissionId = btn.dataset.commissionId;
+        try {
+            const res = await fetch('<?= BASE_URL ?>api/admin/remove_listing.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ commission_id: commissionId })
+            });
+            const data = await res.json();
+            if (data.success) {
+                btn.closest('tr').remove();
+            } else {
+                alert(data.message || 'Failed to remove listing.');
+            }
+        } catch (err) {
+            alert('Network error while removing listing.');
+        }
+    });
+});
+</script>

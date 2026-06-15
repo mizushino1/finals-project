@@ -61,6 +61,9 @@
                                 href="<?php echo BASE_URL; ?>messages">INBOX</a>
                         <?php else: ?>
                         <?php endif; ?>
+                        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+                            <li><a class="nav-link text-light fw-bold fs-fluid-sm" href="<?= BASE_URL ?>admin">ADMIN</a></li>
+                        <?php endif; ?>
                     </div>
 
                     <!-- Spacer on small screens to push right side to the end -->
@@ -134,6 +137,9 @@
                                 <a class="nav-link text-light fw-bold fs-fluid-sm" href="<?php echo BASE_URL; ?>artists">ARTISTS</a>
                                 <a class="nav-link text-light fw-bold fs-fluid-sm"
                                     href="<?php echo BASE_URL; ?>messages">INBOX</a>
+                                <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+                                    <li><a class="nav-link text-light fw-bold fs-fluid-sm" href="<?= BASE_URL ?>admin">ADMIN</a></li>
+                                <?php endif; ?>
                                 <hr class="border-secondary my-1">
                             </div>
 

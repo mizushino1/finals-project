@@ -24,20 +24,46 @@ try {
     // 2. Begin Transaction to guarantee relational cleanup safety
     $db->beginTransaction();
 
-    // Step A: Delete all associated artist proposals/bids for this commission first
+    // Step A: Delete payments tied to transactions of this commission
+    $stmtDeletePayments = $db->prepare('
+        DELETE p FROM payment_tbl p
+        INNER JOIN transaction_tbl t ON p.transaction_id = t.transaction_id
+        WHERE t.commission_id = ?
+    ');
+    $stmtDeletePayments->execute([$commissionId]);
+
+    // Step B: Delete transactions tied to this commission
+    $stmtDeleteTransactions = $db->prepare('DELETE FROM transaction_tbl WHERE commission_id = ?');
+    $stmtDeleteTransactions->execute([$commissionId]);
+
+    // Step C: Delete reviews tied to this commission
+    $stmtDeleteReviews = $db->prepare('DELETE FROM review_tbl WHERE commission_id = ?');
+    $stmtDeleteReviews->execute([$commissionId]);
+
+    // Step D: Delete images referencing this commission (reference/commission images)
+    $stmtDeleteImages = $db->prepare('DELETE FROM image_tbl WHERE commission_id = ?');
+    $stmtDeleteImages->execute([$commissionId]);
+
+    // Step E: Delete all associated artist proposals/bids for this commission
     $stmtDeleteRequests = $db->prepare('DELETE FROM commission_request_tbl WHERE commission_id = ?');
     $stmtDeleteRequests->execute([$commissionId]);
 
-    // Step B: Delete the parent commission listing itself
+    // Step F: Delete the parent commission listing itself
     $stmtDeleteCommission = $db->prepare('DELETE FROM commission_tbl WHERE commission_id = ?');
     $stmtDeleteCommission->execute([$commissionId]);
+
+    if ($stmtDeleteCommission->rowCount() === 0) {
+        $db->rollBack();
+        echo json_encode(['success' => false, 'message' => 'Commission listing not found.']);
+        exit;
+    }
 
     // All steps succeeded; permanently write changes to disk
     $db->commit();
 
     echo json_encode([
-        'success' => true, 
-        'message' => 'Commission listing and all associated artist proposals successfully moderation-purged.'
+        'success' => true,
+        'message' => 'Commission listing and all associated records successfully moderation-purged.'
     ]);
 
 } catch (PDOException $e) {
@@ -45,10 +71,9 @@ try {
     if ($db->inTransaction()) {
         $db->rollBack();
     }
-    
+
     echo json_encode([
-        'success' => false, 
+        'success' => false,
         'message' => 'Administrative deletion failed: ' . $e->getMessage()
     ]);
 }
-?>

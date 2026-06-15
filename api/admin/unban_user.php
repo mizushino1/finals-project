@@ -23,9 +23,8 @@ if ($id <= 0 || !in_array($type, ['user', 'artist', 'client'])) {
 try {
     $accountId = 0;
 
-    // 2. Resolve the absolute account_id depending on the incoming profile type
+    // Resolve the absolute account_id depending on the incoming profile type
     if ($type === 'user' || $type === 'client') {
-        // Users map 1:1 with account_id in a unified schema layout
         $stmtCheck = $db->prepare('SELECT account_id FROM user_tbl WHERE account_id = ?');
         $stmtCheck->execute([$id]);
         $row = $stmtCheck->fetch(PDO::FETCH_ASSOC);
@@ -33,7 +32,6 @@ try {
             $accountId = $row['account_id'];
         }
     } elseif ($type === 'artist') {
-        // Artists must be looked up to translate artist_id -> account_id
         $stmtCheck = $db->prepare('SELECT account_id FROM artist_tbl WHERE artist_id = ?');
         $stmtCheck->execute([$id]);
         $row = $stmtCheck->fetch(PDO::FETCH_ASSOC);
@@ -42,42 +40,28 @@ try {
         }
     }
 
-    // Guard against non-existent records
     if ($accountId <= 0) {
         echo json_encode(['success' => false, 'message' => 'Target profile record could not be found.']);
         exit;
     }
 
-    // Protection Guard: Prevent an admin from accidentally banning themselves
-    if ($accountId === intval($_SESSION['user_id'])) {
-        echo json_encode(['success' => false, 'message' => 'Self-destructive actions are blocked. You cannot ban your own administrative account.']);
-        exit;
-    }
-
-    // 3. Resolve the "Banned" status_id from account_status_tbl (lookup, not freetext)
+    // Resolve the "Active" status_id from account_status_tbl
     $stmtStatus = $db->prepare('SELECT account_status_id FROM account_status_tbl WHERE status_name = ?');
-    $stmtStatus->execute(['Banned']);
+    $stmtStatus->execute(['Active']);
     $statusRow = $stmtStatus->fetch(PDO::FETCH_ASSOC);
 
     if (!$statusRow) {
-        echo json_encode(['success' => false, 'message' => '"Banned" status is not configured in account_status_tbl.']);
+        echo json_encode(['success' => false, 'message' => '"Active" status is not configured in account_status_tbl.']);
         exit;
     }
-    $bannedStatusId = $statusRow['account_status_id'];
+    $activeStatusId = $statusRow['account_status_id'];
 
-    // 4. Execute the status modification using the correct FK column
     $stmt = $db->prepare('UPDATE account_tbl SET account_status_id = ? WHERE account_id = ?');
-    $stmt->execute([$bannedStatusId, $accountId]);
-
-    /**
-     * NOTE ON SESSION TERMINATION:
-     * To prevent a banned user from remaining active until they naturally log out,
-     * consider clearing active session file handles or managing a centralized token blacklist token.
-     */
+    $stmt->execute([$activeStatusId, $accountId]);
 
     echo json_encode([
         'success' => true,
-        'message' => "The target $type account has been successfully banned and restricted from the platform."
+        'message' => "The target $type account has been restored to Active status."
     ]);
 
 } catch (PDOException $e) {
