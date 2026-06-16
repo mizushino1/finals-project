@@ -237,6 +237,12 @@ try {
                                 <i class="fas fa-plus me-1"></i> Follow
                             <?php endif; ?>
                         </button>
+                        <a href="<?php echo BASE_URL; ?>messages?target_id=<?php echo $profile['account_id']; ?>&name=<?php echo urlencode($clean_username); ?>"
+                            class="btn-artovia-primary d-inline-flex align-items-center justify-content-center rounded-2"
+                            style="width:38px;height:38px;"
+                            title="Message <?php echo $clean_username; ?>">
+                            <i class="bi bi-chat-dots-fill"></i>
+                        </a>
                     <?php else: ?>
                         <a href="<?php echo BASE_URL; ?>settings"
                             id="btn-edit-profile"
@@ -485,12 +491,16 @@ try {
 </main>
 
 <?php require_once __DIR__ . '/../commissions/partials/edit_modal.php'; ?>
+<?php require_once __DIR__ . '/../commissions/partials/review_modal.php'; ?>
+<?php require_once __DIR__ . '/../commissions/partials/payment_modal.php'; ?>
 
 <script>
-    window.PROFILE_ACCOUNT_ID = <?php echo $profile_account_id; ?>;
-    window.BASE_URL = '<?php echo BASE_URL; ?>';
+    window.PROFILE_ACCOUNT_ID  = <?php echo $profile_account_id; ?>;
+    window.BASE_URL            = '<?php echo BASE_URL; ?>';
+    window.USER_ROLE           = '<?php echo addslashes(strtolower($_SESSION['role'] ?? 'guest')); ?>';
     window.IS_OWN_USER_PROFILE = <?php echo $is_own_user_profile ? 'true' : 'false'; ?>;
-    window.IS_ARTIST = <?php echo (isset($_SESSION['role']) && strtolower($_SESSION['role']) === 'artist') ? 'true' : 'false'; ?>;
+    window.IS_ARTIST           = <?php echo (isset($_SESSION['role']) && strtolower($_SESSION['role']) === 'artist') ? 'true' : 'false'; ?>;
 </script>
-<script src="<?php echo BASE_URL; ?>public/js/profile.js"></script>
-<script src="<?= BASE_URL ?>public/js/payments.js"></script>
+
+<script src="<?= BASE_URL ?>public/js/artovia.core.js"></script>
+<script src="<?= BASE_URL ?>public/js/profile.js"></script>

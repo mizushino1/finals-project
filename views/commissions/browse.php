@@ -353,4 +353,8 @@
 <?php require_once __DIR__ . '/partials/review_modal.php'; // adjust relative path as needed ?>
 <?php require_once __DIR__ . '/partials/payment_modal.php'; // adjust relative path as needed ?>
 
+
+<script src="<?= BASE_URL ?>public/js/artovia.core.js"></script>
+<script src="<?= BASE_URL ?>public/js/artovia.cards.js"></script>
+<script src="<?= BASE_URL ?>public/js/artovia.api.js"></script>
 <script src="<?= BASE_URL ?>public/js/commission.js"></script>

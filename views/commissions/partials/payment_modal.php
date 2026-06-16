@@ -11,7 +11,7 @@
        new bootstrap.Modal(document.getElementById('paymentModal')).show();
      ===================================================== -->
 
-<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+     <div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
 
@@ -250,7 +250,7 @@
         // ── Fetch commission price ───────────────────────────
         async function fetchCommissionAmount(commissionId) {
             try {
-                const res = await fetch(`/finals-project/api/commissions/get_price.php?id=${commissionId}`);
+                const res = await fetch((window.BASE_URL ?? '/') + `api/commissions/get_price.php?id=${commissionId}`);
                 const data = await res.json();
                 return data.success ? parseFloat(data.price) : 0;
             } catch (e) {
@@ -365,7 +365,7 @@
             setLoading(true);
 
             try {
-                const res = await fetch('/finals-project/api/payments/initiate.php', {
+                const res = await fetch((window.BASE_URL ?? '/') + 'api/payments/initiate.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

@@ -2,7 +2,7 @@
     // ── Config ────────────────────────────────────────────────────────────────
     const FETCH_API = window.location.origin + '/finals-project/api/messages/fetch.php';
     const SEND_API  = window.location.origin + '/finals-project/api/messages/send.php';
-    const POLL_MS   = 3000; // Poll for updates every 3 seconds
+    const POLL_MS   = 3000;
 
     // ── DOM References ────────────────────────────────────────────────────────
     const chatHeader            = document.getElementById('chatHeader');
@@ -15,9 +15,11 @@
     const conversationContainer = document.getElementById('conversationContainer');
 
     // ── State Variables ───────────────────────────────────────────────────────
-    let activeTargetAccountId = null; 
-    let loadedMessageIds     = new Set();
-    let pollTimer            = null;
+    let activeTargetAccountId = null;
+    let loadedMessageIds      = new Set();
+    let pollTimer             = null;
+    let activeContactAvatar   = null;  // avatar_url of the contact
+    let myAvatar              = null;  // avatar_url of the current user
 
     // ── Helpers ───────────────────────────────────────────────────────────────
     function escapeHtml(str) {
@@ -27,60 +29,82 @@
     }
 
     function scrollToBottom() {
-        if (messagePane) {
-            messagePane.scrollTop = messagePane.scrollHeight;
-        }
+        if (messagePane) messagePane.scrollTop = messagePane.scrollHeight;
     }
 
-    // ── HTML Message Bubble Builder ───────────────────────────────────────────
+    // ── Avatar element builder (keeps original icon size: 1.2rem) ────────────
+    function buildMsgAvatar(avatarUrl, isMine) {
+        if (!avatarUrl) {
+            // Fallback: original icon, original size & color
+            const i = document.createElement('i');
+            i.className = 'bi bi-person-circle';
+            i.style.cssText = `font-size:2rem; color:${isMine ? 'var(--clr-gold)' : 'var(--clr-text-muted)'}; flex-shrink:0;`;
+            return i;
+        }
+
+        const img = document.createElement('img');
+        img.src = (window.BASE_URL ?? '') + avatarUrl;
+        img.alt = '';
+        img.style.cssText = 'width:2rem;height:2rem;border-radius:50%;object-fit:cover;flex-shrink:0;';
+        img.addEventListener('error', () => {
+            const i = document.createElement('i');
+            i.className = 'bi bi-person-circle';
+            i.style.cssText = `font-size:2rem; color:${isMine ? 'var(--clr-gold)' : 'var(--clr-text-muted)'}; flex-shrink:0;`;
+            img.replaceWith(i);
+        });
+        return img;
+    }
+
+    // ── Message Bubble Builder ────────────────────────────────────────────────
     function buildBubble(msg) {
         const userAccountId = window.CURRENT_ACCOUNT_ID ?? 0;
         const isMine = parseInt(msg.sender_account_id, 10) === parseInt(userAccountId, 10);
         const text   = escapeHtml(msg.message_content);
 
+        const wrapper = document.createElement('div');
+        wrapper.dataset.msgId = msg.message_id;
+        wrapper.className = 'd-flex align-items-start gap-2';
+        wrapper.style.justifyContent = isMine ? 'flex-end' : '';
+
+        const bubble = document.createElement('div');
+        bubble.className = 'p-3';
+        bubble.style.cssText = `border-radius:var(--radius-md); max-width:75%; word-break:break-word;`;
+        bubble.innerHTML = text;
+
         if (isMine) {
-            return `
-            <div class="d-flex align-items-start justify-content-end gap-2" data-msg-id="${msg.message_id}">
-                <div class="p-3 text-white" style="border-radius:var(--radius-md); background:var(--clr-gold); max-width:75%; word-break:break-word;">
-                    ${text}
-                </div>
-                <i class="bi bi-person-circle" style="font-size:1.2rem; color:var(--clr-gold); flex-shrink:0;"></i>
-            </div>`;
+            bubble.style.background = 'var(--clr-gold)';
+            bubble.style.color = '#fff';
+            wrapper.appendChild(bubble);
+            wrapper.appendChild(buildMsgAvatar(myAvatar, true));
+        } else {
+            bubble.classList.add('theme-border');
+            bubble.style.borderWidth = '1px';
+            bubble.style.background = 'var(--clr-bg-card)';
+            wrapper.appendChild(buildMsgAvatar(activeContactAvatar, false));
+            wrapper.appendChild(bubble);
         }
 
-        return `
-        <div class="d-flex align-items-start gap-2" data-msg-id="${msg.message_id}">
-            <i class="bi bi-person-circle" style="font-size:1.2rem; color:var(--clr-text-muted); flex-shrink:0;"></i>
-            <div class="p-3 theme-border" style="border-width:1px !important; border-radius:var(--radius-md); background:var(--clr-bg-card); max-width:75%; word-break:break-word;">
-                ${text}
-            </div>
-        </div>`;
+        return wrapper;
     }
 
     function appendMessages(messages) {
         if (!messagePane) return;
         let hasNewContent = false;
-        
+
         messages.forEach(msg => {
             const msgId = msg.message_id;
             if (!msgId || loadedMessageIds.has(msgId)) return;
             loadedMessageIds.add(msgId);
 
-            const placeholder = document.getElementById('msgPlaceholder');
-            if (placeholder) placeholder.remove();
-
-            const containerDiv = document.createElement('div');
-            containerDiv.innerHTML = buildBubble(msg);
-            messagePane.appendChild(containerDiv.firstElementChild);
+            document.getElementById('msgPlaceholder')?.remove();
+            messagePane.appendChild(buildBubble(msg));
             hasNewContent = true;
         });
 
-        if (hasNewContent) {
-            scrollToBottom();
-        }
+        if (hasNewContent) scrollToBottom();
     }
 
-    // ── Message Data Polling ─────────────────────────────────────────────────
+    // ── Message Data Polling ──────────────────────────────────────────────────
     async function loadMessages() {
         if (!activeTargetAccountId) return;
         try {
@@ -91,9 +115,7 @@
             if (json.success && Array.isArray(json.data)) {
                 if (json.data.length === 0) {
                     const placeholder = document.getElementById('msgPlaceholder');
-                    if (placeholder) {
-                        placeholder.innerHTML = '<div class="text-center text-muted p-4 fs-fluid-xs">No messages yet. Send a wave!</div>';
-                    }
+                    if (placeholder) placeholder.innerHTML = '<div class="text-center text-muted p-4 fs-fluid-xs">No messages yet. Send a wave!</div>';
                     return;
                 }
                 appendMessages(json.data);
@@ -103,28 +125,27 @@
         }
     }
 
-    function switchConversation(targetAccountId, targetName) {
+    function switchConversation(targetAccountId, targetName, contactAvatarUrl, myAvatarUrl) {
         clearInterval(pollTimer);
         activeTargetAccountId = targetAccountId;
+        activeContactAvatar   = contactAvatarUrl ?? null;
+        myAvatar              = myAvatarUrl ?? null;
         loadedMessageIds.clear();
 
         if (chatHeader) chatHeader.textContent = targetName;
-        if (msgInput) {
-            msgInput.removeAttribute('disabled');
-            msgInput.value = '';
-        }
-        if (sendBtn) sendBtn.removeAttribute('disabled');
+        if (msgInput) { msgInput.removeAttribute('disabled'); msgInput.value = ''; }
+        if (sendBtn)  sendBtn.removeAttribute('disabled');
         if (sendError) sendError.style.display = 'none';
-        
+
         if (messagePane) {
             messagePane.innerHTML = '<div class="text-center text-muted fs-fluid-xs" id="msgPlaceholder">Loading messages…</div>';
         }
-        
+
         loadMessages();
         pollTimer = setInterval(loadMessages, POLL_MS);
     }
 
-    // ── Outbound Message Handlers ────────────────────────────────────────────
+    // ── Outbound Message Handlers ─────────────────────────────────────────────
     async function sendMessage() {
         if (!msgInput || !sendBtn) return;
         const textContent = msgInput.value.trim();
@@ -137,20 +158,16 @@
             const res = await fetch(SEND_API, {
                 method  : 'POST',
                 headers : { 'Content-Type': 'application/json' },
-                body    : JSON.stringify({ 
+                body    : JSON.stringify({
                     receiver_id: activeTargetAccountId,
-                    message_content: textContent 
+                    message_content: textContent
                 }),
             });
             const json = await res.json();
 
             if (json.success) {
                 msgInput.value = '';
-                if (json.data) {
-                    appendMessages([json.data]);
-                } else {
-                    loadMessages();
-                }
+                json.data ? appendMessages([json.data]) : loadMessages();
                 document.dispatchEvent(new CustomEvent('artovia:refreshThreads'));
             } else if (sendError) {
                 sendError.textContent = json.message || 'Could not send message.';
@@ -167,34 +184,29 @@
         }
     }
 
-    // ── Mobile Navigation Controls Handlers ──────────────────────────────────
+    // ── Mobile Navigation ─────────────────────────────────────────────────────
     if (mobileChatBackButton) {
         mobileChatBackButton.addEventListener('click', () => {
-            // Terminate polling processing requests while looking at the thread lists panel
             clearInterval(pollTimer);
             activeTargetAccountId = null;
-
-            // Slide back panel view alignments smoothly
             if (conversationContainer) conversationContainer.classList.remove('active-mobile-view');
             if (inboxSidebarPanel) inboxSidebarPanel.classList.add('active-mobile-view');
         });
     }
 
-    // Watch for desktop window scaling modifications to keep display states synced
     window.addEventListener('resize', () => {
         if (window.innerWidth >= 992) {
-            if (inboxSidebarPanel) inboxSidebarPanel.classList.remove('active-mobile-view');
-            if (conversationContainer) conversationContainer.classList.remove('active-mobile-view');
+            inboxSidebarPanel?.classList.remove('active-mobile-view');
+            conversationContainer?.classList.remove('active-mobile-view');
         } else if (!activeTargetAccountId) {
-            // If on mobile screen sizes with no active thread focused, show the list panel
-            if (inboxSidebarPanel) inboxSidebarPanel.classList.add('active-mobile-view');
+            inboxSidebarPanel?.classList.add('active-mobile-view');
         }
     });
 
-    // ── Inter-Module Observers ───────────────────────────────────────────────
+    // ── Inter-Module Observers ────────────────────────────────────────────────
     document.addEventListener('artovia:threadChanged', (e) => {
-        const { id, name } = e.detail;
-        switchConversation(id, name);
+        const { id, name, contactAvatarUrl, myAvatarUrl } = e.detail;
+        switchConversation(id, name, contactAvatarUrl, myAvatarUrl);
     });
 
     // ── Form Input Listeners ──────────────────────────────────────────────────

@@ -44,35 +44,45 @@ try {
     // ── ACTION 1: FETCH CONVERSATIONS LIST ────────────────────────────────────
     if ($action === 'conversations') {
         $stmt = $db->prepare("
-    SELECT 
-        a.account_id                    AS contact_id,
-        a.username                      AS contact_name,
-        latest.message_content          AS last_message,
-        latest.sent_at                  AS last_sent_at,
-        COALESCE(unread.cnt, 0)         AS unread_count
-    FROM (
-        SELECT 
-            CASE 
-                WHEN sender_account_id = ? THEN receiver_account_id
-                ELSE sender_account_id
-            END AS contact_id,
-            MAX(message_id) AS latest_message_id
-        FROM message_tbl
-        WHERE sender_account_id = ? OR receiver_account_id = ?
-        GROUP BY contact_id
-    ) thread_summary
-    JOIN account_tbl a ON a.account_id = thread_summary.contact_id
-    JOIN message_tbl latest ON latest.message_id = thread_summary.latest_message_id
-    LEFT JOIN (
-        SELECT sender_account_id, COUNT(*) AS cnt
-        FROM message_tbl m
-        JOIN status_tbl s ON m.status_id = s.status_id
-        WHERE m.receiver_account_id = ?
-          AND LOWER(s.status_name) = 'unread'
-        GROUP BY sender_account_id
-    ) unread ON unread.sender_account_id = thread_summary.contact_id
-    ORDER BY latest.sent_at DESC
-");
+            SELECT
+                a.account_id                AS contact_id,
+                a.username                  AS contact_name,
+                latest.message_content      AS last_message,
+                latest.sent_at              AS last_sent_at,
+                COALESCE(unread.cnt, 0)     AS unread_count,
+                (
+                    SELECT img.image_url
+                    FROM image_tbl img
+                    LEFT JOIN user_tbl   u2  ON img.user_id   = u2.user_id
+                    LEFT JOIN artist_tbl ar2 ON img.artist_id = ar2.artist_id
+                    WHERE img.image_type_id = 1
+                      AND (u2.account_id = a.account_id OR ar2.account_id = a.account_id)
+                    ORDER BY img.uploaded_at DESC
+                    LIMIT 1
+                ) AS avatar_url
+            FROM (
+                SELECT
+                    CASE
+                        WHEN sender_account_id = ? THEN receiver_account_id
+                        ELSE sender_account_id
+                    END AS contact_id,
+                    MAX(message_id) AS latest_message_id
+                FROM message_tbl
+                WHERE sender_account_id = ? OR receiver_account_id = ?
+                GROUP BY contact_id
+            ) thread_summary
+            JOIN account_tbl a      ON a.account_id       = thread_summary.contact_id
+            JOIN message_tbl latest ON latest.message_id  = thread_summary.latest_message_id
+            LEFT JOIN (
+                SELECT sender_account_id, COUNT(*) AS cnt
+                FROM message_tbl m
+                JOIN status_tbl s ON m.status_id = s.status_id
+                WHERE m.receiver_account_id = ?
+                  AND LOWER(s.status_name) = 'unread'
+                GROUP BY sender_account_id
+            ) unread ON unread.sender_account_id = thread_summary.contact_id
+            ORDER BY latest.sent_at DESC
+        ");
 
         $stmt->execute([
             $currentAccountId,

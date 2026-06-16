@@ -123,21 +123,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const reviewModal   = bootstrap.Modal.getInstance(reviewModalEl);
             if (reviewModal) reviewModal.hide();
 
-            // Forward commission context to payment modal
+            // Forward commission ID to payment modal
             const payCommId = document.getElementById('payCommissionId');
-            if (payCommId) payCommId.value = commId;
-
-            // Copy amount if available
-            const amountSrc  = document.getElementById('reviewCommissionId');
-            const payAmtEl   = document.getElementById('payCommissionId');
-            if (amountSrc && payAmtEl) {
-                payAmtEl.dataset.amount = amountSrc.dataset.amount || '0';
+            if (payCommId) {
+                payCommId.value = commId;
+                // Payment modal fetches the real price itself — just reset dataset.amount
+                payCommId.dataset.amount = '0';
             }
 
             const payModalEl = document.getElementById('paymentModal');
             if (payModalEl) {
-                const payModal = new bootstrap.Modal(payModalEl);
-                payModal.show();
+                bootstrap.Modal.getOrCreateInstance(payModalEl).show();
             }
         });
     }
@@ -160,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setLoading(true);
 
         try {
-            const res  = await fetch('/finals-project/api/commissions/submit_review.php', {
+            const res  = await fetch((window.BASE_URL ?? '/') + 'api/commissions/submit_review.php', {
                 method : 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body   : JSON.stringify({ commission_id: commissionId, rating, comment }),
