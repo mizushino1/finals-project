@@ -51,8 +51,8 @@ $statusMap = [
 ];
 
 $allowedTransitions = [
-    'user'   => ['cancelled', 'rejected', 'accepted'],
-    'client' => ['cancelled', 'rejected', 'accepted'],
+    'user'   => ['active', 'cancelled', 'rejected', 'accepted'],
+    'client' => ['active', 'cancelled', 'rejected', 'accepted'],
     'artist' => ['in_progress', 'completed', 'cancelled'],
     'admin'  => ['active', 'in_progress', 'completed', 'cancelled'],
 ];
@@ -147,7 +147,34 @@ try {
                 'message' => 'Artist request declined successfully.'
             ]);
 
-            // ── CASE C: User cancels their own commission ─────────────────────────
+            // ── CASE C: User restores a cancelled commission ────────────────────────
+        } elseif ($newStatus === 'active') {
+            $stmtCheck = $db->prepare('
+                SELECT c.commission_id, c.status_id
+                FROM commission_tbl c
+                JOIN user_tbl u ON c.user_id = u.user_id
+                WHERE c.commission_id = ?
+                  AND u.account_id = ?
+            ');
+            $stmtCheck->execute([$commissionId, $account_id]);
+            $row = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+
+            if (!$row) {
+                echo json_encode(['success' => false, 'message' => 'Unauthorized: You do not own this commission.']);
+                exit;
+            }
+            if (intval($row['status_id']) !== 7) {
+                echo json_encode(['success' => false, 'message' => 'Only cancelled commissions can be restored.']);
+                exit;
+            }
+
+            // Clear any previously assigned artist so it goes back to open bidding
+            $stmtUpdate = $db->prepare('UPDATE commission_tbl SET status_id = 1, artist_id = NULL WHERE commission_id = ?');
+            $stmtUpdate->execute([$commissionId]);
+
+            echo json_encode(['success' => true, 'message' => 'Commission restored and set back to Active.']);
+
+        // ── CASE D: User cancels their own commission ─────────────────────────
         } else {
             $stmtCheck = $db->prepare('
                 SELECT c.commission_id

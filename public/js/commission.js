@@ -502,6 +502,53 @@ document.addEventListener('DOMContentLoaded', () => {
             A.handleCancelRequest(t, loadArtistCommissions);
             return;
         }
+
+        // ── Restore cancelled commission ───────────────────────
+        if (t.classList.contains('restore-commission-btn')) {
+            const commissionId = parseInt(t.getAttribute('data-commission-id'));
+            if (!commissionId) return;
+            if (!confirm('Restore this commission? It will be set back to Active and open for artists to apply.')) return;
+
+            t.disabled = true;
+            A.postJSON(`${BASE}api/commissions/update_status.php`, {
+                commission_id: commissionId,
+                status: 'active',
+            }).then(data => {
+                if (data?.success) {
+                    loadCommissions();
+                } else {
+                    alert(data?.message || 'Failed to restore commission.');
+                    t.disabled = false;
+                }
+            }).catch(() => {
+                alert('Network error — please try again.');
+                t.disabled = false;
+            });
+            return;
+        }
+
+        // ── Permanently delete cancelled commission ────────────
+        if (t.classList.contains('delete-commission-btn')) {
+            const commissionId = parseInt(t.getAttribute('data-commission-id'));
+            if (!commissionId) return;
+            if (!confirm('Permanently delete this commission? This cannot be undone.')) return;
+
+            t.disabled = true;
+            A.postJSON(`${BASE}api/commissions/delete.php`, {
+                commission_id: commissionId,
+            }).then(data => {
+                if (data?.success) {
+                    loadCommissions();
+                } else {
+                    alert(data?.message || 'Failed to delete commission.');
+                    t.disabled = false;
+                }
+            }).catch(() => {
+                alert('Network error — please try again.');
+                t.disabled = false;
+            });
+            return;
+        }
     });
 
     // ── Boot ───────────────────────────────────────────────────

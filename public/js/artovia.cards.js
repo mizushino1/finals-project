@@ -53,6 +53,21 @@
                             <i class="bi bi-star-fill me-1"></i>Review
                         </button>`;
             }
+            if (statusId === 7) {
+                return `
+                    <div class="d-flex gap-2">
+                        <button type="button"
+                                class="btn-artovia-outline py-1 px-3 fs-fluid-xs rounded-2 restore-commission-btn"
+                                data-commission-id="${c.commission_id}">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i>Restore
+                        </button>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger py-1 px-3 fs-fluid-xs rounded-2 delete-commission-btn"
+                                data-commission-id="${c.commission_id}">
+                            <i class="bi bi-trash3"></i>
+                        </button>
+                    </div>`;
+            }
             return `<button type="button"
                         class="btn-artovia-outline py-1 px-3 fs-fluid-xs rounded-2"
                         data-bs-toggle="modal" data-bs-target="#editCommissionModal"
