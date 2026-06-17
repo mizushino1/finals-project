@@ -536,3 +536,16 @@ p, .roboto {
     0%, 100% { transform: translateX(-50%) translateY(0); }
     50%       { transform: translateX(-50%) translateY(8px); }
 }
+
+@keyframes commissionFlash {
+    0%   { box-shadow: 0 0 0 0 var(--clr-gold); transform: translateY(0); }
+    20%  { box-shadow: 0 0 0 8px var(--clr-gold); transform: translateY(-5px); }
+    80%  { box-shadow: 0 0 0 4px var(--clr-gold); transform: translateY(-5px); }
+    100% { box-shadow: 0 0 0 0 transparent; transform: translateY(0); }
+}
+
+.commission-highlight {
+    animation: commissionFlash 2.5s ease forwards;
+    outline: 2px solid var(--clr-gold);
+    outline-offset: 2px;
+}

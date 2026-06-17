@@ -1,10 +1,3 @@
-<!-- ═══════════════════════════════════════════════════════════
-     EDIT COMMISSION MODAL (shared partial)
-     Include once per page via:
-       require_once __DIR__ . '/partials/edit_modal.php';
-     Trigger by adding to any button/link:
-       data-bs-toggle="modal" data-bs-target="#editCommissionModal" data-commission-id="<id>"
-═══════════════════════════════════════════════════════════ -->
 <div class="modal fade" id="editCommissionModal" tabindex="-1" aria-labelledby="editCommissionModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow-lg p-4 bg-card" style="border-radius: 1rem;">
@@ -18,8 +11,6 @@
                     <div class="spinner-border" role="status"></div>
                     <p class="text-muted mt-2 mb-0 fs-fluid-sm">Loading commission...</p>
                 </div>
-
-                <div id="editCommissionFormAlert" class="alert d-none fs-fluid-xs"></div>
 
                 <form id="editCommissionForm" class="d-none">
                     <input type="hidden" id="editCommissionId">
@@ -65,8 +56,8 @@
                     </div>
 
                     <div class="d-flex gap-3">
-                        <button type="button" id="saveCommissionBtn" class="btn btn-success w-50">Save Draft</button>
-                        <button type="button" id="cancelCommissionBtn" class="btn btn-danger w-50">Cancel Commission</button>
+                        <button type="button" id="saveCommissionBtn" class="btn btn-fill-static w-50">Save Draft</button>
+                        <button type="button" id="cancelCommissionBtn" class="btn btn-outline w-50">Cancel Commission</button>
                     </div>
                 </form>
 

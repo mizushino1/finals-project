@@ -1,4 +1,5 @@
 <?php require_once __DIR__ . '/../../src/middleware/auth_middleware.php'; ?>
+<link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/inbox.css">
 <main class="py-0">
     <div class="container-fluid p-0">
         <div id="chatMainContainer" class="d-flex position-relative overflow-hidden chat-responsive-wrapper" style="height: 90vh; background: var(--clr-bg-card);">

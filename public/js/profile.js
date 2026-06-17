@@ -605,35 +605,10 @@
     }
 
     function buildProfileCommissionActionBtn(c) {
-        const statusId = parseInt(c.status_id);
-
-        if (statusId === 6) {
-            if (c.has_review) {
-                return `<span class="text-success fw-semibold fs-fluid-xxs">✓ Reviewed</span>`;
-            }
-            return `<button type="button"
-                        class="btn btn-warning text-dark btn-review-trigger py-1 px-3 fs-fluid-xs rounded-2 fw-semibold shadow-sm"
-                        data-commission-id="${c.commission_id}">
-                        <i class="bi bi-star-fill me-1"></i>Review
-                    </button>`;
-        }
-
-        if (statusId === 5) {
-            return `<a href="${BASE()}commissions/payment?id=${c.commission_id}"
-                       class="btn btn-success text-white py-1 px-3 fs-fluid-xs rounded-2 fw-semibold">
-                       <i class="bi bi-credit-card me-1"></i>Pay
-                   </a>`;
-        }
-
-        if (statusId === 1) {
-            return `<button type="button"
-                        class="btn-artovia-outline py-1 px-3 fs-fluid-xs rounded-2"
-                        data-bs-toggle="modal" data-bs-target="#editCommissionModal"
-                        data-commission-id="${c.commission_id}">Manage</button>`;
-        }
-
-        return `<a href="${BASE()}commissions/view?id=${c.commission_id}"
-                   class="btn-artovia-outline py-1 px-3 fs-fluid-xs rounded-2">View</a>`;
+        return `<a href="${BASE()}commissions?highlight=${c.commission_id}"
+                   class="btn-artovia-outline py-1 px-3 fs-fluid-xs rounded-2">
+                   View Listing
+               </a>`;
     }
 
     function buildProfileCommissionCard(c, index) {

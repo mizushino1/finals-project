@@ -3,94 +3,164 @@
    ========================================================================== */
 
 .chat-responsive-wrapper {
-    height: 100vh; /* Changed from 600px to full fluid layout height */
+    display: flex;
+    height: 90vh;
+    /* Kept bounded above main system navigation bars */
     background: var(--clr-bg-card);
+    overflow: hidden;
 }
 
 .chat-sidebar-panel {
-    width: 350px; 
-    border-right: 2px solid var(--clr-border); 
+    width: 350px;
+    border-right: 2px solid var(--clr-border);
     flex-shrink: 0;
 }
 
 .chat-sidebar-header {
-    border-bottom: 2px solid var(--clr-border); 
+    border-bottom: 2px solid var(--clr-border);
     background: var(--clr-bg-card);
 }
 
-.chat-search-prepend { border-right: none !important; }
-.chat-search-input { border-left: none !important; }
+.chat-search-prepend {
+    border-right: none !important;
+}
+
+.chat-search-input {
+    border-left: none !important;
+}
 
 .chat-conversation-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
     background: linear-gradient(to bottom, var(--clr-bg), var(--clr-surface));
 }
 
 .chat-conversation-header {
-    border-bottom: 2px solid var(--clr-border); 
-    background: var(--clr-bg-card); 
-    height: 75px; 
+    border-bottom: 2px solid var(--clr-border);
+    background: var(--clr-bg-card);
+    height: 75px;
     flex-shrink: 0;
 }
 
 .chat-message-pane {
+    flex-grow: 1;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+
+    /* Flex column-reverse forces the browser to align elements to the bottom 
+       by default and naturally keeps the scroll position locked to the latest text. */
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 12px;
+    padding: 1rem;
 }
-.chat-message-pane > div {
+
+.chat-message-pane>div {
     max-width: 100%;
 }
 
-.chat-bubble-mine {
-    border-radius: var(--radius-md); 
-    background: var(--clr-gold); 
-    max-width: 75%; 
-    word-break: break-word;
-}
+.chat-bubble-mine,
 .chat-bubble-theirs {
-    border-width: 1px !important; 
-    border-radius: var(--radius-md); 
-    background: var(--clr-bg-card); 
-    max-width: 75%; 
+    display: inline-block;
+    max-width: 75%;
+    width: auto;
     word-break: break-word;
 }
 
 .chat-conversation-footer {
-    border-top: 2px solid var(--clr-border); 
-    background: var(--clr-bg-card); 
+    border-top: 2px solid var(--clr-border);
+    background: var(--clr-bg-card);
     flex-shrink: 0;
-}
-.chat-footer-input { border-width: 1px !important; }
 
-.hide-scrollbar::-webkit-scrollbar { display: none; }
+    /* Keeps the bar permanently tacked to the base layout boundary */
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    padding: 12px;
+}
+
+.chat-footer-input {
+    border-width: 1px !important;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
 .hide-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
 
 /* ── Mobile View Overrides ─────────────────────────────────────────────── */
+/* ── Mobile View Overrides (Updated for Sticky Footer Input) ─────────────────── */
+/* ── Mobile View Overrides (Fixed Chat Input Fix) ────────────────────────── */
+/* ── Mobile View Overrides (Fixed Chat Input Fix) ────────────────────────── */
 @media (max-width: 991.98px) {
+    /* Main container wrapper spanning the dynamic viewport */
     .chat-responsive-wrapper {
         display: block !important;
-        height: 100vh !important; /* Forces layout tracking viewport to stay 100% full screen */
+        height: 100dvh !important; 
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        z-index: 1030 !important;
     }
     
+    /* Forces the chat panel view to act as a proper layout column box */
     .chat-panel-view {
         position: absolute !important;
-        top: 0;
-        left: 0;
+        top: 0 !important;
+        left: 0 !important;
         width: 100% !important;
         height: 100% !important;
-        transition: transform 0.35s ease-in-out, opacity 0.25s ease-in-out;
+        display: flex !important;
+        flex-direction: column !important;
+        background: var(--clr-bg-card) !important;
+        /* Smooth transitions only when explicitly toggled by user action */
+        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
         transform: translateX(100%);
-        opacity: 0;
-        pointer-events: none;
-        z-index: 1;
-        border-right: none !important;
     }
     
+    /* CRITICAL FIX: If the sidebar is active, slide it into view. 
+       If the conversation panel is active, slide it into view. */
     .chat-panel-view.active-mobile-view {
-        transform: translateX(0);
-        opacity: 1;
-        pointer-events: auto;
-        z-index: 2;
+        transform: translateX(0) !important;
+    }
+
+    #conversationContainer.chat-conversation-container {
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
+        width: 100% !important;
+        overflow: hidden !important;
+    }
+
+    /* Allows messages list pane to take remaining space and handle scrolling */
+    .chat-message-pane {
+        flex: 1 1 auto !important;
+        height: 0 !important; 
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding-bottom: 20px !important;
+    }
+
+    /* Pins your chat input area perfectly flush with the bottom screen frame */
+    .chat-conversation-footer {
+        position: relative !important;
+        bottom: 0 !important;
+        width: 100% !important;
+        background: var(--clr-bg-card) !important;
+        padding: 12px !important;
+        flex-shrink: 0 !important;
+        margin-top: auto !important;
+        border-top: 1px solid var(--clr-border) !important;
+    }
+
+    body {
+        overflow: hidden !important;
     }
 }

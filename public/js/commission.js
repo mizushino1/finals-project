@@ -312,19 +312,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Edit commission modal ──────────────────────────────────
 
+    // ── Global alert rerouter inside edit lifecycle ────────────────
+    // ── Edit commission modal ──────────────────────────────────
+
     function showEditAlert(message, isSuccess = false) {
-        A.showAlert(editAlert, message, isSuccess);
+        // Stop layout manipulation and send directly to your clean custom modals
+        if (isSuccess) {
+            A.showSuccessModal('Success', message);
+        } else {
+            A.showErrorModal(message);
+        }
     }
 
     if (editModal) {
         editModal.addEventListener('show.bs.modal', async (e) => {
-            const commissionId = parseInt(e.relatedTarget?.getAttribute('data-commission-id') ?? 0);
+            if (!e.relatedTarget) return;
+
+            const commissionId = parseInt(e.relatedTarget.getAttribute('data-commission-id') ?? 0);
             if (!commissionId) return;
 
             activeEditId = commissionId;
             A.hide(editAlert);
 
-            // Reset fields while fetching
             if (editTitle) editTitle.value = '';
             if (editDesc) editDesc.value = '';
             if (editBudget) editBudget.value = '';
@@ -336,7 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const res = await fetch(`${BASE}api/commissions/manage.php?commission_id=${commissionId}`);
                 const data = await res.json();
 
-                if (!data?.success) { showEditAlert(data?.message || 'Failed to load commission data.'); return; }
+                if (!data?.success) { A.showErrorModal(data?.message || 'Failed to load commission data.'); return; }
 
                 const d = data.data;
                 if (editTitle) editTitle.value = d.title ?? '';
@@ -350,7 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (err) {
                 console.error('Edit modal load error:', err);
-                showEditAlert('Network error loading commission data.');
+                A.showErrorModal('Network error loading commission data.');
             }
         });
 
@@ -372,8 +381,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (editSaveBtn) {
-        editSaveBtn.addEventListener('click', async () => {
+        editSaveBtn.addEventListener('click', async (e) => {
             if (!activeEditId) return;
+            e.preventDefault();
             A.hide(editAlert);
 
             const title = editTitle?.value.trim() ?? '';
@@ -381,10 +391,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const budget = parseFloat(editBudget?.value ?? 0);
             const category_id = parseInt(editCategory?.value ?? 0);
 
-            if (!title) { showEditAlert('Please provide a commission name.'); return; }
-            if (!description) { showEditAlert('Please provide a project description.'); return; }
-            if (isNaN(budget) || budget <= 0) { showEditAlert('Please enter a valid budget higher than ₱0.'); return; }
-            if (!category_id) { showEditAlert('Please select a category.'); return; }
+            if (!title) { A.showErrorModal('Please provide a commission name.'); return; }
+            if (!description) { A.showErrorModal('Please provide a project description.'); return; }
+            if (isNaN(budget) || budget <= 0) { A.showErrorModal('Please enter a valid budget higher than ₱0.'); return; }
+            if (!category_id) { A.showErrorModal('Please select a category.'); return; }
 
             A.btnLoading(editSaveBtn, 'Saving…');
 
@@ -402,17 +412,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await res.json();
 
                 if (data?.success) {
-                    showEditAlert(data.message || 'Commission updated successfully.', true);
-                    setTimeout(() => {
-                        bootstrap.Modal.getInstance(editModal)?.hide();
-                        loadCommissions();
-                    }, 1200);
+                    const updatedId = activeEditId;
+
+                    // 1. Immediately dismiss the edit modal frame
+                    bootstrap.Modal.getInstance(editModal)?.hide();
+
+                    // 2. Launch the standard core success modal view directly
+                    A.showSuccessModal('Changes Saved', data.message || 'Commission updated successfully.');
+
+                    // 3. Hot-update the local UI state variables instantly without network reloading
+                    allCommissions = allCommissions.map(c => {
+                        const cId = parseInt(c.commission_id || c.id || 0);
+                        if (cId === updatedId) {
+                            return {
+                                ...c,
+                                title: title,
+                                description: description,
+                                price: budget,
+                                category_id: category_id,
+                                category_name: editCategory?.options[editCategory.selectedIndex]?.text || c.category_name
+                            };
+                        }
+                        return c;
+                    });
+
+                    applyFilters();
                 } else {
-                    showEditAlert(data?.message || 'Failed to save changes.');
+                    A.showErrorModal(data?.message || 'Failed to save changes.');
                 }
             } catch (err) {
                 console.error('Save commission error:', err);
-                showEditAlert('Network error — please try again.');
+                A.showErrorModal('Network error — please try again.');
             } finally {
                 A.btnReset(editSaveBtn, 'Save Changes');
             }
@@ -420,8 +450,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (editCancelBtn) {
-        editCancelBtn.addEventListener('click', () => {
+        editCancelBtn.addEventListener('click', (e) => {
             if (!activeEditId) return;
+            e.preventDefault(); // Stop form submission and alert bubbling
+
+            // Explicitly force-hide the HTML alert element banner from the DOM completely
+            if (editAlert) {
+                editAlert.classList.add('d-none');
+                editAlert.style.display = 'none';
+            }
 
             A.showConfirmModal('Are you sure you want to cancel this commission? This cannot be undone.', async () => {
                 A.btnLoading(editCancelBtn, 'Cancelling…');
@@ -432,15 +469,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
 
                     if (data?.success) {
-                        bootstrap.Modal.getInstance(editModal)?.hide();
+                        const cancelledId = activeEditId;
+
+                        // Dismiss the parent Bootstrap edit modal frame
+                        const modalInstance = bootstrap.Modal.getInstance(editModal);
+                        modalInstance?.hide();
+
+                        // Fire clean modal messaging instead of standard banners
                         A.showSuccessModal('Commission Cancelled', data.message || 'Your commission has been cancelled.');
-                        loadCommissions();
+
+                        // Hot filter local state arrays so the UI updates instantly without refreshing
+                        allCommissions = allCommissions.filter(c => {
+                            const cId = parseInt(c.commission_id || c.id || 0);
+                            return cId !== cancelledId;
+                        });
+
+                        applyFilters();
                     } else {
-                        showEditAlert(data?.message || 'Failed to cancel commission.');
+                        A.showErrorModal(data?.message || 'Failed to cancel commission.');
                     }
                 } catch (err) {
                     console.error('Cancel commission error:', err);
-                    showEditAlert('Network error — please try again.');
+                    A.showErrorModal('Network error — please try again.');
                 } finally {
                     A.btnReset(editCancelBtn, 'Cancel Commission');
                 }
@@ -558,17 +608,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const t = e.target.closest('.open-review-btn');
         if (!t) return;
 
-        // 1. Get the commission ID
         const commissionId = t.getAttribute('data-commission-id');
-
-        // 2. Extract the proof URL string stored in your card layout button properties
         const proofUrl = t.getAttribute('data-proof-url');
 
         if (typeof window.initReviewModal === 'function') {
-            // Pass both values down into the updated execution pipeline
             window.initReviewModal(commissionId, proofUrl);
+        } else {
+            console.error('initReviewModal is not loaded on this window scope context.');
         }
     });
+
+    // ── Highlight card linked from profile ─────────────────────
+    const highlightId = new URLSearchParams(location.search).get('highlight');
+    if (highlightId) {
+        // Wait for cards to render, then scroll & flash
+        const tryHighlight = (attempts = 0) => {
+            const card = document.querySelector(`[data-commission-id="${highlightId}"]`);
+            if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                card.classList.add('commission-highlight');
+                setTimeout(() => card.classList.remove('commission-highlight'), 2500);
+            } else if (attempts < 15) {
+                setTimeout(() => tryHighlight(attempts + 1), 200);
+            }
+        };
+        tryHighlight();
+    }
     // ── Boot ───────────────────────────────────────────────────
 
     loadCommissions();

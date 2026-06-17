@@ -73,7 +73,7 @@
                         <button type="button"
                                 class="btn-artovia-outline py-1 px-3 fs-fluid-xs rounded-2 restore-commission-btn"
                                 data-commission-id="${c.commission_id}">
-                            <i class="bi bi-arrow-counterclockwise me-1"></i>Restore
+                            <i class="bi bi-arrow-counterclockwise me-1" style="-webkit-text-stroke: 2px;"></i>
                         </button>
                         <button type="button"
                                 class="btn btn-sm btn-outline-danger py-1 px-3 fs-fluid-xs rounded-2 delete-commission-btn"
@@ -90,7 +90,7 @@
 
         if (role === 'admin') {
             return `<button type="button"
-                        class="btn-danger text-white py-1 px-3 fs-fluid-xs rounded-2"
+                        class="btn-outline text-white py-1 px-3 fs-fluid-xs rounded-2"
                         data-bs-toggle="modal" data-bs-target="#editCommissionModal"
                         data-commission-id="${c.commission_id}">Moderate</button>`;
         }

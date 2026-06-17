@@ -20,7 +20,6 @@
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/profile.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/settings.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/home.css">
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/inbox.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/artwork-card.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/home.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/profile.css">
@@ -112,14 +111,6 @@
                             </button>
                             <a class="btn text-light fw-bold glass-card fs-fluid-xs"
                                 href="<?php echo BASE_URL; ?>login">LOG IN</a>
-                            <button class="navbar-toggler d-lg-none border-secondary ms-1" type="button"
-                                data-bs-toggle="collapse"
-                                data-bs-target="#accountActionsNav"
-                                aria-controls="accountActionsNav"
-                                aria-expanded="false"
-                                aria-label="Toggle navigation menu">
-                                <span class="navbar-toggler-icon"></span>
-                            </button>
                         </div>
                     <?php endif; ?>
 
