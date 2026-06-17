@@ -75,7 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                                 <div class="artist-card__actions d-flex p-2 p-sm-3 pt-0 gap-2 mt-auto">
                                     <a href="${BASE_URL}profile?id=${a.account_id}&role=artist" class="btn-artovia-outline text-center flex-grow-1 p-2 py-1.5 rounded-2 fs-fluid-xs">Profile</a>
-                                    <a href="${BASE_URL}commissions/create?artist=${a.artist_id}" class="btn-artovia-primary text-center flex-grow-1 p-2 py-1.5 rounded-2 fs-fluid-xs">Hire</a>
                                 </div>
 
                             </div>

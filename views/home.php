@@ -261,7 +261,7 @@
                     <div class="gold-divider"></div>
                     <h2 class="section__title mb-0">Top talent on Artovia</h2>
                 </div>
-                <a href="<?= BASE_URL ?>commissions" class="btn-artovia-outline">
+                <a href="<?= BASE_URL ?>artists" class="btn-artovia-outline">
                     View All Artists
                 </a>
             </div>

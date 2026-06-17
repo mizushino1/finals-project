@@ -191,6 +191,27 @@
             .replace(/'/g, '&#039;');
     };
 
+    function renderRatingStars(rating) {
+        const numericRating = parseFloat(rating) || 0;
+        let starsHtml = '';
+        
+        // Loop through 5 stars
+        for (let i = 1; i <= 5; i++) {
+            if (numericRating >= i) {
+                // Full Star
+                starsHtml += `<i class="bi bi-star-fill text-warning me-1"></i>`;
+            } else if (numericRating > i - 1 && numericRating < i) {
+                // Half Star (e.g., 4.5)
+                starsHtml += `<i class="bi bi-star-half text-warning me-1"></i>`;
+            } else {
+                // Empty Star
+                starsHtml += `<i class="bi bi-star text-muted me-1"></i>`;
+            }
+        }
+        
+        return starsHtml;
+    }
+
     // ── Expose globally ────────────────────────────────────────
 
     global.Artovia = Artovia;

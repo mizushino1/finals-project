@@ -49,71 +49,74 @@ document.addEventListener('DOMContentLoaded', () => {
     function buildCard(artist, index, opts = {}) {
         const { isTopArtist = false, rank = null } = opts;
 
-        const isOpen = artist.is_available == 1;
-        const name = artist.username ?? 'Unknown';
-        const price = artist.starting_rate ?? '0';
-        const priceNum = parseFloat(price);
+        const isOpen = artist.is_available == 1; //
+        const name = artist.username ?? 'Unknown'; //
+        const price = artist.starting_rate ?? '0'; //
+        const priceNum = parseFloat(price); //
 
-        const avatarHtml = artist.avatar_url
-            ? `<img src="${BASE_URL}${artist.avatar_url}" class="rounded-circle w-100 h-100 object-fit-cover" alt="${name}">`
-            : initialsAvatar(name, index);
+        // Capture dynamic ratings from backend payload
+        // Adjust the property name ('avg_rating' or 'rating') to match your backend column
+        const ratingNum = parseFloat(artist.avg_rating ?? artist.rating ?? 0);
+        const ratingDisplay = ratingNum > 0 ? ratingNum.toFixed(1) : '—';
 
-        const coverStyle = COVER_GRADIENTS[index % COVER_GRADIENTS.length];
+        const avatarHtml = artist.avatar_url //
+            ? `<img src="${BASE_URL}${artist.avatar_url}" class="rounded-circle w-100 h-100 object-fit-cover" alt="${name}">` //
+            : initialsAvatar(name, index); //
 
-        const rankBadge = rank !== null
-            ? `<span class="artist-card__rank position-absolute d-flex align-items-center justify-content-center rounded-circle fw-bold shadow-sm">#${rank}</span>`
-            : '';
+        const coverStyle = COVER_GRADIENTS[index % COVER_GRADIENTS.length]; //
 
-        const badgeClass = isOpen ? 'artist-card__badge--open' : 'artist-card__badge--closed';
-        const badgeText = isOpen ? 'Open' : 'Closed';
+        const rankBadge = rank !== null //
+            ? `<span class="artist-card__rank position-absolute d-flex align-items-center justify-content-center rounded-circle fw-bold shadow-sm">#${rank}</span>` //
+            : ''; //
 
-        const priceDisplay = priceNum > 0
-            ? `₱${priceNum.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-            : 'Free';
+        const badgeClass = isOpen ? 'artist-card__badge--open' : 'artist-card__badge--closed'; //
+        const badgeText = isOpen ? 'Open' : 'Closed'; //
 
-        // Direct Routing URL Query Configuration Parameter String targeting the Inbox module
-        const chatInboxUrl = `${BASE_URL}messages?target_id=${artist.account_id}&name=${encodeURIComponent(name)}`;
+        const priceDisplay = priceNum > 0 //
+            ? `₱${priceNum.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` //
+            : 'Free'; //
+
+        const chatInboxUrl = `${BASE_URL}messages?target_id=${artist.account_id}&name=${encodeURIComponent(name)}`; //
 
         return `
-<div class="col" data-id="${artist.artist_id}" data-price="${price}" data-open="${isOpen ? 1 : 0}">
-    <div class="artist-card h-100 border rounded-3 position-relative d-flex flex-column shadow-sm overflow-visible bg-card">
-        
-        <div class="artist-card__cover position-relative w-100 d-flex align-items-end px-3" style="background:${coverStyle};">
-            <div class="artist-card__avatar rounded-circle border p-0 position-absolute start-0 end-0 mx-auto shadow-sm bg-card d-flex align-items-center justify-content-center">${avatarHtml}</div>
-            ${rankBadge}
-            <button class="artist-card__wishlist position-absolute d-flex align-items-center justify-content-center rounded-circle border-0" aria-label="Add to wishlist" data-active="0">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                </svg>
-            </button>
-        </div>
-
-        <div class="artist-card__body p-2 p-sm-3 d-flex flex-column gap-1 flex-grow-1">
-            <div class="artist-card__header d-flex align-items-start justify-content-between gap-1">
-                <span class="artist-card__name text-truncate fw-bold text-capitalize">${name}</span>
-                <span class="artist-card__rating d-inline-flex align-items-center gap-1 fw-bold text-nowrap">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                    4.8
-                </span>
-            </div>
-            <p class="artist-card__tag m-0 text-muted small">Commission Artist</p>
-
-            <div class="artist-card__meta d-flex align-items-center justify-content-between mt-auto pt-2 gap-1 flex-wrap">
-                <span class="artist-card__badge d-inline-flex align-items-center fw-bold text-uppercase ${badgeClass}">${badgeText}</span>
-                <span class="artist-card__starting fw-bold text-nowrap">from ${priceDisplay}</span>
-            </div>
-        </div>
-
-        <div class="artist-card__actions d-flex p-2 p-sm-3 pt-0 gap-2 mt-auto align-items-center">
-            <a href="${BASE_URL}profile?id=${artist.account_id}&role=artist" class="btn-artovia-outline text-center flex-grow-1 p-2 py-1.5 rounded-2">Profile</a>
+    <div class="col" data-id="${artist.artist_id}" data-price="${price}" data-open="${isOpen ? 1 : 0}">
+        <div class="artist-card h-100 border rounded-3 position-relative d-flex flex-column shadow-sm overflow-visible bg-card">
             
-            <a href="${chatInboxUrl}" class="btn-artovia-primary d-inline-flex align-items-center justify-content-center p-2 rounded-2" style="width: 40px; height: 38px;" title="Message ${name}">
-                <i class="bi bi-chat-dots-fill"></i>
-            </a>
+            <div class="artist-card__cover position-relative w-100 d-flex align-items-end px-3" style="background:${coverStyle};">
+                <div class="artist-card__avatar rounded-circle border p-0 position-absolute start-0 end-0 mx-auto shadow-sm bg-card d-flex align-items-center justify-content-center">${avatarHtml}</div>
+                ${rankBadge}
+                <button class="artist-card__wishlist position-absolute d-flex align-items-center justify-content-center rounded-circle border-0" aria-label="Add to wishlist" data-active="0">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                </button>
+            </div>
+    
+            <div class="artist-card__body p-2 p-sm-3 d-flex flex-column gap-1 flex-grow-1">
+                <div class="artist-card__header d-flex align-items-start justify-content-between gap-1">
+                    <span class="artist-card__name text-truncate fw-bold text-capitalize">${name}</span>
+                    <span class="artist-card__rating d-inline-flex align-items-center gap-1 fw-bold text-nowrap">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                        ${ratingDisplay}
+                    </span>
+                </div>
+                <p class="artist-card__tag m-0 text-muted small">Commission Artist</p>
+    
+                <div class="artist-card__meta d-flex align-items-center justify-content-between mt-auto pt-2 gap-1 flex-wrap">
+                    <span class="artist-card__badge d-inline-flex align-items-center fw-bold text-uppercase ${badgeClass}">${badgeText}</span>
+                    <span class="artist-card__starting fw-bold text-nowrap">from ${priceDisplay}</span>
+                </div>
+            </div>
+    
+            <div class="artist-card__actions d-flex p-2 p-sm-3 pt-0 gap-2 mt-auto align-items-center">
+                <a href="${BASE_URL}profile?id=${artist.account_id}&role=artist" class="btn-artovia-outline text-center flex-grow-1 p-2 py-1.5 rounded-2">Profile</a>
+                <a href="${chatInboxUrl}" class="btn-artovia-primary d-inline-flex align-items-center justify-content-center p-2 rounded-2" style="width: 40px; height: 38px;" title="Message ${name}">
+                    <i class="bi bi-chat-dots-fill"></i>
+                </a>
+            </div>
+    
         </div>
-
-    </div>
-</div>`;
+    </div>`;
     }
 
     function renderCards(container, artists, opts = {}) {

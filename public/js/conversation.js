@@ -116,13 +116,12 @@
         // ── Text content ──────────────────────────────────────────────────────
         if (msg.message_content) {
             const textNode = document.createElement('span');
-            textNode.classList.add('text-dark')
             textNode.innerHTML = escapeHtml(msg.message_content);
             bubble.appendChild(textNode);
         }
 
         if (isMine) {
-            bubble.style.background = 'var(--clr-gold)';
+            bubble.style.background = '#c9a86c';
             bubble.style.color = '#fff';
             wrapper.appendChild(bubble);
             wrapper.appendChild(buildMsgAvatar(myAvatar, true));
