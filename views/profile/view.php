@@ -155,7 +155,7 @@ try {
                 <?php endif; ?>
 
                 <?php if ($is_artist_profile): ?>
-                    <span class="badge bg-success">Artist</span>
+                    <span class="badge theme-fill text-dark">Artist</span>
                     <small class="text-muted ms-2">
                         Starting Rate: ₱<?php echo number_format($profile['starting_rate'], 2); ?>
                     </small>

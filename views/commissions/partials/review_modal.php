@@ -13,7 +13,7 @@
 
                 <div id="reviewAlert" class="alert d-none" role="alert"></div>
 
-                <div id="proofDownloadSection" class="mb-4 p-3 rounded-3 border border-dashed text-center d-none">
+                <div id="proofDownloadSection" class="mb-4 p-3 rounded-3 theme-border text-center d-none">
                     <span class="d-block small fw-bold mb-2 text-uppercase tracking-wider" style="letter-spacing: 0.05em;">
                         Artist's Completed Work
                     </span>
