@@ -3,6 +3,7 @@
     const FETCH_API = window.location.origin + '/finals-project/api/messages/fetch.php';
     const SEND_API  = window.location.origin + '/finals-project/api/messages/send.php';
     const POLL_MS   = 3000;
+    const MAX_MB    = 5;
 
     // ── DOM References ────────────────────────────────────────────────────────
     const chatHeader            = document.getElementById('chatHeader');
@@ -14,12 +15,21 @@
     const inboxSidebarPanel     = document.getElementById('inboxSidebarPanel');
     const conversationContainer = document.getElementById('conversationContainer');
 
-    // ── State Variables ───────────────────────────────────────────────────────
+    // Photo-attach elements
+    const attachBtn         = document.getElementById('attachBtn');
+    const imageInput        = document.getElementById('imageInput');
+    const imagePreviewStrip = document.getElementById('imagePreviewStrip');
+    const imagePreviewThumb = document.getElementById('imagePreviewThumb');
+    const imagePreviewName  = document.getElementById('imagePreviewName');
+    const clearImageBtn     = document.getElementById('clearImageBtn');
+
+    // ── State ─────────────────────────────────────────────────────────────────
     let activeTargetAccountId = null;
     let loadedMessageIds      = new Set();
     let pollTimer             = null;
-    let activeContactAvatar   = null;  // avatar_url of the contact
-    let myAvatar              = null;  // avatar_url of the current user
+    let activeContactAvatar   = null;
+    let myAvatar              = null;
+    let pendingImageFile      = null;   // File object staged for send
 
     // ── Helpers ───────────────────────────────────────────────────────────────
     function escapeHtml(str) {
@@ -32,16 +42,24 @@
         if (messagePane) messagePane.scrollTop = messagePane.scrollHeight;
     }
 
-    // ── Avatar element builder (keeps original icon size: 1.2rem) ────────────
+    function showError(msg) {
+        if (!sendError) return;
+        sendError.textContent = msg;
+        sendError.style.display = 'block';
+    }
+
+    function clearError() {
+        if (sendError) sendError.style.display = 'none';
+    }
+
+    // ── Avatar Builder ────────────────────────────────────────────────────────
     function buildMsgAvatar(avatarUrl, isMine) {
         if (!avatarUrl) {
-            // Fallback: original icon, original size & color
             const i = document.createElement('i');
             i.className = 'bi bi-person-circle';
             i.style.cssText = `font-size:2rem; color:${isMine ? 'var(--clr-gold)' : 'var(--clr-text-muted)'}; flex-shrink:0;`;
             return i;
         }
-
         const img = document.createElement('img');
         img.src = (window.BASE_URL ?? '') + avatarUrl;
         img.alt = '';
@@ -58,28 +76,59 @@
     // ── Message Bubble Builder ────────────────────────────────────────────────
     function buildBubble(msg) {
         const userAccountId = window.CURRENT_ACCOUNT_ID ?? 0;
-        const isMine = parseInt(msg.sender_account_id, 10) === parseInt(userAccountId, 10);
-        const text   = escapeHtml(msg.message_content);
+        const isMine        = parseInt(msg.sender_account_id, 10) === parseInt(userAccountId, 10);
 
         const wrapper = document.createElement('div');
         wrapper.dataset.msgId = msg.message_id;
-        wrapper.className = 'd-flex align-items-start gap-2';
+        wrapper.className     = 'd-flex align-items-start gap-2';
         wrapper.style.justifyContent = isMine ? 'flex-end' : '';
 
         const bubble = document.createElement('div');
-        bubble.className = 'p-3';
-        bubble.style.cssText = `border-radius:var(--radius-md); max-width:75%; word-break:break-word;`;
-        bubble.innerHTML = text;
+        bubble.className  = 'p-3';
+        bubble.style.cssText = `
+            border-radius: var(--radius-md);
+            max-width: 75%;
+            word-break: break-word;
+        `;
+
+        // ── Image attachment ──────────────────────────────────────────────────
+        if (msg.image_url) {
+            const imageUrl = msg.image_url;
+
+            const imgEl = document.createElement('img');
+            imgEl.src   = imageUrl;
+            imgEl.alt   = 'Sent image';
+            imgEl.style.cssText = `
+                display: block;
+                max-width: 100%;
+                max-height: 300px;
+                border-radius: var(--radius-sm, 6px);
+                cursor: pointer;
+                margin-bottom: ${msg.message_content ? '0.5rem' : '0'};
+            `;
+
+            // Click → open full-size in new tab
+            imgEl.addEventListener('click', () => window.open(imageUrl, '_blank'));
+
+            bubble.appendChild(imgEl);
+        }
+
+        // ── Text content ──────────────────────────────────────────────────────
+        if (msg.message_content) {
+            const textNode = document.createElement('span');
+            textNode.innerHTML = escapeHtml(msg.message_content);
+            bubble.appendChild(textNode);
+        }
 
         if (isMine) {
             bubble.style.background = 'var(--clr-gold)';
-            bubble.style.color = '#fff';
+            bubble.style.color      = '#fff';
             wrapper.appendChild(bubble);
             wrapper.appendChild(buildMsgAvatar(myAvatar, true));
         } else {
             bubble.classList.add('theme-border');
-            bubble.style.borderWidth = '1px';
-            bubble.style.background = 'var(--clr-bg-card)';
+            bubble.style.borderWidth  = '1px';
+            bubble.style.background   = 'var(--clr-bg-card)';
             wrapper.appendChild(buildMsgAvatar(activeContactAvatar, false));
             wrapper.appendChild(bubble);
         }
@@ -104,18 +153,18 @@
         if (hasNewContent) scrollToBottom();
     }
 
-    // ── Message Data Polling ──────────────────────────────────────────────────
+    // ── Polling ───────────────────────────────────────────────────────────────
     async function loadMessages() {
         if (!activeTargetAccountId) return;
         try {
             const res = await fetch(`${FETCH_API}?action=messages&target_id=${activeTargetAccountId}`);
             if (!res.ok) return;
-
             const json = await res.json();
             if (json.success && Array.isArray(json.data)) {
                 if (json.data.length === 0) {
                     const placeholder = document.getElementById('msgPlaceholder');
-                    if (placeholder) placeholder.innerHTML = '<div class="text-center text-muted p-4 fs-fluid-xs">No messages yet. Send a wave!</div>';
+                    if (placeholder) placeholder.innerHTML =
+                        '<div class="text-center text-muted p-4 fs-fluid-xs">No messages yet. Send a wave!</div>';
                     return;
                 }
                 appendMessages(json.data);
@@ -125,63 +174,152 @@
         }
     }
 
+    // ── Switch Conversation ───────────────────────────────────────────────────
     function switchConversation(targetAccountId, targetName, contactAvatarUrl, myAvatarUrl) {
         clearInterval(pollTimer);
         activeTargetAccountId = targetAccountId;
         activeContactAvatar   = contactAvatarUrl ?? null;
         myAvatar              = myAvatarUrl ?? null;
         loadedMessageIds.clear();
+        clearStagedImage();
 
         if (chatHeader) chatHeader.textContent = targetName;
-        if (msgInput) { msgInput.removeAttribute('disabled'); msgInput.value = ''; }
-        if (sendBtn)  sendBtn.removeAttribute('disabled');
-        if (sendError) sendError.style.display = 'none';
+        if (msgInput)  { msgInput.removeAttribute('disabled'); msgInput.value = ''; }
+        if (sendBtn)   sendBtn.removeAttribute('disabled');
+        if (attachBtn) attachBtn.removeAttribute('disabled');
+        clearError();
 
         if (messagePane) {
-            messagePane.innerHTML = '<div class="text-center text-muted fs-fluid-xs" id="msgPlaceholder">Loading messages…</div>';
+            messagePane.innerHTML =
+                '<div class="text-center text-muted fs-fluid-xs" id="msgPlaceholder">Loading messages…</div>';
         }
 
         loadMessages();
         pollTimer = setInterval(loadMessages, POLL_MS);
     }
 
-    // ── Outbound Message Handlers ─────────────────────────────────────────────
+    // ── Image Staging ─────────────────────────────────────────────────────────
+    function stageImage(file) {
+        if (!file) return;
+
+        if (file.size > MAX_MB * 1024 * 1024) {
+            showError(`Image must be under ${MAX_MB} MB.`);
+            imageInput.value = '';
+            return;
+        }
+
+        pendingImageFile = file;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            if (imagePreviewThumb) imagePreviewThumb.src = e.target.result;
+            if (imagePreviewName)  imagePreviewName.textContent = file.name;
+            if (imagePreviewStrip) imagePreviewStrip.classList.remove('d-none');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function clearStagedImage() {
+        pendingImageFile = null;
+        if (imageInput)        imageInput.value = '';
+        if (imagePreviewThumb) imagePreviewThumb.src = '';
+        if (imagePreviewName)  imagePreviewName.textContent = '';
+        if (imagePreviewStrip) imagePreviewStrip.classList.add('d-none');
+    }
+
+    // ── Send Message ──────────────────────────────────────────────────────────
     async function sendMessage() {
         if (!msgInput || !sendBtn) return;
+
         const textContent = msgInput.value.trim();
-        if (!textContent || !activeTargetAccountId) return;
+        if (!textContent && !pendingImageFile) return;
+        if (!activeTargetAccountId) return;
 
         sendBtn.disabled = true;
-        if (sendError) sendError.style.display = 'none';
+        if (attachBtn) attachBtn.disabled = true;
+        clearError();
 
         try {
-            const res = await fetch(SEND_API, {
-                method  : 'POST',
-                headers : { 'Content-Type': 'application/json' },
-                body    : JSON.stringify({
-                    receiver_id: activeTargetAccountId,
-                    message_content: textContent
-                }),
-            });
+            let res;
+
+            if (pendingImageFile) {
+                // Multipart upload when an image is attached
+                const form = new FormData();
+                form.append('receiver_id',     activeTargetAccountId);
+                form.append('message_content', textContent);
+                form.append('image',           pendingImageFile, pendingImageFile.name);
+
+                res = await fetch(SEND_API, { method: 'POST', body: form });
+            } else {
+                // JSON for text-only messages (unchanged behaviour)
+                res = await fetch(SEND_API, {
+                    method  : 'POST',
+                    headers : { 'Content-Type': 'application/json' },
+                    body    : JSON.stringify({
+                        receiver_id     : activeTargetAccountId,
+                        message_content : textContent,
+                    }),
+                });
+            }
+
             const json = await res.json();
 
             if (json.success) {
                 msgInput.value = '';
+                clearStagedImage();
+
+                // Append the returned message immediately, or fall back to polling
                 json.data ? appendMessages([json.data]) : loadMessages();
                 document.dispatchEvent(new CustomEvent('artovia:refreshThreads'));
-            } else if (sendError) {
-                sendError.textContent = json.message || 'Could not send message.';
-                sendError.style.display = 'block';
+            } else {
+                showError(json.message || 'Could not send message.');
             }
         } catch (e) {
-            if (sendError) {
-                sendError.textContent = 'Network error. Please try again.';
-                sendError.style.display = 'block';
-            }
+            showError('Network error. Please try again.');
         } finally {
-            sendBtn.disabled = false;
+            sendBtn.disabled  = false;
+            if (attachBtn) attachBtn.disabled = false;
             msgInput.focus();
         }
+    }
+
+    // ── Image Input Events ────────────────────────────────────────────────────
+    if (attachBtn) {
+        attachBtn.addEventListener('click', () => imageInput?.click());
+    }
+
+    if (imageInput) {
+        imageInput.addEventListener('change', () => {
+            const file = imageInput.files?.[0];
+            if (file) stageImage(file);
+        });
+    }
+
+    if (clearImageBtn) {
+        clearImageBtn.addEventListener('click', () => {
+            clearStagedImage();
+            clearError();
+        });
+    }
+
+    // Drag-and-drop onto the message pane
+    if (messagePane) {
+        messagePane.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            messagePane.style.outline = '2px dashed var(--clr-gold)';
+        });
+
+        messagePane.addEventListener('dragleave', () => {
+            messagePane.style.outline = '';
+        });
+
+        messagePane.addEventListener('drop', (e) => {
+            e.preventDefault();
+            messagePane.style.outline = '';
+            if (!activeTargetAccountId) return;
+            const file = e.dataTransfer.files?.[0];
+            if (file && file.type.startsWith('image/')) stageImage(file);
+        });
     }
 
     // ── Mobile Navigation ─────────────────────────────────────────────────────
@@ -189,8 +327,8 @@
         mobileChatBackButton.addEventListener('click', () => {
             clearInterval(pollTimer);
             activeTargetAccountId = null;
-            if (conversationContainer) conversationContainer.classList.remove('active-mobile-view');
-            if (inboxSidebarPanel) inboxSidebarPanel.classList.add('active-mobile-view');
+            conversationContainer?.classList.remove('active-mobile-view');
+            inboxSidebarPanel?.classList.add('active-mobile-view');
         });
     }
 

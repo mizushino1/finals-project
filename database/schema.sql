@@ -334,3 +334,11 @@ CREATE TABLE review_tbl (
     FOREIGN KEY (reviewer_account_id) REFERENCES account_tbl(account_id) ON DELETE CASCADE,
     FOREIGN KEY (commission_id)       REFERENCES commission_tbl(commission_id) ON DELETE SET NULL
 );
+
+ALTER TABLE message_tbl
+    ADD COLUMN image_id INT NULL DEFAULT NULL,
+    ADD CONSTRAINT fk_message_image
+        FOREIGN KEY (image_id) REFERENCES image_tbl(image_id) ON DELETE SET NULL;
+
+ALTER TABLE message_tbl
+    MODIFY COLUMN message_content TEXT NULL;

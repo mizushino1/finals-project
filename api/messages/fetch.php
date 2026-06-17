@@ -24,7 +24,7 @@ if ($role === 'admin') {
 }
 
 try {
-    // RESOLVE SUB-PROFILE ID TO TRUE ACCOUNT_ID 
+    // ── Resolve sub-profile ID → true account_id ──────────────────────────────
     $currentAccountId = null;
 
     if ($role === 'artist') {
@@ -50,6 +50,11 @@ try {
                 latest.message_content      AS last_message,
                 latest.sent_at              AS last_sent_at,
                 COALESCE(unread.cnt, 0)     AS unread_count,
+                -- show '[Photo]' preview when last message is image-only
+                CASE
+                    WHEN latest.message_content IS NULL AND latest.image_id IS NOT NULL THEN '[Photo]'
+                    ELSE latest.message_content
+                END AS last_message,
                 (
                     SELECT img.image_url
                     FROM image_tbl img
@@ -88,7 +93,7 @@ try {
             $currentAccountId,
             $currentAccountId,
             $currentAccountId,
-            $currentAccountId
+            $currentAccountId,
         ]);
 
         $conversations = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -96,7 +101,7 @@ try {
         exit;
     }
 
-    // ── ACTION 2: FETCH INDIVIDUAL MESSAGES HISTORY ───────────────────
+    // ── ACTION 2: FETCH INDIVIDUAL MESSAGE HISTORY ────────────────────────────
     if ($action === 'messages') {
         $targetId = isset($_GET['target_id']) ? (int)$_GET['target_id'] : 0;
 
@@ -106,23 +111,31 @@ try {
             exit;
         }
 
-        // 1. Mark incoming unread messages from this target user as read
+        // Mark incoming unread messages from this contact as read
         $updateStmt = $db->prepare("
-            UPDATE message_tbl 
+            UPDATE message_tbl
             SET status_id = (SELECT status_id FROM status_tbl WHERE LOWER(status_name) = 'read')
-            WHERE sender_account_id = ? 
-              AND receiver_account_id = ? 
+            WHERE sender_account_id   = ?
+              AND receiver_account_id = ?
               AND status_id = (SELECT status_id FROM status_tbl WHERE LOWER(status_name) = 'unread')
         ");
         $updateStmt->execute([$targetId, $currentAccountId]);
 
-        // 2. Fetch all chronological dialog exchanges
+        // Fetch chronological messages, including optional image_url
         $stmt = $db->prepare("
-            SELECT message_id, sender_account_id, receiver_account_id, message_content, sent_at, status_id 
-            FROM message_tbl
-            WHERE (sender_account_id = ? AND receiver_account_id = ?)
-               OR (sender_account_id = ? AND receiver_account_id = ?)
-            ORDER BY sent_at ASC
+            SELECT
+                m.message_id,
+                m.sender_account_id,
+                m.receiver_account_id,
+                m.message_content,
+                m.sent_at,
+                m.status_id,
+                img.image_url AS image_url
+            FROM message_tbl m
+            LEFT JOIN image_tbl img ON img.image_id = m.image_id
+            WHERE (m.sender_account_id = ? AND m.receiver_account_id = ?)
+               OR (m.sender_account_id = ? AND m.receiver_account_id = ?)
+            ORDER BY m.sent_at ASC
         ");
         $stmt->execute([$currentAccountId, $targetId, $targetId, $currentAccountId]);
         $messages = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -131,9 +144,9 @@ try {
         exit;
     }
 
-    // Fallback error if an action parameter is requested that isn't handled above
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => "Unknown action: {$action}"]);
+
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
