@@ -67,6 +67,28 @@ $statusColors = [
             </a>
         </div>
 
+        <div class="row g-4 mb-4">
+            <div class="col-md-8">
+                <div class="card theme-border p-4 h-100" style="background: var(--clr-bg-card);">
+                    <h5 class="mb-3">Quick Actions</h5>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="<?= BASE_URL ?>admin" class="btn btn-outline-secondary">Dashboard</a>
+                        <a href="<?= BASE_URL ?>admin/users" class="btn btn-outline-secondary">Manage Users</a>
+                        <a href="<?= BASE_URL ?>admin/commissions" class="btn btn-outline-secondary">Review Commissions</a>
+                        <a href="<?= BASE_URL ?>admin/payments" class="btn btn-outline-secondary">Payment Records</a>
+                        <a href="<?= BASE_URL ?>admin/reports" class="btn btn-outline-secondary">Reports</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card theme-border p-4 h-100 d-flex align-items-center justify-content-center"
+                    style="background: var(--clr-bg-card);">
+                    <h6 class="text-muted mb-0">System Status: <span class="text-success fw-bold">Operational</span>
+                    </h6>
+                </div>
+            </div>
+        </div>
+
         <div class="row g-4 mb-5">
             <div class="col-md-3">
                 <div class="card theme-border p-4 h-100" style="background: var(--clr-bg-card);">
@@ -113,40 +135,40 @@ $statusColors = [
                     </thead>
                     <tbody>
                         <?php if (empty($commissions)): ?>
-                        <tr>
-                            <td class="p-3 text-muted text-center" colspan="6">No commissions found.</td>
-                        </tr>
+                            <tr>
+                                <td class="p-3 text-muted text-center" colspan="6">No commissions found.</td>
+                            </tr>
                         <?php else: ?>
                             <?php foreach ($commissions as $c): ?>
-                            <tr style="border-bottom: 1px solid var(--clr-border);" data-commission-id="<?= (int) $c['commission_id'] ?>">
-                                <td class="p-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="rounded-circle me-3"
-                                            style="width: 40px; height: 40px; background: var(--clr-gold-light);"></div>
-                                        <div>
-                                            <div class="fw-bold"><?= htmlspecialchars($c['client_first_name'] . ' ' . $c['client_last_name']) ?></div>
-                                            <small class="text-muted">ID: #C-<?= (int) $c['commission_id'] ?></small>
+                                <tr style="border-bottom: 1px solid var(--clr-border);" data-commission-id="<?= (int) $c['commission_id'] ?>">
+                                    <td class="p-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded-circle me-3"
+                                                style="width: 40px; height: 40px; background: var(--clr-gold-light);"></div>
+                                            <div>
+                                                <div class="fw-bold"><?= htmlspecialchars($c['client_first_name'] . ' ' . $c['client_last_name']) ?></div>
+                                                <small class="text-muted">ID: #C-<?= (int) $c['commission_id'] ?></small>
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td class="p-3">
-                                    <?php if ($c['artist_first_name']): ?>
-                                        <?= htmlspecialchars($c['artist_first_name'] . ' ' . $c['artist_last_name']) ?>
-                                    <?php else: ?>
-                                        <span class="text-muted">Unassigned</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td class="p-3"><?= htmlspecialchars($c['category_name'] ?? 'Uncategorized') ?></td>
-                                <td class="p-3">
-                                    <?php $color = $statusColors[$c['commission_status']] ?? 'var(--clr-text-muted)'; ?>
-                                    <span class="badge"
-                                        style="background-color: <?= $color ?>; color: white;"><?= htmlspecialchars($c['commission_status']) ?></span>
-                                </td>
-                                <td class="p-3">₱<?= number_format((float) $c['price'], 2) ?></td>
-                                <td class="p-3 text-end">
-                                    <button class="btn btn-sm btn-danger js-remove-listing" data-commission-id="<?= (int) $c['commission_id'] ?>">Remove</button>
-                                </td>
-                            </tr>
+                                    </td>
+                                    <td class="p-3">
+                                        <?php if ($c['artist_first_name']): ?>
+                                            <?= htmlspecialchars($c['artist_first_name'] . ' ' . $c['artist_last_name']) ?>
+                                        <?php else: ?>
+                                            <span class="text-muted">Unassigned</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="p-3"><?= htmlspecialchars($c['category_name'] ?? 'Uncategorized') ?></td>
+                                    <td class="p-3">
+                                        <?php $color = $statusColors[$c['commission_status']] ?? 'var(--clr-text-muted)'; ?>
+                                        <span class="badge"
+                                            style="background-color: <?= $color ?>; color: white;"><?= htmlspecialchars($c['commission_status']) ?></span>
+                                    </td>
+                                    <td class="p-3">₱<?= number_format((float) $c['price'], 2) ?></td>
+                                    <td class="p-3 text-end">
+                                        <button class="btn btn-sm btn-danger js-remove-listing" data-commission-id="<?= (int) $c['commission_id'] ?>">Remove</button>
+                                    </td>
+                                </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </tbody>
@@ -157,26 +179,30 @@ $statusColors = [
 </main>
 
 <script>
-document.querySelectorAll('.js-remove-listing').forEach(btn => {
-    btn.addEventListener('click', async () => {
-        if (!confirm('Remove this commission listing and all related records?')) return;
+    document.querySelectorAll('.js-remove-listing').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            if (!confirm('Remove this commission listing and all related records?')) return;
 
-        const commissionId = btn.dataset.commissionId;
-        try {
-            const res = await fetch('<?= BASE_URL ?>api/admin/remove_listing.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ commission_id: commissionId })
-            });
-            const data = await res.json();
-            if (data.success) {
-                btn.closest('tr').remove();
-            } else {
-                alert(data.message || 'Failed to remove listing.');
+            const commissionId = btn.dataset.commissionId;
+            try {
+                const res = await fetch('<?= BASE_URL ?>api/admin/remove_listing.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        commission_id: commissionId
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    btn.closest('tr').remove();
+                } else {
+                    alert(data.message || 'Failed to remove listing.');
+                }
+            } catch (err) {
+                alert('Network error while removing listing.');
             }
-        } catch (err) {
-            alert('Network error while removing listing.');
-        }
+        });
     });
-});
 </script>

@@ -61,6 +61,7 @@ $recentRequests = $stmtRecent->fetchAll(PDO::FETCH_ASSOC);
                 <div class="card theme-border p-4 h-100" style="background: var(--clr-bg-card);">
                     <h5 class="mb-3">Quick Actions</h5>
                     <div class="d-flex gap-2 flex-wrap">
+                        <a href="<?= BASE_URL ?>admin" class="btn btn-outline-secondary">Dashboard</a>
                         <a href="<?= BASE_URL ?>admin/users" class="btn btn-outline-secondary">Manage Users</a>
                         <a href="<?= BASE_URL ?>admin/commissions" class="btn btn-outline-secondary">Review Commissions</a>
                         <a href="<?= BASE_URL ?>admin/payments" class="btn btn-outline-secondary">Payment Records</a>
@@ -123,32 +124,32 @@ $recentRequests = $stmtRecent->fetchAll(PDO::FETCH_ASSOC);
                     </thead>
                     <tbody>
                         <?php if (empty($recentRequests)): ?>
-                        <tr>
-                            <td class="p-3 text-muted text-center" colspan="5">No recent commission requests.</td>
-                        </tr>
+                            <tr>
+                                <td class="p-3 text-muted text-center" colspan="5">No recent commission requests.</td>
+                            </tr>
                         <?php else: ?>
                             <?php foreach ($recentRequests as $req): ?>
-                            <tr style="border-bottom: 1px solid var(--clr-border);" data-commission-id="<?= (int) $req['commission_id'] ?>">
-                                <td class="p-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="rounded-circle me-3"
-                                            style="width: 40px; height: 40px; background: var(--clr-gold-light);"></div>
-                                        <div>
-                                            <div class="fw-bold"><?= htmlspecialchars($req['client_first_name'] . ' ' . $req['client_last_name']) ?></div>
-                                            <small class="text-muted">ID: #C-<?= (int) $req['commission_id'] ?></small>
+                                <tr style="border-bottom: 1px solid var(--clr-border);" data-commission-id="<?= (int) $req['commission_id'] ?>">
+                                    <td class="p-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded-circle me-3"
+                                                style="width: 40px; height: 40px; background: var(--clr-gold-light);"></div>
+                                            <div>
+                                                <div class="fw-bold"><?= htmlspecialchars($req['client_first_name'] . ' ' . $req['client_last_name']) ?></div>
+                                                <small class="text-muted">ID: #C-<?= (int) $req['commission_id'] ?></small>
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td class="p-3"><?= htmlspecialchars($req['category_name'] ?? 'Uncategorized') ?></td>
-                                <td class="p-3">
-                                    <span class="badge"
-                                        style="background-color: var(--clr-open); color: white;"><?= htmlspecialchars($req['request_status']) ?></span>
-                                </td>
-                                <td class="p-3">₱<?= number_format((float) $req['price'], 2) ?></td>
-                                <td class="p-3 text-end">
-                                    <button class="btn btn-sm btn-danger js-remove-listing" data-commission-id="<?= (int) $req['commission_id'] ?>">Remove</button>
-                                </td>
-                            </tr>
+                                    </td>
+                                    <td class="p-3"><?= htmlspecialchars($req['category_name'] ?? 'Uncategorized') ?></td>
+                                    <td class="p-3">
+                                        <span class="badge"
+                                            style="background-color: var(--clr-open); color: white;"><?= htmlspecialchars($req['request_status']) ?></span>
+                                    </td>
+                                    <td class="p-3">₱<?= number_format((float) $req['price'], 2) ?></td>
+                                    <td class="p-3 text-end">
+                                        <button class="btn btn-sm btn-danger js-remove-listing" data-commission-id="<?= (int) $req['commission_id'] ?>">Remove</button>
+                                    </td>
+                                </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </tbody>
@@ -159,26 +160,30 @@ $recentRequests = $stmtRecent->fetchAll(PDO::FETCH_ASSOC);
 </main>
 
 <script>
-document.querySelectorAll('.js-remove-listing').forEach(btn => {
-    btn.addEventListener('click', async () => {
-        if (!confirm('Remove this commission listing and all related records?')) return;
+    document.querySelectorAll('.js-remove-listing').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            if (!confirm('Remove this commission listing and all related records?')) return;
 
-        const commissionId = btn.dataset.commissionId;
-        try {
-            const res = await fetch('<?= BASE_URL ?>api/admin/remove_listing.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ commission_id: commissionId })
-            });
-            const data = await res.json();
-            if (data.success) {
-                btn.closest('tr').remove();
-            } else {
-                alert(data.message || 'Failed to remove listing.');
+            const commissionId = btn.dataset.commissionId;
+            try {
+                const res = await fetch('<?= BASE_URL ?>api/admin/remove_listing.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        commission_id: commissionId
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    btn.closest('tr').remove();
+                } else {
+                    alert(data.message || 'Failed to remove listing.');
+                }
+            } catch (err) {
+                alert('Network error while removing listing.');
             }
-        } catch (err) {
-            alert('Network error while removing listing.');
-        }
+        });
     });
-});
 </script>

@@ -75,6 +75,28 @@ $statusColors = [
         </div>
 
         <div class="row g-4 mb-4">
+            <div class="col-md-8">
+                <div class="card theme-border p-4 h-100" style="background: var(--clr-bg-card);">
+                    <h5 class="mb-3">Quick Actions</h5>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="<?= BASE_URL ?>admin" class="btn btn-outline-secondary">Dashboard</a>
+                        <a href="<?= BASE_URL ?>admin/users" class="btn btn-outline-secondary">Manage Users</a>
+                        <a href="<?= BASE_URL ?>admin/commissions" class="btn btn-outline-secondary">Review Commissions</a>
+                        <a href="<?= BASE_URL ?>admin/payments" class="btn btn-outline-secondary">Payment Records</a>
+                        <a href="<?= BASE_URL ?>admin/reports" class="btn btn-outline-secondary">Reports</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card theme-border p-4 h-100 d-flex align-items-center justify-content-center"
+                    style="background: var(--clr-bg-card);">
+                    <h6 class="text-muted mb-0">System Status: <span class="text-success fw-bold">Operational</span>
+                    </h6>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
             <div class="col-md-4">
                 <div class="card theme-border p-4" style="background: var(--clr-bg-card);">
                     <h6 class="text-muted">Total Processed</h6>
@@ -110,38 +132,37 @@ $statusColors = [
                     </thead>
                     <tbody>
                         <?php if (empty($payments)): ?>
-                        <tr>
-                            <td class="p-3 text-muted text-center" colspan="6">No payment records found.</td>
-                        </tr>
+                            <tr>
+                                <td class="p-3 text-muted text-center" colspan="6">No payment records found.</td>
+                            </tr>
                         <?php else: ?>
                             <?php foreach ($payments as $p): ?>
-                            <?php $isPaid = strcasecmp($p['payment_status'], 'Paid') === 0; ?>
-                            <tr style="border-bottom: 1px solid var(--clr-border);">
-                                <td class="p-3">#TXN-<?= (int) $p['transaction_id'] ?></td>
-                                <td class="p-3"><?= htmlspecialchars($p['client_first_name'] . ' ' . $p['client_last_name']) ?></td>
-                                <td class="p-3">
-                                    <span class="badge bg-light text-dark"><?= htmlspecialchars($p['payment_method_name']) ?></span>
-                                </td>
-                                <td class="p-3 fw-bold">₱<?= number_format((float) $p['amount'], 2) ?></td>
-                                <td class="p-3">
-                                    <?php $color = $statusColors[$p['payment_status']] ?? 'var(--clr-text-muted)'; ?>
-                                    <span class="badge" style="background-color: <?= $color ?>; color: white;"><?= htmlspecialchars($p['payment_status']) ?></span>
-                                </td>
-                                <td class="p-3 text-end">
-                                    <?php if ($isPaid): ?>
-                                        <button
-                                            type="button"
-                                            class="btn btn-sm btn-outline-secondary js-view-receipt"
-                                            data-transaction-id="<?= (int) $p['transaction_id'] ?>"
-                                            data-payment-method="<?= htmlspecialchars($p['payment_method_name']) ?>"
-                                            data-amount="<?= number_format((float) $p['amount'], 2) ?>"
-                                            data-date="<?= date('M d, Y h:i A', strtotime($p['payment_date'])) ?>"
-                                        >View</button>
-                                    <?php else: ?>
-                                        <span class="text-muted small">—</span>
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
+                                <?php $isPaid = strcasecmp($p['payment_status'], 'Paid') === 0; ?>
+                                <tr style="border-bottom: 1px solid var(--clr-border);">
+                                    <td class="p-3">#TXN-<?= (int) $p['transaction_id'] ?></td>
+                                    <td class="p-3"><?= htmlspecialchars($p['client_first_name'] . ' ' . $p['client_last_name']) ?></td>
+                                    <td class="p-3">
+                                        <span class="badge bg-light text-dark"><?= htmlspecialchars($p['payment_method_name']) ?></span>
+                                    </td>
+                                    <td class="p-3 fw-bold">₱<?= number_format((float) $p['amount'], 2) ?></td>
+                                    <td class="p-3">
+                                        <?php $color = $statusColors[$p['payment_status']] ?? 'var(--clr-text-muted)'; ?>
+                                        <span class="badge" style="background-color: <?= $color ?>; color: white;"><?= htmlspecialchars($p['payment_status']) ?></span>
+                                    </td>
+                                    <td class="p-3 text-end">
+                                        <?php if ($isPaid): ?>
+                                            <button
+                                                type="button"
+                                                class="btn btn-sm btn-outline-secondary js-view-receipt"
+                                                data-transaction-id="<?= (int) $p['transaction_id'] ?>"
+                                                data-payment-method="<?= htmlspecialchars($p['payment_method_name']) ?>"
+                                                data-amount="<?= number_format((float) $p['amount'], 2) ?>"
+                                                data-date="<?= date('M d, Y h:i A', strtotime($p['payment_date'])) ?>">View</button>
+                                        <?php else: ?>
+                                            <span class="text-muted small">—</span>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </tbody>
@@ -206,15 +227,15 @@ $statusColors = [
 </div>
 
 <script>
-document.querySelectorAll('.js-view-receipt').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.getElementById('receiptTransactionId').textContent = '#' + btn.dataset.transactionId;
-        document.getElementById('receiptPaymentMethod').textContent = btn.dataset.paymentMethod;
-        document.getElementById('receiptAmount').textContent = '₱' + btn.dataset.amount;
-        document.getElementById('receiptDate').textContent = btn.dataset.date;
+    document.querySelectorAll('.js-view-receipt').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById('receiptTransactionId').textContent = '#' + btn.dataset.transactionId;
+            document.getElementById('receiptPaymentMethod').textContent = btn.dataset.paymentMethod;
+            document.getElementById('receiptAmount').textContent = '₱' + btn.dataset.amount;
+            document.getElementById('receiptDate').textContent = btn.dataset.date;
 
-        const modalEl = document.getElementById('paymentReceiptModal');
-        bootstrap.Modal.getOrCreateInstance(modalEl).show();
+            const modalEl = document.getElementById('paymentReceiptModal');
+            bootstrap.Modal.getOrCreateInstance(modalEl).show();
+        });
     });
-});
 </script>
