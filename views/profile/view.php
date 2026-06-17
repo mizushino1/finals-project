@@ -189,11 +189,6 @@ try {
                 <span class="profile-stat-label">Following</span>
             </div>
 
-            <div class="profile-stat">
-                <span class="profile-stat-value">0</span>
-                <span class="profile-stat-label">Likes</span>
-            </div>
-
             <?php if ($is_artist_profile): ?>
                 <div class="profile-stat">
                     <span class="profile-stat-value profile-reviews-badge" id="stat-avg-rating">
