@@ -15,54 +15,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── DOM refs ───────────────────────────────────────────────
 
-    const grid              = document.getElementById('commissionGrid');
-    const gridLoading       = document.getElementById('commissionGridLoading');
-    const gridError         = document.getElementById('commissionGridError');
-    const gridEmpty         = document.getElementById('commissionGridEmpty');
+    const grid = document.getElementById('commissionGrid');
+    const gridLoading = document.getElementById('commissionGridLoading');
+    const gridError = document.getElementById('commissionGridError');
+    const gridEmpty = document.getElementById('commissionGridEmpty');
 
-    const pendingStrip      = document.getElementById('pendingGrid');
+    const pendingStrip = document.getElementById('pendingGrid');
     const pendingStripLoading = document.getElementById('pendingGridLoading');
-    const pendingSection    = document.getElementById('pendingSection');
+    const pendingSection = document.getElementById('pendingSection');
 
-    const artistPendingSection  = document.getElementById('artistPendingSection');
-    const artistPendingGrid     = document.getElementById('artistPendingGrid');
-    const artistPendingLoading  = document.getElementById('artistPendingLoading');
-    const artistPendingEmpty    = document.getElementById('artistPendingEmpty');
-    const artistPendingBadge    = document.getElementById('artistPendingBadge');
+    const artistPendingSection = document.getElementById('artistPendingSection');
+    const artistPendingGrid = document.getElementById('artistPendingGrid');
+    const artistPendingLoading = document.getElementById('artistPendingLoading');
+    const artistPendingEmpty = document.getElementById('artistPendingEmpty');
+    const artistPendingBadge = document.getElementById('artistPendingBadge');
     const artistAcceptedSection = document.getElementById('artistAcceptedSection');
-    const artistAcceptedGrid    = document.getElementById('artistAcceptedGrid');
+    const artistAcceptedGrid = document.getElementById('artistAcceptedGrid');
     const artistAcceptedLoading = document.getElementById('artistAcceptedLoading');
-    const artistAcceptedEmpty   = document.getElementById('artistAcceptedEmpty');
-    const artistAcceptedBadge   = document.getElementById('artistAcceptedBadge');
+    const artistAcceptedEmpty = document.getElementById('artistAcceptedEmpty');
+    const artistAcceptedBadge = document.getElementById('artistAcceptedBadge');
 
     const searchInput = document.getElementById('searchInput');
-    const searchBtn   = document.getElementById('searchBtn');
-    const sortSelect  = document.getElementById('sortSelect');
-    const resultsNum  = document.getElementById('resultsNumber');
-    const clearBtn    = document.getElementById('clearFilters');
+    const searchBtn = document.getElementById('searchBtn');
+    const sortSelect = document.getElementById('sortSelect');
+    const resultsNum = document.getElementById('resultsNumber');
+    const clearBtn = document.getElementById('clearFilters');
 
     // Post commission modal
-    const submitBtn     = document.getElementById('submitCommissionBtn');
-    const titleInput    = document.getElementById('commissionTitle');
-    const descInput     = document.getElementById('commissionDescription');
-    const budgetInput   = document.getElementById('commissionBudget');
+    const submitBtn = document.getElementById('submitCommissionBtn');
+    const titleInput = document.getElementById('commissionTitle');
+    const descInput = document.getElementById('commissionDescription');
+    const budgetInput = document.getElementById('commissionBudget');
     const categoryInput = document.getElementById('commissionCategory');
-    const imageFile     = document.getElementById('commissionImageFile');
-    const imageName     = document.getElementById('commissionImageName');
-    const formAlert     = document.getElementById('commissionFormAlert');
+    const imageFile = document.getElementById('commissionImageFile');
+    const imageName = document.getElementById('commissionImageName');
+    const formAlert = document.getElementById('commissionFormAlert');
 
     // Edit commission modal
-    const editModal        = document.getElementById('editCommissionModal');
-    const editTitle        = document.getElementById('editCommissionTitle');
-    const editDesc         = document.getElementById('editCommissionDescription');
-    const editBudget       = document.getElementById('editCommissionBudget');
-    const editCategory     = document.getElementById('editCommissionCategory');
-    const editImageFile    = document.getElementById('editCommissionImageFile');
-    const editImageName    = document.getElementById('editCommissionImageName');
+    const editModal = document.getElementById('editCommissionModal');
+    const editTitle = document.getElementById('editCommissionTitle');
+    const editDesc = document.getElementById('editCommissionDescription');
+    const editBudget = document.getElementById('editCommissionBudget');
+    const editCategory = document.getElementById('editCommissionCategory');
+    const editImageFile = document.getElementById('editCommissionImageFile');
+    const editImageName = document.getElementById('editCommissionImageName');
     const editImagePreview = document.getElementById('editCommissionImagePreview');
-    const editAlert        = document.getElementById('editCommissionFormAlert');
-    const editSaveBtn      = document.getElementById('saveCommissionBtn');
-    const editCancelBtn    = document.getElementById('cancelCommissionBtn');
+    const editAlert = document.getElementById('editCommissionFormAlert');
+    const editSaveBtn = document.getElementById('saveCommissionBtn');
+    const editCancelBtn = document.getElementById('cancelCommissionBtn');
 
     let activeEditId = null;
 
@@ -73,11 +73,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function sortData(data, sortVal) {
         const list = [...data];
         switch (sortVal) {
-            case 'newest':      return list.sort((a, b) => new Date(b.commission_date || 0) - new Date(a.commission_date || 0));
-            case 'oldest':      return list.sort((a, b) => new Date(a.commission_date || 0) - new Date(b.commission_date || 0));
+            case 'newest': return list.sort((a, b) => new Date(b.commission_date || 0) - new Date(a.commission_date || 0));
+            case 'oldest': return list.sort((a, b) => new Date(a.commission_date || 0) - new Date(b.commission_date || 0));
             case 'budget_desc': return list.sort((a, b) => parseFloat(b.price ?? 0) - parseFloat(a.price ?? 0));
-            case 'budget_asc':  return list.sort((a, b) => parseFloat(a.price ?? 0) - parseFloat(b.price ?? 0));
-            default:            return list;
+            case 'budget_asc': return list.sort((a, b) => parseFloat(a.price ?? 0) - parseFloat(b.price ?? 0));
+            default: return list;
         }
     }
 
@@ -85,16 +85,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const budgetVal = document.querySelector('input[name="budget"]:checked')?.value ?? '0-999999';
         const statusVal = document.querySelector('input[name="status"]:checked')?.value ?? 'all';
         const searchVal = searchInput?.value.trim().toLowerCase() ?? '';
-        const sortVal   = sortSelect?.value ?? 'newest';
+        const sortVal = sortSelect?.value ?? 'newest';
 
         const [minPrice, maxPrice] = budgetVal.split('-').map(Number);
 
         let filtered = allCommissions.filter(c => {
-            const price          = parseFloat(c.price ?? 0);
-            const matchesBudget  = price >= minPrice && price <= maxPrice;
-            const matchesStatus  = statusVal === 'all' || parseInt(c.status_id) === parseInt(statusVal);
-            const searchIn       = [c.posted_by, c.description, c.category_name].map(s => (s || '').toLowerCase());
-            const matchesSearch  = !searchVal || searchIn.some(s => s.includes(searchVal));
+            const price = parseFloat(c.price ?? 0);
+            const matchesBudget = price >= minPrice && price <= maxPrice;
+            const matchesStatus = statusVal === 'all' || parseInt(c.status_id) === parseInt(statusVal);
+            const searchIn = [c.posted_by, c.description, c.category_name].map(s => (s || '').toLowerCase());
+            const matchesSearch = !searchVal || searchIn.some(s => s.includes(searchVal));
             return matchesBudget && matchesStatus && matchesSearch;
         });
 
@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         A.hide(gridEmpty);
 
         try {
-            const res  = await fetch(`${BASE}api/commissions/fetch.php`);
+            const res = await fetch(`${BASE}api/commissions/fetch.php`);
             const data = await res.json();
 
             A.hide(gridLoading);
@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const res  = await fetch(`${BASE}api/commissions/fetch_pending_requests.php`);
+            const res = await fetch(`${BASE}api/commissions/fetch_pending_requests.php`);
             const data = await res.json();
 
             A.hide(pendingStripLoading);
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const res  = await fetch(`${BASE}api/commissions/fetch_artist_commissions.php`);
+            const res = await fetch(`${BASE}api/commissions/fetch_artist_commissions.php`);
             const data = await res.json();
 
             A.hide(artistPendingLoading);
@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function openReviewModal(commissionId) {
         const reviewModalEl = document.getElementById('reviewModal');
-        const hiddenInput   = document.getElementById('reviewCommissionId');
+        const hiddenInput = document.getElementById('reviewCommissionId');
 
         if (!reviewModalEl) {
             console.error('Review modal not found in DOM.');
@@ -249,12 +249,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── Post commission modal ──────────────────────────────────
 
     function resetPostModal() {
-        if (titleInput)    titleInput.value    = '';
-        if (descInput)     descInput.value     = '';
-        if (budgetInput)   budgetInput.value   = '';
+        if (titleInput) titleInput.value = '';
+        if (descInput) descInput.value = '';
+        if (budgetInput) budgetInput.value = '';
         if (categoryInput) categoryInput.value = '';
-        if (imageFile)     imageFile.value     = '';
-        if (imageName)     imageName.textContent = '';
+        if (imageFile) imageFile.value = '';
+        if (imageName) imageName.textContent = '';
         A.hide(formAlert);
     }
 
@@ -268,27 +268,27 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.addEventListener('click', async () => {
             A.hide(formAlert);
 
-            const title       = titleInput?.value.trim()    ?? '';
-            const description = descInput?.value.trim()     ?? '';
-            const budget      = parseFloat(budgetInput?.value ?? 0);
+            const title = titleInput?.value.trim() ?? '';
+            const description = descInput?.value.trim() ?? '';
+            const budget = parseFloat(budgetInput?.value ?? 0);
             const category_id = parseInt(categoryInput?.value ?? 0);
 
-            if (!title)                        { A.showAlert(formAlert, 'Please provide a commission name.');            return; }
-            if (!description)                  { A.showAlert(formAlert, 'Please provide a project description.');        return; }
-            if (isNaN(budget) || budget <= 0)  { A.showAlert(formAlert, 'Please enter a valid budget higher than ₱0.'); return; }
-            if (!category_id)                  { A.showAlert(formAlert, 'Please select a category.');                   return; }
+            if (!title) { A.showAlert(formAlert, 'Please provide a commission name.'); return; }
+            if (!description) { A.showAlert(formAlert, 'Please provide a project description.'); return; }
+            if (isNaN(budget) || budget <= 0) { A.showAlert(formAlert, 'Please enter a valid budget higher than ₱0.'); return; }
+            if (!category_id) { A.showAlert(formAlert, 'Please select a category.'); return; }
 
             A.btnLoading(submitBtn, 'Posting…');
 
             try {
                 const formData = new FormData();
-                formData.append('title',       title);
+                formData.append('title', title);
                 formData.append('description', description);
-                formData.append('budget',      budget);
+                formData.append('budget', budget);
                 formData.append('category_id', category_id);
                 if (imageFile?.files[0]) formData.append('image', imageFile.files[0]);
 
-                const res  = await fetch(`${BASE}api/commissions/create.php`, { method: 'POST', body: formData });
+                const res = await fetch(`${BASE}api/commissions/create.php`, { method: 'POST', body: formData });
                 const data = await res.json();
 
                 if (data?.success) {
@@ -325,23 +325,23 @@ document.addEventListener('DOMContentLoaded', () => {
             A.hide(editAlert);
 
             // Reset fields while fetching
-            if (editTitle)    editTitle.value        = '';
-            if (editDesc)     editDesc.value         = '';
-            if (editBudget)   editBudget.value       = '';
-            if (editCategory) editCategory.value     = '';
+            if (editTitle) editTitle.value = '';
+            if (editDesc) editDesc.value = '';
+            if (editBudget) editBudget.value = '';
+            if (editCategory) editCategory.value = '';
             if (editImageName) editImageName.textContent = '';
             if (editImagePreview) { editImagePreview.src = ''; A.hide(editImagePreview); }
 
             try {
-                const res  = await fetch(`${BASE}api/commissions/manage.php?commission_id=${commissionId}`);
+                const res = await fetch(`${BASE}api/commissions/manage.php?commission_id=${commissionId}`);
                 const data = await res.json();
 
                 if (!data?.success) { showEditAlert(data?.message || 'Failed to load commission data.'); return; }
 
                 const d = data.data;
-                if (editTitle)    editTitle.value    = d.title       ?? '';
-                if (editDesc)     editDesc.value     = d.description ?? '';
-                if (editBudget)   editBudget.value   = d.price       ?? '';
+                if (editTitle) editTitle.value = d.title ?? '';
+                if (editDesc) editDesc.value = d.description ?? '';
+                if (editBudget) editBudget.value = d.price ?? '';
                 if (editCategory) editCategory.value = d.category_id ?? '';
 
                 if (editImagePreview && d.image_url) {
@@ -376,29 +376,29 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!activeEditId) return;
             A.hide(editAlert);
 
-            const title       = editTitle?.value.trim()    ?? '';
-            const description = editDesc?.value.trim()     ?? '';
-            const budget      = parseFloat(editBudget?.value ?? 0);
+            const title = editTitle?.value.trim() ?? '';
+            const description = editDesc?.value.trim() ?? '';
+            const budget = parseFloat(editBudget?.value ?? 0);
             const category_id = parseInt(editCategory?.value ?? 0);
 
-            if (!title)                        { showEditAlert('Please provide a commission name.');            return; }
-            if (!description)                  { showEditAlert('Please provide a project description.');        return; }
-            if (isNaN(budget) || budget <= 0)  { showEditAlert('Please enter a valid budget higher than ₱0.'); return; }
-            if (!category_id)                  { showEditAlert('Please select a category.');                   return; }
+            if (!title) { showEditAlert('Please provide a commission name.'); return; }
+            if (!description) { showEditAlert('Please provide a project description.'); return; }
+            if (isNaN(budget) || budget <= 0) { showEditAlert('Please enter a valid budget higher than ₱0.'); return; }
+            if (!category_id) { showEditAlert('Please select a category.'); return; }
 
             A.btnLoading(editSaveBtn, 'Saving…');
 
             try {
                 const formData = new FormData();
                 formData.append('commission_id', activeEditId);
-                formData.append('action',        'update');
-                formData.append('title',         title);
-                formData.append('description',   description);
-                formData.append('budget',        budget);
-                formData.append('category_id',   category_id);
+                formData.append('action', 'update');
+                formData.append('title', title);
+                formData.append('description', description);
+                formData.append('budget', budget);
+                formData.append('category_id', category_id);
                 if (editImageFile?.files[0]) formData.append('image', editImageFile.files[0]);
 
-                const res  = await fetch(`${BASE}api/commissions/manage.php`, { method: 'POST', body: formData });
+                const res = await fetch(`${BASE}api/commissions/manage.php`, { method: 'POST', body: formData });
                 const data = await res.json();
 
                 if (data?.success) {
@@ -420,31 +420,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (editCancelBtn) {
-        editCancelBtn.addEventListener('click', async () => {
+        editCancelBtn.addEventListener('click', () => {
             if (!activeEditId) return;
-            if (!confirm('Are you sure you want to cancel this commission? This cannot be undone.')) return;
 
-            A.btnLoading(editCancelBtn, 'Cancelling…');
+            A.showConfirmModal('Are you sure you want to cancel this commission? This cannot be undone.', async () => {
+                A.btnLoading(editCancelBtn, 'Cancelling…');
+                try {
+                    const data = await A.postJSON(`${BASE}api/commissions/manage.php`, {
+                        commission_id: activeEditId,
+                        action: 'cancel',
+                    });
 
-            try {
-                const data = await A.postJSON(`${BASE}api/commissions/manage.php`, {
-                    commission_id: activeEditId,
-                    action:        'cancel',
-                });
-
-                if (data?.success) {
-                    bootstrap.Modal.getInstance(editModal)?.hide();
-                    A.showSuccessModal('Commission Cancelled', data.message || 'Your commission has been cancelled.');
-                    loadCommissions();
-                } else {
-                    showEditAlert(data?.message || 'Failed to cancel commission.');
+                    if (data?.success) {
+                        bootstrap.Modal.getInstance(editModal)?.hide();
+                        A.showSuccessModal('Commission Cancelled', data.message || 'Your commission has been cancelled.');
+                        loadCommissions();
+                    } else {
+                        showEditAlert(data?.message || 'Failed to cancel commission.');
+                    }
+                } catch (err) {
+                    console.error('Cancel commission error:', err);
+                    showEditAlert('Network error — please try again.');
+                } finally {
+                    A.btnReset(editCancelBtn, 'Cancel Commission');
                 }
-            } catch (err) {
-                console.error('Cancel commission error:', err);
-                showEditAlert('Network error — please try again.');
-            } finally {
-                A.btnReset(editCancelBtn, 'Cancel Commission');
-            }
+            });
         });
     }
 
@@ -452,17 +452,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('input[type="radio"]').forEach(r => r.addEventListener('change', applyFilters));
     if (sortSelect) sortSelect.addEventListener('change', applyFilters);
-    if (searchBtn)  searchBtn.addEventListener('click', applyFilters);
+    if (searchBtn) searchBtn.addEventListener('click', applyFilters);
     if (searchInput) searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') applyFilters(); });
 
     if (clearBtn) {
         clearBtn.addEventListener('click', () => {
             const budgetAll = document.querySelector('input[name="budget"][value="0-999999"]');
             const statusAll = document.querySelector('input[name="status"][value="all"]');
-            if (budgetAll)  budgetAll.checked = true;
-            if (statusAll)  statusAll.checked = true;
+            if (budgetAll) budgetAll.checked = true;
+            if (statusAll) statusAll.checked = true;
             if (searchInput) searchInput.value = '';
-            if (sortSelect)  sortSelect.value  = 'newest';
+            if (sortSelect) sortSelect.value = 'newest';
             applyFilters();
         });
     }
@@ -507,22 +507,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (t.classList.contains('restore-commission-btn')) {
             const commissionId = parseInt(t.getAttribute('data-commission-id'));
             if (!commissionId) return;
-            if (!confirm('Restore this commission? It will be set back to Active and open for artists to apply.')) return;
 
-            t.disabled = true;
-            A.postJSON(`${BASE}api/commissions/update_status.php`, {
-                commission_id: commissionId,
-                status: 'active',
-            }).then(data => {
-                if (data?.success) {
-                    loadCommissions();
-                } else {
-                    alert(data?.message || 'Failed to restore commission.');
+            A.showConfirmModal('Restore this commission? It will be set back to Active and open for artists to apply.', () => {
+                t.disabled = true;
+                A.postJSON(`${BASE}api/commissions/update_status.php`, {
+                    commission_id: commissionId,
+                    status: 'active',
+                }).then(data => {
+                    if (data?.success) {
+                        loadCommissions();
+                    } else {
+                        A.showErrorModal(data?.message || 'Failed to restore commission.');
+                        t.disabled = false;
+                    }
+                }).catch(() => {
+                    A.showErrorModal('Network error — please try again.');
                     t.disabled = false;
-                }
-            }).catch(() => {
-                alert('Network error — please try again.');
-                t.disabled = false;
+                });
             });
             return;
         }
@@ -531,26 +532,43 @@ document.addEventListener('DOMContentLoaded', () => {
         if (t.classList.contains('delete-commission-btn')) {
             const commissionId = parseInt(t.getAttribute('data-commission-id'));
             if (!commissionId) return;
-            if (!confirm('Permanently delete this commission? This cannot be undone.')) return;
 
-            t.disabled = true;
-            A.postJSON(`${BASE}api/commissions/delete.php`, {
-                commission_id: commissionId,
-            }).then(data => {
-                if (data?.success) {
-                    loadCommissions();
-                } else {
-                    alert(data?.message || 'Failed to delete commission.');
+            A.showConfirmModal('Permanently delete this commission? This cannot be undone.', () => {
+                t.disabled = true;
+                A.postJSON(`${BASE}api/commissions/delete.php`, {
+                    commission_id: commissionId,
+                }).then(data => {
+                    if (data?.success) {
+                        loadCommissions();
+                    } else {
+                        A.showErrorModal(data?.message || 'Failed to delete commission.');
+                        t.disabled = false;
+                    }
+                }).catch(() => {
+                    A.showErrorModal('Network error — please try again.');
                     t.disabled = false;
-                }
-            }).catch(() => {
-                alert('Network error — please try again.');
-                t.disabled = false;
+                });
             });
             return;
         }
     });
 
+    // ── Handle Client Review & Pay Modal Launch ────────────────────────
+    grid.addEventListener('click', (e) => {
+        const t = e.target.closest('.open-review-btn');
+        if (!t) return;
+
+        // 1. Get the commission ID
+        const commissionId = t.getAttribute('data-commission-id');
+
+        // 2. Extract the proof URL string stored in your card layout button properties
+        const proofUrl = t.getAttribute('data-proof-url');
+
+        if (typeof window.initReviewModal === 'function') {
+            // Pass both values down into the updated execution pipeline
+            window.initReviewModal(commissionId, proofUrl);
+        }
+    });
     // ── Boot ───────────────────────────────────────────────────
 
     loadCommissions();

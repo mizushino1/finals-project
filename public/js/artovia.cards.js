@@ -13,9 +13,9 @@
     // Returns the appropriate CTA button HTML based on role & status.
 
     function buildActionBtn(c) {
-        const role     = A.config.currentRole;
+        const role = A.config.currentRole;
         const statusId = parseInt(c.status_id);
-        const baseUrl  = A.config.baseUrl;
+        const baseUrl = A.config.baseUrl;
 
         if (role === 'artist') {
             if (statusId === 1) {
@@ -46,11 +46,25 @@
                                 data-request-id="${c.request_id}">Accept</button>
                     </div>`;
             }
-            if (statusId === 6) {
+            if (statusId === 6) { // Completed
+                let rawPath = c.completion_proof_url || '';
+                let fullProofPath = '';
+
+                if (rawPath) {
+                    // If the database value already contains a path prefix, use it directly
+                    if (rawPath.startsWith('http') || rawPath.includes('/') || rawPath.includes('\\')) {
+                        fullProofPath = rawPath;
+                    } else {
+                        // Otherwise, if it's just a raw file name, prepend the folder path
+                        fullProofPath = 'uploads/proof/' + rawPath;
+                    }
+                }
+
                 return `<button type="button"
-                            class="btn btn-warning text-dark btn-review-trigger py-1 px-3 fs-fluid-xs rounded-2 fw-semibold shadow-sm"
-                            data-commission-id="${c.commission_id}">
-                            <i class="bi bi-star-fill me-1"></i>Review
+                            class="btn-artovia-primary open-review-btn py-1 px-3 fs-fluid-xs rounded-2"
+                            data-commission-id="${c.commission_id}"
+                            data-proof-url="${fullProofPath}">
+                            Review & Pay
                         </button>`;
             }
             if (statusId === 7) {
@@ -120,15 +134,15 @@
     // fixed-width card for the horizontal scroll strips.
 
     A.buildCard = function (c, index, compact = false) {
-        const clientName   = c.posted_by ?? 'Anonymous Client';
-        const [bg, fg]     = A.PALETTE[index % A.PALETTE.length];
-        const status       = A.getStatusConfig(c.status_id);
+        const clientName = c.posted_by ?? 'Anonymous Client';
+        const [bg, fg] = A.PALETTE[index % A.PALETTE.length];
+        const status = A.getStatusConfig(c.status_id);
         const { title, body } = A.parseDescription(c.description);
-        const budgetDisplay   = A.formatBudget(c.price);
-        const dateStr         = A.formatDate(c.commission_date);
-        const avatarHtml      = A.makeAvatar(clientName, index, c.client_avatar_url ?? c.avatar_url ?? null);
-        const categoryBadge   = A.makeCategoryBadge(c.category_name, bg, fg);
-        const actionBtn       = buildActionBtn(c);
+        const budgetDisplay = A.formatBudget(c.price);
+        const dateStr = A.formatDate(c.commission_date);
+        const avatarHtml = A.makeAvatar(clientName, index, c.client_avatar_url ?? c.avatar_url ?? null);
+        const categoryBadge = A.makeCategoryBadge(c.category_name, bg, fg);
+        const actionBtn = buildActionBtn(c);
 
         const refUrl = c.image_url ?? c.reference_image ?? c.reference_url ?? null;
         const refImg = refUrl
@@ -170,13 +184,13 @@
     // ── Pending request card (client view — inbound artist bids) ──
 
     A.buildRequestCard = function (r, index) {
-        const artistName  = r.artist_username ?? 'Unknown Artist';
-        const [bg, fg]    = A.PALETTE[index % A.PALETTE.length];
-        const { title }   = A.parseDescription(r.commission_description ?? '');
-        const pitch       = r.pitch_message?.trim() ?? null;
+        const artistName = r.artist_username ?? 'Unknown Artist';
+        const [bg, fg] = A.PALETTE[index % A.PALETTE.length];
+        const { title } = A.parseDescription(r.commission_description ?? '');
+        const pitch = r.pitch_message?.trim() ?? null;
         const budgetDisplay = A.formatBudget(r.price, 'Open');
-        const dateStr     = A.formatDate(r.requested_at, 'Recently');
-        const avatarHtml  = A.makeAvatar(artistName, index, r.artist_avatar_url ?? r.avatar_url ?? null);
+        const dateStr = A.formatDate(r.requested_at, 'Recently');
+        const avatarHtml = A.makeAvatar(artistName, index, r.artist_avatar_url ?? r.avatar_url ?? null);
         const categoryBadge = A.makeCategoryBadge(r.category_name, bg, fg);
 
         const pitchBlock = pitch
@@ -222,13 +236,13 @@
     // ── Artist pending card (artist view — outgoing applications) ──
 
     A.buildArtistPendingCard = function (r, index) {
-        const ownerName   = r.owner_username ?? 'Client';
-        const [bg, fg]    = A.PALETTE[index % A.PALETTE.length];
-        const { title }   = A.parseDescription(r.commission_description ?? '');
-        const pitch       = r.pitch_message?.trim() ?? null;
+        const ownerName = r.owner_username ?? 'Client';
+        const [bg, fg] = A.PALETTE[index % A.PALETTE.length];
+        const { title } = A.parseDescription(r.commission_description ?? '');
+        const pitch = r.pitch_message?.trim() ?? null;
         const budgetDisplay = A.formatBudget(r.price, 'Open');
-        const dateStr     = A.formatDate(r.requested_at, 'Recently');
-        const avatarHtml  = A.makeAvatar(ownerName, index, r.owner_avatar_url ?? r.avatar_url ?? null);
+        const dateStr = A.formatDate(r.requested_at, 'Recently');
+        const avatarHtml = A.makeAvatar(ownerName, index, r.owner_avatar_url ?? r.avatar_url ?? null);
         const categoryBadge = A.makeCategoryBadge(r.category_name, bg, fg);
 
         const pitchSnippet = pitch
@@ -273,14 +287,14 @@
     // ── Artist accepted card (artist view — active/completed work) ──
 
     A.buildArtistAcceptedCard = function (c, index) {
-        const ownerName   = c.owner_username ?? 'Client';
-        const [bg, fg]    = A.PALETTE[index % A.PALETTE.length];
-        const { title }   = A.parseDescription(c.commission_description ?? '');
-        const statusId    = parseInt(c.commission_status_id);
-        const status      = A.getStatusConfig(statusId);
+        const ownerName = c.owner_username ?? 'Client';
+        const [bg, fg] = A.PALETTE[index % A.PALETTE.length];
+        const { title } = A.parseDescription(c.commission_description ?? '');
+        const statusId = parseInt(c.commission_status_id);
+        const status = A.getStatusConfig(statusId);
         const budgetDisplay = A.formatBudget(c.price, 'Open');
-        const dateStr     = A.formatDate(c.commission_date);
-        const avatarHtml  = A.makeAvatar(ownerName, index, c.owner_avatar_url ?? c.avatar_url ?? null);
+        const dateStr = A.formatDate(c.commission_date);
+        const avatarHtml = A.makeAvatar(ownerName, index, c.owner_avatar_url ?? c.avatar_url ?? null);
         const categoryBadge = A.makeCategoryBadge(c.category_name, bg, fg);
 
         let actionBtn = '';
