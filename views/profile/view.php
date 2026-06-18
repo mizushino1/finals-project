@@ -162,16 +162,6 @@ try {
                 <?php endif; ?>
             </div>
 
-            <!-- Search -->
-            <div class="profile-search-wrapper ms-auto mt-1">
-                <i class="fas fa-search search-icon"></i>
-                <input type="search"
-                    class="profile-search-input"
-                    id="profile-search"
-                    placeholder="Search artworks"
-                    aria-label="Search artworks">
-            </div>
-
         </div><!-- /row -->
 
         <!-- Stats row -->

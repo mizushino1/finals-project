@@ -51,9 +51,6 @@ $recentRequests = $stmtRecent->fetchAll(PDO::FETCH_ASSOC);
                 <h2 class="joan mb-0">Admin Dashboard</h2>
                 <p class="text-muted mb-0">Overview of all things going on in Artovia Web</p>
             </div>
-            <a href="<?= BASE_URL ?>commissions/create-commission" class="btn btn-artovia-primary">
-                <i class="bi bi-plus-lg"></i> Create New Listing
-            </a>
         </div>
 
         <div class="row g-4 mb-4">
@@ -112,7 +109,7 @@ $recentRequests = $stmtRecent->fetchAll(PDO::FETCH_ASSOC);
                 <a href="<?= BASE_URL ?>admin/commissions" class="text-decoration-none" style="color: var(--clr-gold);">View All</a>
             </div>
             <div class="table-responsive">
-                <table class="table align-middle mb-0">
+                <table class="table align-middle mb-0 fs-fluid-3xs">
                     <thead style="background-color: var(--clr-bg-alt);">
                         <tr>
                             <th class="p-3">Client</th>

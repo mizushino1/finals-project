@@ -62,9 +62,6 @@ $statusColors = [
                 <h3 class="joan mb-0">Commissions</h3>
                 <p class="text-muted mb-0">Manage every commission listing on Artovia</p>
             </div>
-            <a href="<?= BASE_URL ?>commissions/create-commission" class="btn btn-artovia-primary">
-                <i class="bi bi-plus-lg"></i> Create New Listing
-            </a>
         </div>
 
         <div class="row g-4 mb-4">
@@ -122,7 +119,7 @@ $statusColors = [
                 <h5 class="mb-0">All Commission Listings</h5>
             </div>
             <div class="table-responsive">
-                <table class="table align-middle mb-0">
+                <table class="table align-middle mb-0 fs-fluid-3xs">
                     <thead style="background-color: var(--clr-bg-alt);">
                         <tr>
                             <th class="p-3">Client</th>

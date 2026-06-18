@@ -80,11 +80,11 @@ if ($txnId > 0) {
                     <!-- Footer -->
                     <div class="modal-footer border-0 p-4 d-flex gap-2">
                         <a href="<?= BASE_URL ?>payments/history"
-                            class="btn btn-outline-secondary flex-grow-1">
+                            class="btn btn-outline flex-grow-1">
                             View History
                         </a>
                         <a href="<?= BASE_URL ?>commissions"
-                            class="btn btn-artovia-primary flex-grow-1">
+                            class="btn btn-fill-static flex-grow-1">
                             Back to Commissions
                         </a>
                     </div>

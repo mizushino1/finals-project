@@ -21,10 +21,6 @@
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/settings.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/home.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/artwork-card.css">
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/home.css">
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/profile.css">
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>public/css/settings.css">
-
 
     <script>
         window.USER_ROLE = "<?php echo isset($_SESSION['role']) ? $_SESSION['role'] : 'guest'; ?>";
@@ -58,17 +54,16 @@
                         <?php if (isset($_SESSION['user_id'])): ?>
                             <a class="nav-link text-light fw-bold fs-fluid-sm"
                                 href="<?php echo BASE_URL; ?>messages">INBOX</a>
-                        <?php else: ?>
                         <?php endif; ?>
                         <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
                             <li><a class="nav-link text-light fw-bold fs-fluid-sm" href="<?= BASE_URL ?>admin">ADMIN</a></li>
                         <?php endif; ?>
                     </div>
 
-                    <!-- Spacer on small screens to push right side to the end -->
+                    <!-- Spacer on small screens -->
                     <div class="flex-grow-1 d-sm-none"></div>
 
-                    <!-- Right side — always stays here, never collapses -->
+                    <!-- Right side -->
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <div class="d-flex align-items-center gap-2 ms-auto">
                             <a href="<?php echo BASE_URL; ?>profile" class="nav-user-avatar text-decoration-none d-flex align-items-center gap-2 flex-shrink-0" title="View Profile">
@@ -77,6 +72,21 @@
 
                             <!-- Inline actions: only visible on large screens -->
                             <div class="d-none d-lg-flex align-items-center gap-1">
+
+                                <?php if (isset($_SESSION['role']) && strtolower($_SESSION['role']) === 'artist'): ?>
+                                    <a class="btn btn-sm text-light fw-bold border-0 bg-transparent"
+                                        href="<?php echo BASE_URL; ?>payments/transactions"
+                                        title="Transaction Records">
+                                        <i class="bi bi-receipt me-1 fs-5"></i>
+                                    </a>
+                                <?php elseif (isset($_SESSION['role']) && strtolower($_SESSION['role']) === 'user'): ?>
+                                    <a class="btn btn-sm text-light fw-bold border-0 bg-transparent"
+                                        href="<?php echo BASE_URL; ?>payments/history"
+                                        title="Payment History">
+                                        <i class="bi bi-receipt me-1 fs-5"></i>
+                                    </a>
+                                <?php endif; ?>
+
                                 <a class="btn btn-sm text-light fw-bold border-0 bg-transparent"
                                     href="<?php echo BASE_URL; ?>settings">
                                     <i class="bi bi-gear me-1 fs-5"></i>
@@ -116,7 +126,7 @@
 
                 </div>
 
-                <!-- Row 2: Collapsible account actions — hidden by default on ALL screen sizes -->
+                <!-- Collapsible account actions -->
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <div class="collapse w-100" id="accountActionsNav">
                         <div class="navbar-nav d-flex flex-column gap-2 ps-3 pt-2 pb-3 border-top border-secondary mt-2">
@@ -134,8 +144,21 @@
                                 <hr class="border-secondary my-1">
                             </div>
 
-                            <!-- Account actions: only shown in collapse on small screens -->
+                            <!-- Account actions in collapse -->
                             <div class="d-lg-none d-flex flex-column gap-2">
+                                <?php if (isset($_SESSION['role']) && strtolower($_SESSION['role']) === 'artist'): ?>
+                                    <a class="btn btn-sm text-light fw-bold border-0 bg-transparent"
+                                        href="<?php echo BASE_URL; ?>payments/transactions"
+                                        title="Transaction Records">
+                                        <i class="bi bi-receipt me-1 fs-5"></i>
+                                    </a>
+                                <?php elseif (isset($_SESSION['role']) && strtolower($_SESSION['role']) === 'user'): ?>
+                                    <a class="btn btn-sm text-light fw-bold border-0 bg-transparent"
+                                        href="<?php echo BASE_URL; ?>payments/history"
+                                        title="Payment History">
+                                        <i class="bi bi-receipt me-1 fs-5"></i>
+                                    </a>
+                                <?php endif; ?>
                                 <a class="nav-link text-light fw-bold fs-fluid-sm"
                                     href="<?php echo BASE_URL; ?>settings">
                                     <i class="bi bi-gear me-2"></i>Settings

@@ -27,6 +27,18 @@ document.addEventListener('DOMContentLoaded', () => {
         ['#e0e8d0', '#5a7a3a'],
     ];
 
+    // Adjust the property name to match your backend column if it differs
+    // (e.g. completed_commissions, commissions_completed, total_commissions, commission_count)
+    function getCommissionCount(artist) {
+        const raw = artist.completed_commissions
+            ?? artist.commissions_completed
+            ?? artist.total_commissions
+            ?? artist.commission_count
+            ?? 0;
+        const num = parseInt(raw, 10);
+        return Number.isNaN(num) ? 0 : num;
+    }
+
     function initialsAvatar(name, index) {
         const parts = name.trim().split(/[\s_]+/);
         const letter = (parts[0]?.[0] ?? '?').toUpperCase();
@@ -58,6 +70,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Adjust the property name ('avg_rating' or 'rating') to match your backend column
         const ratingNum = parseFloat(artist.avg_rating ?? artist.rating ?? 0);
         const ratingDisplay = ratingNum > 0 ? ratingNum.toFixed(1) : '—';
+
+        const commissionCount = getCommissionCount(artist);
+        const tagText = isTopArtist
+            ? `${commissionCount.toLocaleString('en-PH')} commission${commissionCount === 1 ? '' : 's'} done`
+            : 'Commission Artist';
 
         const avatarHtml = artist.avatar_url //
             ? `<img src="${BASE_URL}${artist.avatar_url}" class="rounded-circle w-100 h-100 object-fit-cover" alt="${name}">` //
@@ -100,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${ratingDisplay}
                     </span>
                 </div>
-                <p class="artist-card__tag m-0 text-muted small">Commission Artist</p>
+                <p class="artist-card__tag m-0 text-muted small">${tagText}</p>
     
                 <div class="artist-card__meta d-flex align-items-center justify-content-between mt-auto pt-2 gap-1 flex-wrap">
                     <span class="artist-card__badge d-inline-flex align-items-center fw-bold text-uppercase ${badgeClass}">${badgeText}</span>
@@ -219,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderCards(artistGrid, allArtists);
 
             const top5 = [...allArtists]
-                .sort((a, b) => parseFloat(b.starting_rate ?? 0) - parseFloat(a.starting_rate ?? 0))
+                .sort((a, b) => getCommissionCount(b) - getCommissionCount(a))
                 .slice(0, 5);
 
             if (topArtistsLoading) topArtistsLoading.classList.add('d-none');

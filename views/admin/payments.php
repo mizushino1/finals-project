@@ -69,9 +69,6 @@ $statusColors = [
                 <h2 class="joan mb-0">Payments Overview</h2>
                 <p class="text-muted mb-0">Track all financial transactions and payment gateway activities</p>
             </div>
-            <button class="btn btn-artovia-primary">
-                <i class="bi bi-download"></i> Export Reports
-            </button>
         </div>
 
         <div class="row g-4 mb-4">
@@ -119,7 +116,7 @@ $statusColors = [
 
         <div class="card theme-border border-0 shadow-sm p-0 overflow-hidden" style="background: var(--clr-bg-card);">
             <div class="table-responsive">
-                <table class="table align-middle mb-0">
+                <table class="table align-middle mb-0 fs-fluid-3xs">
                     <thead style="background-color: var(--clr-bg-alt);">
                         <tr>
                             <th class="p-3">Transaction ID</th>

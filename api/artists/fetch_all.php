@@ -24,7 +24,9 @@ try {
             art.artist_description,
             img.image_url AS avatar_url,
             -- Dynamically fetch average rating and cast to float (returns null if no reviews)
-            (SELECT ROUND(AVG(r.rating), 1) FROM review_tbl r WHERE r.artist_id = art.artist_id) AS avg_rating
+            (SELECT ROUND(AVG(r.rating), 1) FROM review_tbl r WHERE r.artist_id = art.artist_id) AS avg_rating,
+            -- Count of commissions this artist has completed (status_id 6 = Completed)
+            (SELECT COUNT(*) FROM commission_tbl c WHERE c.artist_id = art.artist_id AND c.status_id = 6) AS completed_commissions
         FROM account_tbl a
         JOIN account_status_tbl s ON a.account_status_id = s.account_status_id
         JOIN artist_tbl art ON a.account_id = art.account_id
@@ -39,6 +41,7 @@ try {
     // Ensure numeric types are properly cast for frontend use
     foreach ($artists as &$artist) {
         $artist['avg_rating'] = $artist['avg_rating'] !== null ? (float)$artist['avg_rating'] : null;
+        $artist['completed_commissions'] = (int)$artist['completed_commissions'];
     }
     unset($artist);
 

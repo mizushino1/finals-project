@@ -131,6 +131,7 @@ p, .roboto {
 .joan { font-family: var(--font-display); }
 
 /* Fluid font helpers */
+.fs-fluid-3xs  { font-size: clamp(0.50rem, 0.6vw,  0.65rem) !important; }
 .fs-fluid-xxs  { font-size: clamp(0.60rem, 0.7vw,  0.80rem) !important; }
 .fs-fluid-xs   { font-size: clamp(0.50rem, 1.0vw,  1.00rem) !important; }
 .fs-fluid-sm   { font-size: clamp(0.75rem, 1.5vw,  1.00rem) !important; }

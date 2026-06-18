@@ -71,7 +71,7 @@ $statusColors = [
                 <h5 class="mb-0">System User Management</h5>
             </div>
             <div class="table-responsive">
-                <table class="table align-middle mb-0">
+                <table class="table align-middle mb-0 fs-fluid-3xs">
                     <thead style="background-color: var(--clr-bg-alt);">
                         <tr>
                             <th class="p-3">Username</th>

@@ -101,8 +101,8 @@
 
     Artovia.makeCategoryBadge = function (category, bg, fg) {
         if (!category) return '';
-        return `<span class="badge rounded-pill fs-fluid-xxs fw-semibold text-uppercase mb-2"
-                      style="background:${bg};color:${fg};border:1px solid ${fg}33;letter-spacing:0.04em;">
+        return `<span class="badge rounded-pill text-dark fs-fluid-xxs fw-semibold theme-fill text-uppercase mb-2"
+                      style="letter-spacing:0.04em;">
                     ${category}
                 </span>`;
     };
