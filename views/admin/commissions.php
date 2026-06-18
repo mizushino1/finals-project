@@ -54,6 +54,128 @@ $statusColors = [
 ];
 ?>
 
+<style>
+    /* Modal Overlay - Slightly tinted dark overlay to match the warm palette */
+    .admin-modal {
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(25, 23, 20, 0.4);
+        /* Warm dark tint */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Modal Content Box - Styled like your dashboard cards */
+    .modal-content {
+        background-color: #ffffff;
+        padding: 24px;
+        border: 2px solid #c8b189;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 450px;
+        box-shadow: 0 10px 25px rgba(200, 177, 137, 0.15);
+        animation: fadeIn 0.2s ease-out;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    /* Heading matching your serif/dark dashboard typography */
+    .modal-header h3 {
+        margin: 0;
+        font-family: inherit;
+        color: #1a1a1a;
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+    .close-modal-btn {
+        font-size: 24px;
+        cursor: pointer;
+        color: #c8b189;
+        /* Uses the accent tan color */
+        transition: color 0.2s ease;
+    }
+
+    .close-modal-btn:hover {
+        color: #1a1a1a;
+    }
+
+    .modal-body {
+        color: #555555;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 24px;
+    }
+
+    .modal-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+
+    /* Button UI Basics */
+    .btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        border: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    /* Cancel Button - Subtle and clean */
+    .btn-secondary {
+        background-color: #f4f0e6;
+        /* Cream shade to match the dashboard vibe */
+        color: #555555;
+        border: 1px solid #e2dacb;
+    }
+
+    .btn-secondary:hover {
+        background-color: #eae3d2;
+        color: #1a1a1a;
+    }
+
+    /* Danger Button - The exact red from your dashboard screenshot */
+    .btn-danger {
+        background-color: #dc3545;
+        color: #fff;
+    }
+
+    .btn-danger:hover {
+        background-color: #bd2130;
+        /* Darker red on hover */
+    }
+
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-15px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
 <main class="py-5">
     <div class="container-fluid px-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -175,12 +297,83 @@ $statusColors = [
     </div>
 </main>
 
-<script>
-    document.querySelectorAll('.js-remove-listing').forEach(btn => {
-        btn.addEventListener('click', async () => {
-            if (!confirm('Remove this commission listing and all related records?')) return;
+<div id="deleteModal" class="admin-modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Confirm Deletion</h3>
+            <span class="close-modal-btn">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to remove this commission listing and all related records? This action cannot be undone.</p>
+            <div id="modalErrorMessage" style="display: none; color: #dc3545; font-size: 0.85rem; margin-top: 12px; font-weight: 600;"></div>
+        </div>
+        <div class="modal-footer">
+            <button id="cancelDeleteBtn" class="btn btn-secondary">Cancel</button>
+            <button id="confirmDeleteBtn" class="btn btn-danger">
+                <span class="btn-text">Remove Commission</span>
+                <span class="btn-spinner" style="display: none;">Removing...</span>
+            </button>
+        </div>
+    </div>
+</div>
 
-            const commissionId = btn.dataset.commissionId;
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const modal = document.getElementById('deleteModal');
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+        const cancelBtn = document.getElementById('cancelDeleteBtn');
+        const closeX = document.querySelector('.close-modal-btn');
+        const errorContainer = document.getElementById('modalErrorMessage');
+
+        let activeRowToRemove = null;
+        let activeCommissionId = null;
+
+        // Open modal on click
+        document.querySelectorAll('.js-remove-listing').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                activeRowToRemove = btn.closest('tr');
+                activeCommissionId = btn.dataset.commissionId;
+
+                // Clear previous error states if any
+                if (errorContainer) {
+                    errorContainer.style.display = 'none';
+                    errorContainer.textContent = '';
+                }
+
+                modal.style.display = 'flex';
+            });
+        });
+
+        // Cleanly close modal and reset actions
+        const closeModal = () => {
+            modal.style.display = 'none';
+            activeRowToRemove = null;
+            activeCommissionId = null;
+
+            confirmBtn.disabled = false;
+            confirmBtn.querySelector('.btn-text').style.display = 'inline';
+            confirmBtn.querySelector('.btn-spinner').style.display = 'none';
+        };
+
+        cancelBtn.addEventListener('click', closeModal);
+        closeX.addEventListener('click', closeModal);
+
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        // Handle AJAX Deletion inside the custom modal workflow
+        confirmBtn.addEventListener('click', async () => {
+            if (!activeCommissionId || !activeRowToRemove) return;
+
+            // Visual loading state
+            confirmBtn.disabled = true;
+            confirmBtn.querySelector('.btn-text').style.display = 'none';
+            confirmBtn.querySelector('.btn-spinner').style.display = 'inline';
+            if (errorContainer) errorContainer.style.display = 'none';
+
             try {
                 const res = await fetch('<?= BASE_URL ?>api/admin/remove_listing.php', {
                     method: 'POST',
@@ -188,17 +381,29 @@ $statusColors = [
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        commission_id: commissionId
+                        commission_id: activeCommissionId
                     })
                 });
+
                 const data = await res.json();
+
                 if (data.success) {
-                    btn.closest('tr').remove();
+                    activeRowToRemove.remove();
+                    closeModal();
                 } else {
-                    alert(data.message || 'Failed to remove listing.');
+                    throw new Error(data.message || 'Failed to remove listing.');
                 }
             } catch (err) {
-                alert('Network error while removing listing.');
+                // Display errors inside the modal UI itself instead of browser alerts
+                if (errorContainer) {
+                    errorContainer.textContent = err.message || 'Network error while removing listing.';
+                    errorContainer.style.display = 'block';
+                }
+
+                // Re-enable button so they can try again
+                confirmBtn.disabled = false;
+                confirmBtn.querySelector('.btn-text').style.display = 'inline';
+                confirmBtn.querySelector('.btn-spinner').style.display = 'none';
             }
         });
     });
